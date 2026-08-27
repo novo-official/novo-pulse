@@ -54,6 +54,7 @@ class DataValidator:
         findings += self._check_columns(frame)
         findings += self._check_leakage(frame)
         findings += self._check_outliers(frame)
+        findings += self._check_censoring(frame)
 
         score = 100
         for finding in findings:
@@ -335,6 +336,43 @@ class DataValidator:
                 )
             )
         return out[:5]
+
+    def _check_censoring(self, frame: pd.DataFrame) -> list[Finding]:
+        """Is the target capped by supply?
+
+        A censored target is not a data error - it is a modelling constraint
+        the reader has to know about, because "demand" that sits at capacity is
+        really "everything we had left to sell".
+        """
+        from .censoring import analyse
+
+        report = analyse(frame, self.contract)
+        if not report.enabled or report.censored_share <= 0.05:
+            return []
+
+        share = report.censored_share
+        severity = "medium" if share > 0.25 else "low"
+        return [
+            Finding(
+                code="demand_censoring",
+                severity=severity,
+                title="Target is capped by available capacity",
+                detail=(
+                    f"{share:.1%} of observations sit at or above capacity across "
+                    f"{report.affected_entities} entities. Observed demand understates "
+                    "true market demand for those periods."
+                ),
+                recommendation=(
+                    "Forecasts describe *bookable* demand, not unconstrained demand. "
+                    "The censoring report estimates the uplift where supply binds."
+                ),
+                context={
+                    "censored_share": round(share, 4),
+                    "affected_entities": report.affected_entities,
+                    "capacity_column": report.capacity_column,
+                },
+            )
+        ]
 
     def _check_outliers(self, frame: pd.DataFrame) -> list[Finding]:
         target = frame[TARGET].astype(float)

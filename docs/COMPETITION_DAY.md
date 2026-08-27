@@ -183,9 +183,31 @@ destination, weekday and month. Confirm:
 make train PROFILE=full HORIZON=90
 ```
 
-Enables more trees, more folds, and hyper-parameter search. Do **not** start
-this unless you have a working `competition` run already saved — a completed
-good run beats an unfinished perfect one.
+Enables more trees, more folds, and an Optuna search over LightGBM/CatBoost
+hyper-parameters. The search:
+
+- validates on a held-out **time** window, like everything else,
+- is hard-capped by `tuning.max_minutes` in `config/profiles.yaml`,
+- keeps the profile defaults unless it actually beats them,
+- reports every outcome in `reports/model_report.md` and on `/models`.
+
+Do **not** start this unless you have a working `competition` run already
+saved — a completed good run beats an unfinished perfect one.
+
+### If the target can hit a ceiling
+
+If the dataset has a capacity/availability column, declare it:
+
+```yaml
+target_options:
+  censoring_column: available_capacity
+  censoring_enabled: true
+```
+
+The pipeline then measures how much of the history sits at capacity and
+reports it. This matters for interpretation: a destination that looks flat may
+be flat only because it is full, and the forecast describes bookable demand
+rather than unconstrained demand.
 
 ## 14–15. Ensemble and final forecast
 

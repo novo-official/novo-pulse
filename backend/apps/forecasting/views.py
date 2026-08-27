@@ -223,6 +223,8 @@ def model_list(request):
             "uncertainty_method": metadata.get("uncertainty_method"),
             "environment": metadata.get("environment"),
             "warnings": metadata.get("warnings"),
+            "tuning": metrics.get("tuning") or [],
+            "censoring": metrics.get("censoring") or {},
         }
     return ok(payload)
 

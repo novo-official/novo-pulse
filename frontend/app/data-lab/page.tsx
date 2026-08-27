@@ -718,7 +718,11 @@ export default function DataLabPage() {
                 {run.warnings?.length ? (
                   <div className="mt-3 space-y-1">
                     {run.warnings.map((warning) => (
-                      <p key={warning} className="text-xs text-amber-700">
+                      <p
+                        key={warning}
+                        dir="ltr"
+                        className="text-left text-xs text-amber-700"
+                      >
                         • {warning}
                       </p>
                     ))}

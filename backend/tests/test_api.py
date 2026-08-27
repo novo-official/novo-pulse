@@ -395,3 +395,60 @@ def test_training_rejects_an_unknown_metric(client):
 def test_training_detail_404s_for_a_missing_run(client):
     response = client.get(reverse("training-detail", args=["nope"]))
     assert response.status_code == 404
+
+
+# --------------------------------------------------------------- path safety
+def test_local_path_registration_rejects_traversal(tmp_path):
+    """`../../etc/passwd` must not be readable through the Data Lab."""
+    from apps.datasets.services import register_local_file
+
+    for attempt in ("../../etc/passwd", "/etc/passwd", "data/../../etc/hosts"):
+        with pytest.raises((ValueError, FileNotFoundError)):
+            register_local_file(attempt)
+
+
+def test_local_path_registration_rejects_a_sibling_prefix_directory(tmp_path, monkeypatch):
+    """A directory whose name merely starts with the repo path is still outside it."""
+    from apps.datasets import services
+    from ml.paths import REPO_ROOT
+
+    sibling = tmp_path / "novo-pulse-backup"
+    sibling.mkdir()
+    secret = sibling / "secrets.csv"
+    secret.write_text("a,b\n1,2\n", encoding="utf-8")
+
+    monkeypatch.setattr(services, "REPO_ROOT", tmp_path / "novo-pulse")
+    (tmp_path / "novo-pulse").mkdir()
+
+    with pytest.raises(ValueError, match="inside the project"):
+        services.register_local_file(str(secret))
+
+
+@pytest.mark.parametrize(
+    "crafted",
+    [
+        "../../evil.csv",
+        "/etc/passwd.csv",
+        "a b;rm -rf /.csv",
+        "x/y/z.csv",
+        "..\\..\\windows.csv",
+        "sh -c 'curl evil'.csv",
+    ],
+)
+def test_upload_filename_cannot_escape_the_upload_directory(crafted, tmp_path):
+    """Whatever the client sends, the stored name must be a plain filename."""
+    from apps.datasets.services import UPLOAD_DIR, safe_filename
+
+    cleaned = safe_filename(crafted)
+    assert "/" not in cleaned and "\\" not in cleaned
+    assert ".." not in cleaned
+    # The resolved destination stays inside the upload directory.
+    assert (UPLOAD_DIR / cleaned).resolve().is_relative_to(UPLOAD_DIR.resolve())
+
+
+def test_upload_filename_keeps_a_legitimate_name_readable():
+    from apps.datasets.services import safe_filename
+
+    assert safe_filename("../../evil.csv") == "evil.csv"
+    assert safe_filename("/data/raw/Competition Data 2026.csv") == "Competition_Data_2026.csv"
+    assert safe_filename("x/y/z.parquet") == "z.parquet"

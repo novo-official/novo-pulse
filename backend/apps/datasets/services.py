@@ -57,8 +57,10 @@ def register_local_file(path: str | Path) -> Path:
     if not source.is_absolute():
         source = REPO_ROOT / source
     source = source.resolve()
-    # Never read outside the repository.
-    if not str(source).startswith(str(REPO_ROOT.resolve())):
+    # Never read outside the repository. A string prefix check is not enough:
+    # "/srv/novo-pulse-backup/secrets.csv" starts with "/srv/novo-pulse", so
+    # compare path components instead.
+    if not source.is_relative_to(REPO_ROOT.resolve()):
         raise ValueError("Path must be inside the project directory")
     if not source.exists():
         raise FileNotFoundError(f"No such file: {path}")

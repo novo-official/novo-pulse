@@ -149,6 +149,50 @@ def write_model_report(run, result) -> Path:
             add(f"| `{name}` | {weight:.1%} |")
         add("")
 
+    # ---- hyper-parameter search -----------------------------------------
+    tuning = metrics.get("tuning") or []
+    if tuning:
+        add("## Hyper-parameter search")
+        add("")
+        add(
+            "Searched with Optuna against a held-out time window, time-boxed by "
+            "`tuning.max_minutes`. Defaults are kept whenever the search does not beat them."
+        )
+        add("")
+        add("| Model | Trials | Default | Best | Kept | Seconds |")
+        add("| --- | --- | --- | --- | --- | --- |")
+        for entry in tuning:
+            add(
+                f"| `{entry['model']}` | {entry['n_trials']} "
+                f"| {_fmt(entry.get('default_score'))} | {_fmt(entry.get('best_score'))} "
+                f"| {'tuned' if entry.get('improved') else 'defaults'} "
+                f"| {entry.get('seconds', 0)} |"
+            )
+            if entry.get("note"):
+                add(f"| | | | | | _{entry['note']}_ |")
+        add("")
+
+    # ---- demand censoring -------------------------------------------------
+    censoring = metrics.get("censoring") or {}
+    if censoring.get("enabled"):
+        add("## Demand censoring")
+        add("")
+        add(
+            f"{censoring['censored_share']:.1%} of observed periods sit at or above "
+            f"available capacity (`{censoring['capacity_column']}`), across "
+            f"{censoring['affected_entities']} entities."
+        )
+        add("")
+        add(
+            "Where supply binds, the recorded target is capacity rather than demand, so "
+            "the forecast describes **bookable** demand rather than unconstrained market "
+            f"demand. Estimated mean uplift on censored periods: "
+            f"{censoring['mean_uplift']:+.1%}."
+        )
+        add("")
+        add(f"Method: {censoring['method']}")
+        add("")
+
     # ---- drivers ---------------------------------------------------------
     importance = _read_json(result.run_dir / "feature_importance.json")
     groups = importance.get("group_importance") or []

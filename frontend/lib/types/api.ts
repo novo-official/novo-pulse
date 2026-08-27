@@ -247,6 +247,28 @@ export interface ModelInfo {
   status: string;
 }
 
+export interface TuningRun {
+  model: string;
+  best_params: Record<string, number | string>;
+  best_score: number | null;
+  default_score: number | null;
+  n_trials: number;
+  seconds: number;
+  improved: boolean;
+  note: string;
+}
+
+export interface CensoringReport {
+  enabled: boolean;
+  reason: string;
+  capacity_column: string | null;
+  censored_share: number;
+  censored_periods: number;
+  affected_entities: number;
+  mean_uplift: number;
+  method: string;
+}
+
 export interface ModelsResponse {
   registry: ModelInfo[];
   trained: {
@@ -265,6 +287,8 @@ export interface ModelsResponse {
     uncertainty_method: string;
     environment: Record<string, unknown>;
     warnings: string[];
+    tuning: TuningRun[];
+    censoring: CensoringReport | null;
   } | null;
 }
 

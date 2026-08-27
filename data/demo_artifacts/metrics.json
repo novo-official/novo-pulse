@@ -1,5 +1,5 @@
 {
-  "run_id": "2026-08-27_001",
+  "run_id": "2026-08-28_002",
   "champion": "lightgbm",
   "primary_metric": "wape",
   "horizon": 30,
@@ -56,7 +56,7 @@
           "r2": 0.914586
         }
       ],
-      "fit_seconds": 29.44,
+      "fit_seconds": 21.73,
       "rank": 1,
       "improvement_vs_baseline": 0.1971,
       "baseline_model": "moving_average"
@@ -170,7 +170,7 @@
           "r2": 0.910192
         }
       ],
-      "fit_seconds": 34.56,
+      "fit_seconds": 25.69,
       "rank": 3,
       "improvement_vs_baseline": 0.1762,
       "baseline_model": "moving_average"
@@ -227,7 +227,7 @@
           "r2": 0.851369
         }
       ],
-      "fit_seconds": 0.02,
+      "fit_seconds": 0.01,
       "rank": 4,
       "improvement_vs_baseline": 0.0,
       "baseline_model": "moving_average"
@@ -951,6 +951,119 @@
     "catboost": 0.4739
   },
   "uncertainty_method": "native model quantiles",
+  "tuning": [],
+  "censoring": {
+    "enabled": true,
+    "reason": "capacity column present; censoring measured",
+    "capacity_column": "available_capacity",
+    "censored_share": 0.1639,
+    "censored_periods": 17181,
+    "affected_entities": 137,
+    "mean_uplift": 0.0107,
+    "by_entity": [
+      {
+        "entity_id": "acc_0135",
+        "censored_share": 0.525,
+        "censored_periods": 105
+      },
+      {
+        "entity_id": "acc_0106",
+        "censored_share": 0.52,
+        "censored_periods": 468
+      },
+      {
+        "entity_id": "acc_0042",
+        "censored_share": 0.4819,
+        "censored_periods": 347
+      },
+      {
+        "entity_id": "acc_0030",
+        "censored_share": 0.4422,
+        "censored_periods": 398
+      },
+      {
+        "entity_id": "acc_0082",
+        "censored_share": 0.442,
+        "censored_periods": 221
+      },
+      {
+        "entity_id": "acc_0077",
+        "censored_share": 0.4322,
+        "censored_periods": 389
+      },
+      {
+        "entity_id": "acc_0095",
+        "censored_share": 0.432,
+        "censored_periods": 216
+      },
+      {
+        "entity_id": "acc_0124",
+        "censored_share": 0.41,
+        "censored_periods": 82
+      },
+      {
+        "entity_id": "acc_0080",
+        "censored_share": 0.4033,
+        "censored_periods": 363
+      },
+      {
+        "entity_id": "acc_0004",
+        "censored_share": 0.39,
+        "censored_periods": 351
+      },
+      {
+        "entity_id": "acc_0086",
+        "censored_share": 0.39,
+        "censored_periods": 351
+      },
+      {
+        "entity_id": "acc_0125",
+        "censored_share": 0.3811,
+        "censored_periods": 343
+      },
+      {
+        "entity_id": "acc_0041",
+        "censored_share": 0.3767,
+        "censored_periods": 339
+      },
+      {
+        "entity_id": "acc_0015",
+        "censored_share": 0.3711,
+        "censored_periods": 334
+      },
+      {
+        "entity_id": "acc_0034",
+        "censored_share": 0.3622,
+        "censored_periods": 326
+      },
+      {
+        "entity_id": "acc_0128",
+        "censored_share": 0.354,
+        "censored_periods": 177
+      },
+      {
+        "entity_id": "acc_0068",
+        "censored_share": 0.3344,
+        "censored_periods": 301
+      },
+      {
+        "entity_id": "acc_0094",
+        "censored_share": 0.332,
+        "censored_periods": 166
+      },
+      {
+        "entity_id": "acc_0058",
+        "censored_share": 0.3292,
+        "censored_periods": 237
+      },
+      {
+        "entity_id": "acc_0020",
+        "censored_share": 0.3278,
+        "censored_periods": 236
+      }
+    ],
+    "method": "observed >= 98% of available capacity is treated as censored; unconstrained demand is estimated from the entity's uncensored periods at the same seasonal phase"
+  },
   "segment_scores": {
     "by_destination": [
       {
@@ -1227,9 +1340,9 @@
     "market_vs_listing_pct_diff": 0.0
   },
   "data_quality": {
-    "health_score": 82,
+    "health_score": 80,
     "grade": "good",
-    "n_findings": 3,
+    "n_findings": 4,
     "findings": [
       {
         "code": "potential_leakage",
@@ -1262,13 +1375,25 @@
         "context": {
           "n_outliers": 4858
         }
+      },
+      {
+        "code": "demand_censoring",
+        "severity": "low",
+        "title": "Target is capped by available capacity",
+        "detail": "16.4% of observations sit at or above capacity across 137 entities. Observed demand understates true market demand for those periods.",
+        "recommendation": "Forecasts describe *bookable* demand, not unconstrained demand. The censoring report estimates the uplift where supply binds.",
+        "context": {
+          "censored_share": 0.1639,
+          "affected_entities": 137,
+          "capacity_column": "available_capacity"
+        }
       }
     ],
     "by_severity": {
       "critical": 0,
       "high": 0,
       "medium": 3,
-      "low": 0,
+      "low": 1,
       "info": 0
     },
     "summary": {
@@ -1322,6 +1447,8 @@
     ],
     "notes": []
   },
-  "training_seconds": 110.77,
-  "warnings": []
+  "training_seconds": 84.58,
+  "warnings": [
+    "16% of observed periods sit at capacity - the target understates true market demand where supply binds"
+  ]
 }

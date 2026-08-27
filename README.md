@@ -147,6 +147,8 @@ scripts/             download_models.py
 **Detection**
 - Residual anomalies (robust MAD z-score) and forecast anomalies
 - Phase-aware peak detection: a busy Friday is not a "peak", a festival is
+- Demand censoring: measures how much of the history sits at capacity, and
+  estimates the demand that was there but could not be sold
 
 **Adaptability**
 - Automatic schema detection with editable suggestions
@@ -215,6 +217,11 @@ features, and requires them to be bit-identical.
 | `demo` | baselines + LightGBM + CatBoost | 150k | 2 | ~2 min |
 | `competition` | + Chronos, more trees | 1.2M | 3 | 10–40 min |
 | `full` | everything + Optuna | 4M | 4 | 30–90 min |
+
+Hyper-parameter search (`full` only) runs Optuna against a held-out time
+window, hard-capped by `tuning.max_minutes`, and keeps the profile defaults
+unless the search genuinely beats them. Every outcome is reported - including
+the runs that changed nothing.
 
 ```bash
 make train PROFILE=competition HORIZON=90 METRIC=wape
@@ -421,6 +428,7 @@ adaptability, explainability, and a dashboard that survives a live demo.
   data. They are associations, not causal effects, and the UI says so.
 - Known-future covariates beyond the observed range are projected seasonally
   unless real planned values are supplied via `--future-covariates`.
-- Demand censoring (`observed = min(latent, capacity)`) is modelled in the
-  synthetic generator and available in the contract, but the champion model
-  currently forecasts observed demand rather than uncensored latent demand.
+- The champion forecasts **bookable** demand, not unconstrained market demand.
+  Censoring is measured and reported (with an estimated uplift where supply
+  binds), but the target itself is not silently uncensored - that would be an
+  assumption dressed up as data.

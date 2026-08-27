@@ -31,6 +31,7 @@ from ..anomaly.detector import (
 )
 from ..contract import ENTITY, TARGET, TS, DataContract, load_profile
 from ..data.adapter import DataAdapter, Panel, read_tabular
+from ..data.censoring import analyse as analyse_censoring
 from ..data.validator import DataValidator
 from ..evaluation.backtest import Backtester
 from ..evaluation.metrics import evaluate_intervals, get_metric
@@ -46,7 +47,8 @@ from ..hierarchy import aggregate_all_levels, aggregate_bottom_up, coherence_che
 from ..insights.engine import build_decision_opportunities, build_insights
 from ..models.base import FitContext, ModelUnavailable, PredictContext
 from ..models.ensemble import EnsembleModel, compute_weights
-from ..models.registry import build_models, is_baseline
+from ..models.registry import REGISTRY, build_models, is_baseline
+from ..models.tuning import tune_model
 from ..paths import REPO_ROOT, RUNS_DIR, ensure_dirs
 from ..resources import detect_resources
 
@@ -109,6 +111,7 @@ class TrainingPipeline:
         self.contract = config.contract
         self.profile = config.profile
         self.warnings: list[str] = []
+        self.tuning_results: list[dict[str, Any]] = []
         self.run_id = config.run_id or _new_run_id(config.runs_dir or RUNS_DIR)
         self.run_dir = (config.runs_dir or RUNS_DIR) / self.run_id
         self.started = time.perf_counter()
@@ -130,6 +133,14 @@ class TrainingPipeline:
         horizon = int(self.config.horizon or self.contract.evaluation.max_horizon)
         log1p = self._decide_log1p(panel)
         engine = self._build_engine(panel, horizon)
+
+        # Demand censoring: how much of the history was capped by supply?
+        censoring = analyse_censoring(panel.frame, self.contract, engine.config.season)
+        if censoring.enabled and censoring.censored_share > 0.15:
+            self.warnings.append(
+                f"{censoring.censored_share:.0%} of observed periods sit at capacity - "
+                "the target understates true market demand where supply binds"
+            )
 
         self._progress("rolling backtest", 0.15)
         backtester = Backtester(
@@ -167,6 +178,8 @@ class TrainingPipeline:
         cv_scores = _ensemble_candidates(backtest_result.model_scores, metric)
         weights = compute_weights(cv_scores, metric)
 
+        tuned_params = self._tune(engine, model_names, log1p, backtest_result)
+
         self._progress("refitting on full history", 0.6)
         origin_idx = engine.tensor.origin_index
         final_train = engine.build_training(
@@ -184,7 +197,9 @@ class TrainingPipeline:
             non_negative=self.contract.target_options.non_negative,
             log1p=log1p,
         )
-        final_models, skipped = build_models(model_names, self.profile, season)
+        final_models, skipped = build_models(
+            model_names, self._profile_with(tuned_params), season
+        )
         for entry in skipped:
             message = f"model '{entry['model']}' skipped: {entry['reason']}"
             if message not in self.warnings:
@@ -245,6 +260,12 @@ class TrainingPipeline:
         forecast["lower"] = np.minimum(lower, point)
         forecast["upper"] = np.maximum(upper, point)
         forecast["model"] = champion_name
+        if self.contract.target_options.integer:
+            # A count target cannot be fractional. Bounds round outwards so the
+            # interval never narrows as a side effect of rounding.
+            forecast["forecast"] = np.round(forecast["forecast"])
+            forecast["lower"] = np.floor(forecast["lower"])
+            forecast["upper"] = np.ceil(forecast["upper"])
 
         # ---- champion backtest slice ---------------------------------------
         champion_backtest = backtest_result.predictions[
@@ -330,6 +351,8 @@ class TrainingPipeline:
             ),
             "ensemble_weights": weights,
             "uncertainty_method": uncertainty_method,
+            "tuning": self.tuning_results,
+            "censoring": censoring.as_dict(),
             "segment_scores": _segment_scores(champion_backtest, mapping, metric),
             "hierarchy_coherence": coherence_check(stacked_forecast),
             "data_quality": quality,
@@ -413,6 +436,96 @@ class TrainingPipeline:
         )
         config = FeatureConfig.for_frequency(panel.frequency, max_horizon=horizon)
         return FeatureEngine(tensor, config).prepare()
+
+    def _tune(self, engine, model_names, log1p, backtest_result) -> dict[str, dict[str, Any]]:
+        """Optional Optuna search, validated on a held-out time window.
+
+        Runs only when the profile asks for it, is hard-capped by
+        `tuning.max_minutes`, and never blocks a run: any failure falls through
+        to the profile defaults with a warning.
+        """
+        settings = self.profile.get("tuning") or {}
+        if not settings.get("enabled"):
+            return {}
+        budget = float(settings.get("max_minutes") or 0)
+        if budget <= 0:
+            return {}
+
+        tunable = [n for n in model_names if n in {"lightgbm", "catboost"} and not is_baseline(n)]
+        if not tunable:
+            return {}
+
+        self._progress("hyper-parameter search", 0.56)
+        horizon = engine.config.max_horizon
+        # Validate on the last window, exactly as the final fold does.
+        origin = engine.tensor.origin_index - horizon
+        if origin <= engine.config.min_context:
+            self.warnings.append("history too short for hyper-parameter search; defaults kept")
+            return {}
+
+        train = engine.build_training(
+            train_end_idx=origin,
+            samples_per_target=int(self.profile.get("samples_per_target", 3)),
+            max_rows=int(self.profile.get("max_train_rows", 500_000)),
+            seed=self.config.seed,
+        )
+        fit_context = FitContext(
+            engine=engine,
+            train_end_idx=origin,
+            frame=train,
+            seed=self.config.seed,
+            quantiles=tuple(self.contract.evaluation.quantiles),
+            non_negative=self.contract.target_options.non_negative,
+            log1p=log1p,
+        )
+        predict_context = PredictContext(
+            engine=engine,
+            origin_idx=origin,
+            horizon=horizon,
+            frame=engine.build_inference(origin, horizon),
+        )
+
+        per_model = budget / len(tunable)
+        results: dict[str, dict[str, Any]] = {}
+        for name in tunable:
+            entry = REGISTRY.get(name)
+            if entry is None:
+                continue
+            outcome = tune_model(
+                model_name=name,
+                factory=entry.build,
+                base_params=dict(self.profile.get(name) or {}),
+                fit_context=fit_context,
+                predict_context=predict_context,
+                metric=self.contract.evaluation.primary_metric,
+                max_minutes=per_model,
+                seed=self.config.seed,
+            )
+            if outcome is None:
+                continue
+            self.tuning_results.append(outcome.as_dict())
+            if outcome.n_trials == 0 and outcome.note:
+                self.warnings.append(
+                    f"hyper-parameter search skipped for '{name}': {outcome.note}"
+                )
+            elif outcome.improved:
+                results[name] = outcome.best_params
+                log.info(
+                    "Tuned %s: %s -> %s over %d trials",
+                    name, outcome.baseline_score, outcome.best_score, outcome.n_trials,
+                )
+            elif outcome.note:
+                self.warnings.append(f"'{name}': {outcome.note}")
+        return results
+
+    def _profile_with(self, tuned: dict[str, dict[str, Any]]) -> dict[str, Any]:
+        """The profile with any tuned hyper-parameters merged in."""
+        if not tuned:
+            return self.profile
+        merged = dict(self.profile)
+        for name, params in tuned.items():
+            merged[name] = {**(merged.get(name) or {}), **params}
+        return merged
 
     def _score_ensemble(
         self, backtester, backtest_result, leaderboard, weights, metric

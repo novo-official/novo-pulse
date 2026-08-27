@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Award, Cpu, Info, Layers, Trophy } from 'lucide-react';
 
+import { CensoringCard, TuningCard } from '@/components/dashboard/censoring-card';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { AsyncBoundary, CardSkeleton, NoModelState } from '@/components/ui/states';
@@ -189,6 +190,11 @@ export default function ModelsPage() {
         </AsyncBoundary>
       </Card>
 
+      {registry?.trained?.tuning?.length ? <TuningCard runs={registry.trained.tuning} /> : null}
+      {registry?.trained?.censoring?.enabled ? (
+        <CensoringCard report={registry.trained.censoring} />
+      ) : null}
+
       <div className="grid gap-6 lg:grid-cols-2">
         {/* ------------------------------------------- technical metadata */}
         <Card>
@@ -237,7 +243,8 @@ export default function ModelsPage() {
                   {registry.trained.warnings.map((warning) => (
                     <p
                       key={warning}
-                      className="rounded-lg bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-800"
+                      dir="ltr"
+                      className="rounded-lg bg-amber-50 px-3 py-2 text-left text-xs leading-5 text-amber-800"
                     >
                       {warning}
                     </p>
