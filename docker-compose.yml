@@ -1,0 +1,71 @@
+# ---------------------------------------------------------------------------
+# Novo Pulse - hackathon MVP stack.
+#
+#   docker compose up --build          # backend + frontend
+#   docker compose --profile async up  # ... plus Redis for background training
+#
+# SQLite lives on a named volume; switch to Postgres by setting DATABASE_URL.
+# ---------------------------------------------------------------------------
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: novo-pulse-backend
+    ports:
+      - "8000:8000"
+    environment:
+      DEBUG: "${DEBUG:-true}"
+      DEMO_MODE: "${DEMO_MODE:-true}"
+      SECRET_KEY: "${SECRET_KEY:-dev-only-change-me}"
+      ALLOWED_HOSTS: "*"
+      CORS_ALLOWED_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000"
+      DATABASE_URL: "${DATABASE_URL:-}"
+      SYNC_TASKS: "${SYNC_TASKS:-true}"
+      DEFAULT_HORIZON: "${DEFAULT_HORIZON:-30}"
+      PRIMARY_METRIC: "${PRIMARY_METRIC:-wape}"
+      TRAINING_PROFILE: "${TRAINING_PROFILE:-demo}"
+      ENABLE_CHRONOS: "${ENABLE_CHRONOS:-false}"
+      ENABLE_NEURALFORECAST: "${ENABLE_NEURALFORECAST:-false}"
+      ENABLE_LOCAL_LLM: "${ENABLE_LOCAL_LLM:-false}"
+      OLLAMA_BASE_URL: "${OLLAMA_BASE_URL:-http://host.docker.internal:11434}"
+      HF_HOME: /app/models/hf_cache
+    volumes:
+      - ./data:/app/data
+      - ./runs:/app/runs
+      - ./reports:/app/reports
+      - ./config:/app/config
+      - ./models:/app/models
+      - backend-db:/app/backend
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/api/v1/health/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: "${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000/api/v1}"
+    container_name: novo-pulse-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # Optional. Only needed when SYNC_TASKS=false.
+  redis:
+    image: redis:7-alpine
+    container_name: novo-pulse-redis
+    profiles: ["async"]
+    ports:
+      - "6379:6379"
+    command: redis-server --save "" --appendonly no
+
+volumes:
+  backend-db:

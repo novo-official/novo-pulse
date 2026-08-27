@@ -1,0 +1,33 @@
+# ---------------------------------------------------------------------------
+# Novo Pulse - core requirements.
+# Everything here is free and runs locally. No paid or cloud-only API.
+# Optional heavy models live in requirements-optional.txt.
+# ---------------------------------------------------------------------------
+
+# Web
+Django>=5.0,<5.2
+djangorestframework>=3.15
+django-cors-headers>=4.4
+django-filter>=24.3
+
+# Data
+pandas>=2.2
+numpy>=1.26,<3
+pyarrow>=16.0
+PyYAML>=6.0
+openpyxl>=3.1          # .xlsx ingestion
+
+# ML
+scikit-learn>=1.5
+lightgbm>=4.3
+catboost>=1.2
+shap>=0.45
+joblib>=1.4
+
+# Tooling
+python-dotenv>=1.0
+psutil>=6.0            # resource detection (optional at runtime)
+
+# Tests
+pytest>=8.3
+pytest-django>=4.9

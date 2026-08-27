@@ -1,0 +1,183 @@
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
+import { LineChart, ListTree } from 'lucide-react';
+
+import { ForecastChart } from '@/components/charts/forecast-chart';
+import { DemandHeatmap } from '@/components/charts/heatmap';
+import { OverviewTable } from '@/components/dashboard/overview-table';
+import { PeaksCard } from '@/components/dashboard/peaks-card';
+import { FilterBar } from '@/components/filters/forecast-filters';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardBody, CardHeader } from '@/components/ui/card';
+import {
+  AsyncBoundary,
+  CardSkeleton,
+  ChartSkeleton,
+  NoModelState,
+  Skeleton,
+} from '@/components/ui/states';
+import { useForecastFilters } from '@/hooks/useForecastFilters';
+import { api } from '@/lib/api/endpoints';
+import { LEVEL_FA, formatCompact, formatNumber } from '@/lib/utils';
+
+export default function ForecastsPage() {
+  const { level, entityId, horizon, setEntityId } = useForecastFilters();
+  const filters = { level, id: entityId, horizon };
+
+  const timeseriesQuery = useQuery({
+    queryKey: ['timeseries', level, entityId, horizon],
+    queryFn: () => api.timeseries(filters),
+  });
+  const overviewQuery = useQuery({
+    queryKey: ['overview', level, horizon],
+    queryFn: () => api.overview({ level, horizon }),
+  });
+  const peaksQuery = useQuery({ queryKey: ['peaks'], queryFn: () => api.peaks(8) });
+  const heatmapQuery = useQuery({
+    queryKey: ['heatmap', level, horizon],
+    queryFn: () => api.heatmap({ level, horizon, top_n: 14 }),
+  });
+  const summaryQuery = useQuery({
+    queryKey: ['dashboard-summary', level, horizon],
+    queryFn: () => api.dashboardSummary({ level, horizon }),
+  });
+
+  const timeseries = timeseriesQuery.data?.data;
+
+  if (timeseriesQuery.isSuccess && !timeseriesQuery.data?.available) {
+    return (
+      <Card>
+        <NoModelState detail={timeseriesQuery.data?.detailFa} />
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="section-title">پیش‌بینی‌ها</h2>
+        <p className="mt-1 text-sm text-muted">
+          تقاضای آینده در هر سطح از سلسله‌مراتب: اقامتگاه، مقصد، دسته‌بندی و کل بازار.
+        </p>
+      </div>
+
+      {timeseries ? (
+        <FilterBar
+          levels={timeseries.levels}
+          members={timeseries.members}
+          horizons={summaryQuery.data?.data?.available_horizons ?? [7, 14, 30]}
+        />
+      ) : (
+        <Skeleton className="h-24 w-full rounded-2xl" />
+      )}
+
+      <Card>
+        <CardHeader
+          icon={<LineChart className="h-4.5 w-4.5" />}
+          title={timeseries?.label ?? LEVEL_FA[level]}
+          subtitle={`افق ${horizon} روزه · سطح ${LEVEL_FA[level]}`}
+          action={
+            timeseries ? (
+              <div className="flex flex-wrap gap-2">
+                <Badge tone="brand">مجموع: {formatNumber(timeseries.totals.forecast)}</Badge>
+                <Badge tone="neutral">
+                  {formatCompact(timeseries.totals.lower)} – {formatCompact(timeseries.totals.upper)}
+                </Badge>
+              </div>
+            ) : null
+          }
+        />
+        <AsyncBoundary
+          isLoading={timeseriesQuery.isLoading}
+          error={timeseriesQuery.error}
+          isEmpty={!timeseries?.series?.length}
+          onRetry={() => timeseriesQuery.refetch()}
+          skeleton={<ChartSkeleton height={400} />}
+        >
+          <CardBody>
+            {timeseries ? (
+              <ForecastChart
+                series={timeseries.series}
+                forecastStart={timeseries.forecast_start}
+                height={430}
+              />
+            ) : null}
+          </CardBody>
+        </AsyncBoundary>
+      </Card>
+
+      <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+        <AsyncBoundary
+          isLoading={overviewQuery.isLoading}
+          error={overviewQuery.error}
+          onRetry={() => overviewQuery.refetch()}
+          skeleton={
+            <Card>
+              <CardSkeleton lines={8} />
+            </Card>
+          }
+        >
+          <OverviewTable
+            rows={overviewQuery.data?.data ?? []}
+            onSelect={setEntityId}
+            title={`جزئیات — ${LEVEL_FA[level]}`}
+          />
+        </AsyncBoundary>
+
+        <AsyncBoundary
+          isLoading={peaksQuery.isLoading}
+          error={peaksQuery.error}
+          onRetry={() => peaksQuery.refetch()}
+          skeleton={
+            <Card>
+              <CardSkeleton lines={6} />
+            </Card>
+          }
+        >
+          <PeaksCard
+            peaks={peaksQuery.data?.data?.peaks ?? []}
+            troughs={peaksQuery.data?.data?.troughs ?? []}
+          />
+        </AsyncBoundary>
+      </div>
+
+      <AsyncBoundary
+        isLoading={heatmapQuery.isLoading}
+        error={heatmapQuery.error}
+        onRetry={() => heatmapQuery.refetch()}
+        skeleton={
+          <Card>
+            <ChartSkeleton height={280} />
+          </Card>
+        }
+      >
+        {heatmapQuery.data?.data ? <DemandHeatmap data={heatmapQuery.data.data} /> : null}
+      </AsyncBoundary>
+
+      <Card className="debug-only">
+        <CardHeader
+          icon={<ListTree className="h-4.5 w-4.5" />}
+          title="سلسله‌مراتب پیش‌بینی"
+          subtitle="پیش‌بینی در سطح اقامتگاه تولید و به سطوح بالاتر تجمیع می‌شود (Bottom-Up)"
+        />
+        <CardBody>
+          <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
+            {(timeseries?.levels ?? []).map((item, index, all) => (
+              <span key={item} className="flex items-center gap-2">
+                <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-ink">
+                  {LEVEL_FA[item]}
+                </span>
+                {index < all.length - 1 ? <span>←</span> : null}
+              </span>
+            ))}
+          </div>
+          <p className="mt-3 text-xs leading-6 text-muted">
+            بازه اطمینان سطوح بالاتر از جمع کران‌های سطح پایین به دست می‌آید. این کار همبستگی خطاها
+            را فرض می‌گیرد و پهنای بازه را محافظه‌کارانه بیش‌برآورد می‌کند.
+          </p>
+        </CardBody>
+      </Card>
+    </div>
+  );
+}

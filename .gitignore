@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+*.sqlite3
+*.sqlite3-journal
+
+# Env
+.env
+.env.local
+
+# Node
+node_modules/
+*.tsbuildinfo
+.next/
+out/
+npm-debug.log*
+.eslintcache
+
+# Artifacts
+runs/*
+!runs/.gitkeep
+media/
+backend/media/
+data/raw/*
+!data/raw/.gitkeep
+data/synthetic/*
+!data/synthetic/.gitkeep
+data/uploads/*
+!data/uploads/.gitkeep
+reports/*
+!reports/.gitkeep
+models/hf_cache/
+*.joblib
+*.cbm
+*.parquet
+# The precomputed demo run IS committed: it is what makes DEMO_MODE work on a
+# fresh clone with no training, and it is the presentation safety net.
+!data/demo_artifacts/**
+
+# OS
+.DS_Store

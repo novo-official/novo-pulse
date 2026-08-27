@@ -1,0 +1,84 @@
+dataset:
+  name: synthetic_pol_e_chaharom
+  path: data/synthetic/daily_demand.csv
+  joins:
+  - path: data/synthetic/accommodations.csv
+    'on': accommodation_id
+  - path: data/synthetic/destinations.csv
+    'on': destination_id
+  - path: data/synthetic/calendar.csv
+    'on': date
+schema:
+  timestamp: date
+  target: booking_count
+  entity_id: accommodation_id
+  frequency: D
+  aggregation: sum
+hierarchy:
+  destination: destination_id
+  category: category
+labels:
+  destination_id: destination_name
+  category: category_fa
+features:
+  future:
+  - price
+  - is_holiday
+  - is_weekend
+  - is_event
+  - is_promotion
+  - available_capacity
+  historical:
+  - search_count
+  - view_count
+  static:
+  - category
+  - capacity
+  - rating
+  - bedrooms
+  - base_price
+  - destination_type
+  - province
+  ignored:
+  - latent_demand
+  - reserved_nights
+  - holiday_name
+  - event_name
+target_options:
+  non_negative: true
+  integer: true
+  log1p_transform: auto
+  censoring_column: available_capacity
+  censoring_enabled: true
+evaluation:
+  primary_metric: wape
+  secondary_metrics:
+  - mae
+  - rmse
+  - smape
+  - mape
+  - r2
+  horizons:
+  - 7
+  - 14
+  - 30
+  - 60
+  - 90
+  horizon_buckets:
+  - - 1
+    - 7
+  - - 8
+    - 14
+  - - 15
+    - 30
+  - - 31
+    - 60
+  - - 61
+    - 90
+  quantiles:
+  - 0.1
+  - 0.5
+  - 0.9
+  cv:
+    n_folds: 3
+    step: 30

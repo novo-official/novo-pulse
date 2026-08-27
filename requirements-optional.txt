@@ -1,0 +1,27 @@
+# ---------------------------------------------------------------------------
+# Optional models. The system runs fully without any of these - each one is
+# feature-flagged and degrades to a warning rather than an error.
+#
+#   pip install -r requirements-optional.txt
+#   python scripts/download_models.py      # pre-fetch weights for offline use
+# ---------------------------------------------------------------------------
+
+# Chronos-2 zero-shot foundation forecasting (ENABLE_CHRONOS=true)
+torch>=2.3
+chronos-forecasting>=1.4
+
+# Deep learning forecasters: NHITS / NBEATSx (ENABLE_NEURALFORECAST=true)
+neuralforecast>=1.7
+
+# Classical statistical forecasters
+statsforecast>=1.7
+
+# Hyper-parameter search (profile `full`)
+optuna>=3.6
+
+# Faster dataframe engine for very large competition datasets
+polars>=1.0
+
+# Async training via a broker (only needed when SYNC_TASKS=false)
+celery>=5.4
+redis>=5.0

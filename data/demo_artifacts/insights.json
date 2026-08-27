@@ -1,0 +1,415 @@
+{
+  "generated_for_horizon": 30,
+  "primary_metric": "wape",
+  "entities": [
+    {
+      "entity_id": "tehran",
+      "label": "تهران",
+      "forecast_total": 8157.3,
+      "forecast_mean": 271.91,
+      "recent_total": 7553.0,
+      "change_pct": 8.0,
+      "lower_total": 4796.75,
+      "upper_total": 10356.97,
+      "relative_interval_width": 0.6816,
+      "periods": 30
+    },
+    {
+      "entity_id": "shiraz",
+      "label": "شیراز",
+      "forecast_total": 4894.61,
+      "forecast_mean": 163.154,
+      "recent_total": 4709.0,
+      "change_pct": 3.94,
+      "lower_total": 2550.45,
+      "upper_total": 6910.27,
+      "relative_interval_width": 0.8907,
+      "periods": 30
+    },
+    {
+      "entity_id": "rasht",
+      "label": "رشت",
+      "forecast_total": 3715.49,
+      "forecast_mean": 123.85,
+      "recent_total": 3733.0,
+      "change_pct": -0.47,
+      "lower_total": 2084.09,
+      "upper_total": 5285.58,
+      "relative_interval_width": 0.8617,
+      "periods": 30
+    },
+    {
+      "entity_id": "mashhad",
+      "label": "مشهد",
+      "forecast_total": 3515.74,
+      "forecast_mean": 117.191,
+      "recent_total": 3583.0,
+      "change_pct": -1.88,
+      "lower_total": 2125.11,
+      "upper_total": 4670.43,
+      "relative_interval_width": 0.724,
+      "periods": 30
+    },
+    {
+      "entity_id": "kish",
+      "label": "کیش",
+      "forecast_total": 2850.88,
+      "forecast_mean": 95.029,
+      "recent_total": 2803.0,
+      "change_pct": 1.71,
+      "lower_total": 1538.04,
+      "upper_total": 4087.6,
+      "relative_interval_width": 0.8943,
+      "periods": 30
+    },
+    {
+      "entity_id": "tabriz",
+      "label": "تبریز",
+      "forecast_total": 1808.04,
+      "forecast_mean": 60.268,
+      "recent_total": 1781.0,
+      "change_pct": 1.52,
+      "lower_total": 1000.33,
+      "upper_total": 2753.32,
+      "relative_interval_width": 0.9696,
+      "periods": 30
+    },
+    {
+      "entity_id": "isfahan",
+      "label": "اصفهان",
+      "forecast_total": 1768.58,
+      "forecast_mean": 58.953,
+      "recent_total": 1665.0,
+      "change_pct": 6.22,
+      "lower_total": 903.03,
+      "upper_total": 2562.58,
+      "relative_interval_width": 0.9384,
+      "periods": 30
+    },
+    {
+      "entity_id": "yazd",
+      "label": "یزد",
+      "forecast_total": 1723.27,
+      "forecast_mean": 57.442,
+      "recent_total": 1596.0,
+      "change_pct": 7.97,
+      "lower_total": 980.01,
+      "upper_total": 2296.24,
+      "relative_interval_width": 0.7638,
+      "periods": 30
+    },
+    {
+      "entity_id": "qeshm",
+      "label": "قشم",
+      "forecast_total": 1457.17,
+      "forecast_mean": 48.572,
+      "recent_total": 1373.0,
+      "change_pct": 6.13,
+      "lower_total": 729.0,
+      "upper_total": 2231.58,
+      "relative_interval_width": 1.0312,
+      "periods": 30
+    },
+    {
+      "entity_id": "ramsar",
+      "label": "رامسر",
+      "forecast_total": 1430.79,
+      "forecast_mean": 47.693,
+      "recent_total": 1491.0,
+      "change_pct": -4.04,
+      "lower_total": 729.14,
+      "upper_total": 2064.89,
+      "relative_interval_width": 0.9336,
+      "periods": 30
+    },
+    {
+      "entity_id": "chabahar",
+      "label": "چابهار",
+      "forecast_total": 1285.02,
+      "forecast_mean": 42.834,
+      "recent_total": 1232.0,
+      "change_pct": 4.3,
+      "lower_total": 574.16,
+      "upper_total": 1979.29,
+      "relative_interval_width": 1.0935,
+      "periods": 30
+    },
+    {
+      "entity_id": "bandar_abbas",
+      "label": "بندرعباس",
+      "forecast_total": 246.67,
+      "forecast_mean": 8.222,
+      "recent_total": 224.0,
+      "change_pct": 10.12,
+      "lower_total": 89.0,
+      "upper_total": 419.66,
+      "relative_interval_width": 1.3405,
+      "periods": 30
+    }
+  ],
+  "fastest_growing": {
+    "entity_id": "bandar_abbas",
+    "label": "بندرعباس",
+    "forecast_total": 246.67,
+    "forecast_mean": 8.222,
+    "recent_total": 224.0,
+    "change_pct": 10.12,
+    "lower_total": 89.0,
+    "upper_total": 419.66,
+    "relative_interval_width": 1.3405,
+    "periods": 30
+  },
+  "fastest_declining": {
+    "entity_id": "ramsar",
+    "label": "رامسر",
+    "forecast_total": 1430.79,
+    "forecast_mean": 47.693,
+    "recent_total": 1491.0,
+    "change_pct": -4.04,
+    "lower_total": 729.14,
+    "upper_total": 2064.89,
+    "relative_interval_width": 0.9336,
+    "periods": 30
+  },
+  "highest_uncertainty": {
+    "entity_id": "bandar_abbas",
+    "label": "بندرعباس",
+    "forecast_total": 246.67,
+    "forecast_mean": 8.222,
+    "recent_total": 224.0,
+    "change_pct": 10.12,
+    "lower_total": 89.0,
+    "upper_total": 419.66,
+    "relative_interval_width": 1.3405,
+    "periods": 30
+  },
+  "lowest_uncertainty": {
+    "entity_id": "tehran",
+    "label": "تهران",
+    "forecast_total": 8157.3,
+    "forecast_mean": 271.91,
+    "recent_total": 7553.0,
+    "change_pct": 8.0,
+    "lower_total": 4796.75,
+    "upper_total": 10356.97,
+    "relative_interval_width": 0.6816,
+    "periods": 30
+  },
+  "upcoming_peaks": [
+    {
+      "entity_id": "isfahan",
+      "type": "peak",
+      "start": "2026-09-05",
+      "end": "2026-09-09",
+      "days": 5,
+      "expected_change_pct": 35.36,
+      "baseline_level": 50.6,
+      "forecast_level": 67.948,
+      "total_forecast": 339.74,
+      "relative_interval_width": 0.8934,
+      "confidence": "medium",
+      "level": "destination"
+    },
+    {
+      "entity_id": "tabriz",
+      "type": "peak",
+      "start": "2026-08-30",
+      "end": "2026-08-31",
+      "days": 2,
+      "expected_change_pct": 20.92,
+      "baseline_level": 45.5,
+      "forecast_level": 55.094,
+      "total_forecast": 110.19,
+      "relative_interval_width": 1.0186,
+      "confidence": "low",
+      "level": "destination"
+    },
+    {
+      "entity_id": "tabriz",
+      "type": "peak",
+      "start": "2026-09-06",
+      "end": "2026-09-07",
+      "days": 2,
+      "expected_change_pct": 20.58,
+      "baseline_level": 45.5,
+      "forecast_level": 54.906,
+      "total_forecast": 109.81,
+      "relative_interval_width": 1.0151,
+      "confidence": "low",
+      "level": "destination"
+    },
+    {
+      "entity_id": "tabriz",
+      "type": "peak",
+      "start": "2026-09-20",
+      "end": "2026-09-21",
+      "days": 2,
+      "expected_change_pct": 20.4,
+      "baseline_level": 45.5,
+      "forecast_level": 54.831,
+      "total_forecast": 109.66,
+      "relative_interval_width": 1.0396,
+      "confidence": "low",
+      "level": "destination"
+    },
+    {
+      "entity_id": "shiraz",
+      "type": "peak",
+      "start": "2026-09-06",
+      "end": "2026-09-08",
+      "days": 3,
+      "expected_change_pct": 19.59,
+      "baseline_level": 139.0,
+      "forecast_level": 166.231,
+      "total_forecast": 498.69,
+      "relative_interval_width": 0.8733,
+      "confidence": "low",
+      "level": "destination"
+    }
+  ],
+  "upcoming_troughs": [
+    {
+      "entity_id": "ramsar",
+      "type": "trough",
+      "start": "2026-09-13",
+      "end": "2026-09-15",
+      "days": 3,
+      "expected_change_pct": -20.65,
+      "baseline_level": 47.167,
+      "forecast_level": 37.379,
+      "total_forecast": 112.14,
+      "relative_interval_width": 1.0956,
+      "confidence": "low",
+      "level": "destination"
+    },
+    {
+      "entity_id": "ramsar",
+      "type": "trough",
+      "start": "2026-09-20",
+      "end": "2026-09-22",
+      "days": 3,
+      "expected_change_pct": -20.15,
+      "baseline_level": 47.167,
+      "forecast_level": 37.607,
+      "total_forecast": 112.82,
+      "relative_interval_width": 1.1037,
+      "confidence": "low",
+      "level": "destination"
+    }
+  ],
+  "model_confidence": {
+    "champion": "lightgbm",
+    "metric": "wape",
+    "value": 0.254003,
+    "baseline": "moving_average",
+    "baseline_value": 0.316367,
+    "improvement_pct": 19.71
+  },
+  "anomaly_summary": {
+    "total": 6,
+    "spikes": 4,
+    "drops": 2,
+    "high_severity": 0
+  },
+  "market": {
+    "total_forecast": 32853.55,
+    "previous_period_total": 31743.0,
+    "change_pct": 3.5,
+    "horizon": 30,
+    "n_entities": 12
+  },
+  "level": "destination",
+  "decision_opportunities": [
+    {
+      "kind": "growth",
+      "entity_id": "bandar_abbas",
+      "label": "بندرعباس",
+      "headline_fa": "رشد تقاضا در بندرعباس",
+      "change_pct": 10.12,
+      "evidence_fa": "تقاضای پیش‌بینی‌شده 247 در برابر 224 در دوره مشابه قبل.",
+      "uncertainty": 1.3405
+    },
+    {
+      "kind": "peak",
+      "entity_id": "isfahan",
+      "label": "اصفهان",
+      "headline_fa": "دوره اوج تقاضا در اصفهان",
+      "change_pct": 35.36,
+      "evidence_fa": "از 2026-09-05 تا 2026-09-09 (5 روز) تقاضا حدود 35٪ بالاتر از سطح معمول است.",
+      "confidence": "medium"
+    },
+    {
+      "kind": "peak",
+      "entity_id": "tabriz",
+      "label": "تبریز",
+      "headline_fa": "دوره اوج تقاضا در تبریز",
+      "change_pct": 20.92,
+      "evidence_fa": "از 2026-08-30 تا 2026-08-31 (2 روز) تقاضا حدود 21٪ بالاتر از سطح معمول است.",
+      "confidence": "low"
+    },
+    {
+      "kind": "uncertainty",
+      "entity_id": "bandar_abbas",
+      "label": "بندرعباس",
+      "headline_fa": "عدم‌قطعیت بالا در بندرعباس",
+      "change_pct": 10.12,
+      "evidence_fa": "بازه اطمینان این مقصد نسبت به سطح پیش‌بینی پهن است؛ تصمیم‌گیری قطعی بر پایه این پیش‌بینی توصیه نمی‌شود.",
+      "uncertainty": 1.3405
+    }
+  ],
+  "data_quality": {
+    "health_score": 82,
+    "grade": "good",
+    "n_findings": 3,
+    "findings": [
+      {
+        "code": "potential_leakage",
+        "severity": "medium",
+        "title": "'search_count' tracks the target almost exactly",
+        "detail": "Correlation with the target is +0.925. It is used only through lags, so this is likely benign.",
+        "recommendation": "Confirm this value is genuinely available before the target is observed. If not, move it to `historical` or `ignored`.",
+        "context": {
+          "column": "search_count",
+          "correlation": 0.9248
+        }
+      },
+      {
+        "code": "potential_leakage",
+        "severity": "medium",
+        "title": "'view_count' tracks the target almost exactly",
+        "detail": "Correlation with the target is +0.911. It is used only through lags, so this is likely benign.",
+        "recommendation": "Confirm this value is genuinely available before the target is observed. If not, move it to `historical` or `ignored`.",
+        "context": {
+          "column": "view_count",
+          "correlation": 0.9114
+        }
+      },
+      {
+        "code": "target_outliers",
+        "severity": "medium",
+        "title": "Extreme target values",
+        "detail": "4858 observations (4.63%) sit beyond 10 robust standard deviations.",
+        "recommendation": "These may be genuine demand spikes. They are kept, but the anomaly detector will surface them.",
+        "context": {
+          "n_outliers": 4858
+        }
+      }
+    ],
+    "by_severity": {
+      "critical": 0,
+      "high": 0,
+      "medium": 3,
+      "low": 0,
+      "info": 0
+    },
+    "summary": {
+      "rows": 104820,
+      "entities": 140,
+      "periods": 900,
+      "start": "2024-03-10",
+      "end": "2026-08-26",
+      "target_mean": 7.2317,
+      "zero_ratio": 0.1439
+    }
+  }
+}

@@ -1,0 +1,70 @@
+# ---------------------------------------------------------------------------
+# Training profiles - trade accuracy for wall-clock time.
+# Selected with `--profile` or the TRAINING_PROFILE env var.
+# ---------------------------------------------------------------------------
+
+demo:
+  description: "Fastest path. Full run on a 4-core laptop CPU in ~2 minutes."
+  max_train_rows: 150000
+  samples_per_target: 2        # horizons sampled per (entity, date)
+  cv_folds: 2
+  models: [seasonal_naive_7, seasonal_naive_30, moving_average, historical_mean, lightgbm, catboost]
+  lightgbm:
+    n_estimators: 260
+    learning_rate: 0.08
+    num_leaves: 63
+    min_child_samples: 30
+    quantile_tree_ratio: 0.4   # cheaper interval heads than the point model
+  catboost:
+    iterations: 180
+    depth: 6
+    learning_rate: 0.12
+    one_hot_max_size: 300      # avoids costly CTRs on low-cardinality ids
+    quantile_tree_ratio: 0.35
+  neural:
+    max_steps: 120
+  tuning:
+    enabled: false
+    max_minutes: 0
+
+competition:
+  description: "Balanced accuracy/speed. The default for competition day."
+  max_train_rows: 1200000
+  samples_per_target: 4
+  cv_folds: 3
+  models: [naive, seasonal_naive_7, seasonal_naive_30, moving_average, historical_mean, lightgbm, catboost, chronos]
+  lightgbm:
+    n_estimators: 1200
+    learning_rate: 0.04
+    num_leaves: 127
+    min_child_samples: 20
+  catboost:
+    iterations: 1200
+    depth: 8
+    learning_rate: 0.05
+  neural:
+    max_steps: 500
+  tuning:
+    enabled: false
+    max_minutes: 20
+
+full:
+  description: "Everything on, plus hyper-parameter search."
+  max_train_rows: 4000000
+  samples_per_target: 6
+  cv_folds: 4
+  models: [naive, seasonal_naive_7, seasonal_naive_30, moving_average, historical_mean, lightgbm, catboost, chronos, nhits]
+  lightgbm:
+    n_estimators: 3000
+    learning_rate: 0.02
+    num_leaves: 255
+    min_child_samples: 20
+  catboost:
+    iterations: 3000
+    depth: 8
+    learning_rate: 0.03
+  neural:
+    max_steps: 1500
+  tuning:
+    enabled: true
+    max_minutes: 30

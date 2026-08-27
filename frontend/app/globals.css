@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --canvas: 248 250 252;
+    --surface: 255 255 255;
+    --ink: 15 23 42;
+    --muted: 100 116 139;
+    --line: 226 232 240;
+  }
+
+  .dark {
+    --canvas: 9 12 22;
+    --surface: 20 25 38;
+    --ink: 226 232 240;
+    --muted: 148 163 184;
+    --line: 39 47 66;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-canvas text-ink antialiased;
+    font-feature-settings: 'ss01';
+  }
+
+  /* Latin numerals stay readable inside RTL prose. */
+  .nums {
+    direction: ltr;
+    unicode-bidi: embed;
+    display: inline-block;
+  }
+
+  ::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-slate-300;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer components {
+  .kpi-value {
+    @apply text-2xl font-semibold leading-none tracking-tight text-ink lg:text-3xl;
+  }
+  .section-title {
+    @apply text-lg font-semibold text-ink;
+  }
+  /* Recharts renders LTR internally; the wrapper opts its subtree out of RTL. */
+  .chart-ltr {
+    direction: ltr;
+  }
+}
+
+/* Presentation mode: bigger numbers, quieter chrome. */
+.presentation .kpi-value {
+  @apply text-4xl lg:text-5xl;
+}
+.presentation .debug-only {
+  display: none !important;
+}
+.presentation .section-title {
+  @apply text-xl;
+}

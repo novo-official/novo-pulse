@@ -1,0 +1,204 @@
+[
+  {
+    "feature": "fut_price",
+    "curve": [
+      {
+        "bin": 0,
+        "feature_value": 753665.7661,
+        "feature_min": 279458.3125,
+        "feature_max": 882519.6875,
+        "mean_contribution": 0.000573,
+        "n": 332
+      },
+      {
+        "bin": 1,
+        "feature_value": 1049794.2108,
+        "feature_min": 882519.6875,
+        "feature_max": 1209060.875,
+        "mean_contribution": -0.000229,
+        "n": 333
+      },
+      {
+        "bin": 2,
+        "feature_value": 1322868.7943,
+        "feature_min": 1209060.875,
+        "feature_max": 1451648.625,
+        "mean_contribution": -0.001798,
+        "n": 333
+      },
+      {
+        "bin": 3,
+        "feature_value": 1602207.1437,
+        "feature_min": 1451648.625,
+        "feature_max": 1744900.0,
+        "mean_contribution": -0.000623,
+        "n": 334
+      },
+      {
+        "bin": 4,
+        "feature_value": 1849885.4228,
+        "feature_min": 1744900.0,
+        "feature_max": 1953749.7187,
+        "mean_contribution": -0.001146,
+        "n": 335
+      },
+      {
+        "bin": 5,
+        "feature_value": 2030666.4366,
+        "feature_min": 1953749.7187,
+        "feature_max": 2122921.5,
+        "mean_contribution": -0.000289,
+        "n": 331
+      },
+      {
+        "bin": 6,
+        "feature_value": 2205354.341,
+        "feature_min": 2122921.5,
+        "feature_max": 2323775.6875,
+        "mean_contribution": 3.1e-05,
+        "n": 335
+      },
+      {
+        "bin": 7,
+        "feature_value": 2445513.0,
+        "feature_min": 2323775.6875,
+        "feature_max": 2592618.0,
+        "mean_contribution": -0.000142,
+        "n": 331
+      },
+      {
+        "bin": 8,
+        "feature_value": 2748866.0548,
+        "feature_min": 2592618.0,
+        "feature_max": 2903431.75,
+        "mean_contribution": -0.000384,
+        "n": 333
+      },
+      {
+        "bin": 9,
+        "feature_value": 3120244.9266,
+        "feature_min": 2903431.75,
+        "feature_max": 3365878.25,
+        "mean_contribution": -0.000141,
+        "n": 334
+      },
+      {
+        "bin": 10,
+        "feature_value": 3616216.3509,
+        "feature_min": 3365878.25,
+        "feature_max": 3897291.5,
+        "mean_contribution": -0.00037,
+        "n": 332
+      },
+      {
+        "bin": 11,
+        "feature_value": 5035362.7997,
+        "feature_min": 3897291.5,
+        "feature_max": 10635060.0,
+        "mean_contribution": 0.001767,
+        "n": 337
+      }
+    ]
+  },
+  {
+    "feature": "fut_price_vs_origin",
+    "curve": [
+      {
+        "bin": 0,
+        "feature_value": 0.8259,
+        "feature_min": 0.636,
+        "feature_max": 0.8939,
+        "mean_contribution": 0.007488,
+        "n": 333
+      },
+      {
+        "bin": 1,
+        "feature_value": 0.915,
+        "feature_min": 0.8939,
+        "feature_max": 0.939,
+        "mean_contribution": 0.00012,
+        "n": 332
+      },
+      {
+        "bin": 2,
+        "feature_value": 0.951,
+        "feature_min": 0.939,
+        "feature_max": 0.962,
+        "mean_contribution": 0.002474,
+        "n": 333
+      },
+      {
+        "bin": 3,
+        "feature_value": 0.9715,
+        "feature_min": 0.962,
+        "feature_max": 0.9802,
+        "mean_contribution": 0.004081,
+        "n": 334
+      },
+      {
+        "bin": 4,
+        "feature_value": 0.9878,
+        "feature_min": 0.9802,
+        "feature_max": 0.9957,
+        "mean_contribution": 0.002645,
+        "n": 333
+      },
+      {
+        "bin": 5,
+        "feature_value": 1.004,
+        "feature_min": 0.9957,
+        "feature_max": 1.0123,
+        "mean_contribution": 0.001867,
+        "n": 335
+      },
+      {
+        "bin": 6,
+        "feature_value": 1.0218,
+        "feature_min": 1.0123,
+        "feature_max": 1.0334,
+        "mean_contribution": 0.00015,
+        "n": 330
+      },
+      {
+        "bin": 7,
+        "feature_value": 1.0488,
+        "feature_min": 1.0334,
+        "feature_max": 1.0609,
+        "mean_contribution": -0.001629,
+        "n": 334
+      },
+      {
+        "bin": 8,
+        "feature_value": 1.0767,
+        "feature_min": 1.0609,
+        "feature_max": 1.09,
+        "mean_contribution": -0.004827,
+        "n": 334
+      },
+      {
+        "bin": 9,
+        "feature_value": 1.105,
+        "feature_min": 1.09,
+        "feature_max": 1.122,
+        "mean_contribution": -0.005113,
+        "n": 332
+      },
+      {
+        "bin": 10,
+        "feature_value": 1.1541,
+        "feature_min": 1.122,
+        "feature_max": 1.1969,
+        "mean_contribution": -0.005583,
+        "n": 333
+      },
+      {
+        "bin": 11,
+        "feature_value": 1.3201,
+        "feature_min": 1.1969,
+        "feature_max": 1.77,
+        "mean_contribution": -0.004018,
+        "n": 337
+      }
+    ]
+  }
+]
