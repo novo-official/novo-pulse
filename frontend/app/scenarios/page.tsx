@@ -13,7 +13,7 @@ import { AsyncBoundary, CardSkeleton, EmptyState, NoModelState } from '@/compone
 import { InfoHint } from '@/components/ui/tooltip';
 import { api } from '@/lib/api/endpoints';
 import type { Level, ScenarioAdjustable, ScenarioResult } from '@/lib/types/api';
-import { LEVEL_FA, cn, formatNumber, formatPercent } from '@/lib/utils';
+import { LEVEL_FA, cn, formatAuto, formatNumber, formatPercent } from '@/lib/utils';
 
 type Adjustments = Record<string, number>;
 
@@ -358,8 +358,7 @@ export default function ScenariosPage() {
                   >
                     <span className="text-ink">{item.label_fa}</span>
                     <span className="nums text-xs text-muted" dir="ltr">
-                      {item.mean_before.toLocaleString()} → {item.mean_after.toLocaleString()} (
-                      {item.change})
+                      {formatAuto(item.mean_before)} → {formatAuto(item.mean_after)} ({item.change})
                     </span>
                   </div>
                 ))}

@@ -35,6 +35,14 @@ export function formatRatioAsPercent(value: number | null | undefined, digits = 
   return `${(value * 100).toFixed(digits)}٪`;
 }
 
+/** Sensible precision for a value of unknown magnitude (prices, counts, rates). */
+export function formatAuto(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+  const abs = Math.abs(value);
+  const digits = abs >= 1000 ? 0 : abs >= 10 ? 1 : abs >= 1 ? 2 : 3;
+  return value.toLocaleString('en-US', { maximumFractionDigits: digits });
+}
+
 export function formatMetric(value: number | null | undefined, metric: string): string {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—';
   if (metric === 'wape' || metric === 'r2' || metric === 'rmsle') {
