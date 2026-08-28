@@ -260,7 +260,7 @@ nominal. If those pass, the dashboard will behave.
 | Ollama is not running | Expected. The template narrator takes over automatically. |
 | Redis is not running | Expected. `SYNC_TASKS=true` runs training inline. |
 | Dashboard says "no data" | No successful run yet. Check `/api/v1/training/` for the failure reason. |
-| Everything is broken 10 minutes before the demo | `DEMO_MODE=true` serves the committed artefacts in `data/demo_artifacts/`. The dashboard works with zero training. |
+| Everything is broken 10 minutes before the demo | `DEMO_MODE=true` serves the committed artefacts in `data/demo_artifacts/`. Every page works with zero training, including the scenario simulator - the run ships its own model and panel. |
 
 ## Metric cheat-sheet
 

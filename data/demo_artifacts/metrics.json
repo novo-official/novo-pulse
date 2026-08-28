@@ -1,5 +1,5 @@
 {
-  "run_id": "2026-08-28_008",
+  "run_id": "2026-08-28_003",
   "champion": "lightgbm",
   "primary_metric": "wape",
   "horizon": 30,
@@ -56,7 +56,7 @@
           "r2": 0.914586
         }
       ],
-      "fit_seconds": 20.75,
+      "fit_seconds": 19.89,
       "rank": 1,
       "improvement_vs_baseline": 0.1971,
       "baseline_model": "moving_average"
@@ -170,7 +170,7 @@
           "r2": 0.910192
         }
       ],
-      "fit_seconds": 27.66,
+      "fit_seconds": 25.49,
       "rank": 3,
       "improvement_vs_baseline": 0.1762,
       "baseline_model": "moving_average"
@@ -1447,7 +1447,7 @@
     ],
     "notes": []
   },
-  "training_seconds": 89.11,
+  "training_seconds": 85.06,
   "warnings": [
     "16% of observed periods sit at capacity - the target understates true market demand where supply binds"
   ]

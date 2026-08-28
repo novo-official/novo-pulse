@@ -394,6 +394,19 @@ export default function DataLabPage() {
                   </button>
                 ))}
                 {datasetsQuery.isLoading ? <Skeleton className="h-12 w-full" /> : null}
+                {!datasetsQuery.isLoading &&
+                (datasetsQuery.data?.data?.datasets ?? []).length === 0 ? (
+                  <p className="rounded-xl border border-dashed border-line px-3 py-3 text-xs leading-6 text-muted">
+                    هنوز دیتاستی ثبت نشده است. فایل خود را بارگذاری کنید، یا برای ساخت داده
+                    نمونه این دستور را اجرا کنید:
+                    <code
+                      dir="ltr"
+                      className="mt-2 block rounded-lg bg-slate-900 px-2.5 py-1.5 text-[11px] text-slate-100"
+                    >
+                      make seed
+                    </code>
+                  </p>
+                ) : null}
               </div>
             </div>
           </CardBody>

@@ -104,38 +104,40 @@ class ScenarioEngine:
         return out
 
 
-def load_engine(run) -> ScenarioEngine:
-    """Rebuild the forecasting context for a completed run (cached)."""
-    cached = _CACHE.get(run.run_id)
+def load_engine(run_dir: str | Path, run_id: str = "") -> ScenarioEngine:
+    """Rebuild the forecasting context for a completed run (cached).
+
+    Takes a directory rather than a database row so the same code serves a real
+    training run and the committed demo artefacts - which is what makes the
+    what-if page work on a fresh clone with no training and no source data.
+    """
+    from ml.paths import REPO_ROOT
+
+    directory = Path(run_dir)
+    if not directory.is_absolute():
+        directory = REPO_ROOT / directory
+    key = run_id or directory.name
+
+    cached = _CACHE.get(key)
     if cached is not None:
         return cached
 
     import joblib
 
-    from ml.paths import REPO_ROOT
-
-    run_dir = Path(run.run_dir)
-    if not run_dir.is_absolute():
-        run_dir = REPO_ROOT / run_dir
-
-    contract = DataContract.load(run_dir / "config.yaml")
-    metadata = _read_json(run_dir / "metadata.json")
+    contract = DataContract.load(directory / "config.yaml")
+    metadata = _read_json(directory / "metadata.json")
     champion = metadata.get("champion")
     horizon = int(metadata.get("horizon") or 30)
 
-    model_paths = metadata.get("models") or {}
-    model = None
-    if champion in model_paths:
-        model = joblib.load(REPO_ROOT / model_paths[champion])
-    elif model_paths:
-        # The ensemble is not persisted as one file; fall back to the best member.
-        name = next(iter(model_paths))
-        model = joblib.load(REPO_ROOT / model_paths[name])
-        champion = name
+    model = _load_model(directory, metadata, champion)
     if model is None:
-        raise RuntimeError("No persisted model available for scenario simulation")
+        raise RuntimeError(
+            "This run has no persisted model, so scenarios cannot be simulated. "
+            "Re-run training to produce one."
+        )
+    champion = getattr(model, "name", champion)
 
-    panel = DataAdapter(contract).build()
+    panel = _load_panel(directory, contract)
     tensor = build_tensor(
         panel.frame,
         freq=panel.frequency,
@@ -149,18 +151,72 @@ def load_engine(run) -> ScenarioEngine:
     ).prepare()
 
     result = ScenarioEngine(
-        run_id=run.run_id,
+        run_id=key,
         engine=engine,
         model=model,
         contract=contract,
         mapping=entity_map(panel.frame),
-        labels=_read_json(run_dir / "labels.json"),
+        labels=_read_json(directory / "labels.json"),
         horizon=horizon,
         quantiles=tuple(contract.evaluation.quantiles),
     )
     _CACHE.clear()
-    _CACHE[run.run_id] = result
+    _CACHE[key] = result
     return result
+
+
+def _load_model(directory: Path, metadata: dict, champion: str | None):
+    """Find the champion's binary, tolerating a relocated run directory."""
+    import joblib
+
+    from ml.paths import REPO_ROOT
+
+    recorded = metadata.get("models") or {}
+    candidates: list[Path] = []
+    if champion and champion in recorded:
+        candidates.append(REPO_ROOT / recorded[champion])
+        candidates.append(directory / "models" / f"{champion}.joblib")
+    for name, relative in recorded.items():
+        candidates.append(REPO_ROOT / relative)
+        candidates.append(directory / "models" / f"{name}.joblib")
+    # Anything present on disk, in case metadata and directory disagree.
+    candidates.extend(sorted((directory / "models").glob("*.joblib")))
+
+    for path in candidates:
+        if path.exists():
+            try:
+                return joblib.load(path)
+            except Exception:  # noqa: BLE001 - try the next candidate
+                continue
+    return None
+
+
+def _load_panel(directory: Path, contract: DataContract):
+    """Prefer the panel saved with the run; fall back to re-reading the source.
+
+    A published run is self-contained: the source file may be gitignored, on
+    another machine, or a competition dataset that was never committed.
+    """
+    import pandas as pd
+
+    from ml.data.adapter import Panel
+    from ml.features.calendar import is_event_like
+
+    saved = directory / "panel.parquet"
+    if saved.exists():
+        frame = pd.read_parquet(saved)
+        present = set(frame.columns)
+        return Panel(
+            frame=frame,
+            contract=contract,
+            static=pd.DataFrame(),
+            frequency=contract.pandas_freq,
+            future_features=[c for c in contract.future_features if c in present],
+            historical_features=[c for c in contract.historical_features if c in present],
+            static_features=[c for c in contract.static_features if c in present],
+            notes=["panel restored from the run artefacts"],
+        )
+    return DataAdapter(contract).build()
 
 
 def _read_json(path: Path) -> dict:

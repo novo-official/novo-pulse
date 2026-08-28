@@ -5,7 +5,7 @@ import logging
 from rest_framework.decorators import api_view
 
 from apps.core.responses import error, no_data, ok
-from apps.forecasting.store import active_run
+from apps.forecasting.store import active_store
 
 from . import services
 
@@ -15,20 +15,24 @@ log = logging.getLogger(__name__)
 @api_view(["GET"])
 def scenario_options(request):
     """Which covariates can be simulated, and over what window."""
-    run = active_run()
-    if run is None:
+    store = active_store()
+    if store is None:
         return no_data()
     try:
-        scenario = services.load_engine(run)
+        scenario = services.load_engine(store.directory, store.run_id)
     except Exception as exc:  # noqa: BLE001
         log.exception("scenario engine failed to load")
-        return error(f"Scenario engine unavailable: {exc}", 503)
+        return error(
+            f"Scenario engine unavailable: {exc}",
+            503,
+            detail_fa=f"موتور شبیه‌سازی در دسترس نیست: {exc}",
+        )
 
     tensor = scenario.engine.tensor
     origin = tensor.origin_index
     return ok(
         {
-            "run_id": run.run_id,
+            "run_id": store.run_id,
             "model": getattr(scenario.model, "name", "unknown"),
             "horizon": scenario.horizon,
             "adjustable": scenario.adjustable,
@@ -43,8 +47,8 @@ def scenario_options(request):
 
 @api_view(["POST"])
 def scenario_simulate(request):
-    run = active_run()
-    if run is None:
+    store = active_store()
+    if store is None:
         return no_data()
 
     adjustments = request.data.get("adjustments") or []
@@ -52,7 +56,7 @@ def scenario_simulate(request):
         return error("`adjustments` must be a list of {column, change_pct|value}.")
 
     try:
-        scenario = services.load_engine(run)
+        scenario = services.load_engine(store.directory, store.run_id)
         result = services.simulate(
             scenario,
             adjustments=adjustments,
@@ -64,5 +68,9 @@ def scenario_simulate(request):
         )
     except Exception as exc:  # noqa: BLE001
         log.exception("scenario simulation failed")
-        return error(f"Simulation failed: {exc}", 500)
+        return error(
+            f"Simulation failed: {exc}",
+            500,
+            detail_fa=f"اجرای سناریو با خطا مواجه شد: {exc}",
+        )
     return ok(result)

@@ -202,11 +202,15 @@ class Command(BaseCommand):
             return
         if DEMO_ARTIFACTS_DIR.exists():
             shutil.rmtree(DEMO_ARTIFACTS_DIR)
-        shutil.copytree(source, DEMO_ARTIFACTS_DIR, ignore=shutil.ignore_patterns("models"))
+        # Model binaries are included: without them the scenario simulator
+        # cannot re-predict, and "change the price, see the forecast move" is
+        # the step of the demo that lands hardest.
+        shutil.copytree(source, DEMO_ARTIFACTS_DIR)
+        size_mb = sum(f.stat().st_size for f in DEMO_ARTIFACTS_DIR.rglob("*") if f.is_file()) / 1e6
         self.stdout.write(
             self.style.SUCCESS(
                 f"Published precomputed demo artefacts to "
-                f"{DEMO_ARTIFACTS_DIR.relative_to(REPO_ROOT)}"
+                f"{DEMO_ARTIFACTS_DIR.relative_to(REPO_ROOT)} ({size_mb:.1f} MB)"
             )
         )
 

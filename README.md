@@ -178,9 +178,14 @@ Together. Everything runs locally and free.
 
 ## Demo mode
 
-`DEMO_MODE=true` (the default) serves the synthetic dataset and the
-precomputed artefacts in `data/demo_artifacts/`, so the dashboard works
-immediately — even if training was never run on this machine.
+`DEMO_MODE=true` (the default) serves the precomputed artefacts in
+`data/demo_artifacts/` (4.6 MB, committed), so a **fresh clone renders the full
+product with no database, no source data and no training** — the dashboard,
+drivers, backtesting, leaderboard *and* the scenario simulator.
+
+That last one is why each run is self-contained: the fitted model binary and
+the canonical panel are written alongside the metrics, so "change the price,
+watch the forecast move" works on a laptop that has never seen the dataset.
 
 `DEMO_MODE=false` makes a hard promise: **no fabricated numbers**. With no
 trained model, every endpoint returns `available: false` and the UI shows an
@@ -385,7 +390,7 @@ make audit          # live API audit against a running backend
 make e2e            # browser walkthrough with real clicks
 ```
 
-**216 unit/integration tests** covering: leakage guarantees, the data adapter,
+**218 unit/integration tests** covering: leakage guarantees, the data adapter,
 schema detection, validation, metrics, time-series splitting, conformal
 calibration, baselines, GBDT models, the optional Chronos/NHITS adapters, the
 registry, the full pipeline, reproducibility, hierarchy coherence, anomaly and
@@ -400,6 +405,9 @@ Three further layers run against a live system rather than fixtures:
 | API audit | 63 calls across every endpoint, including malformed input and edge cases | `make audit` |
 | Semantic audit | 45 checks that the *numbers* are right - hierarchy coherence, KPI/series agreement, scenario direction, coverage vs. nominal | `make audit` |
 | Browser E2E | 46 real interactions: filters, entity selection, horizon switching, running a scenario, uploading a CSV and training from the UI | `make e2e` |
+
+All three were run against a bare clone (no DB, no data, no runs) as well as a
+seeded one.
 
 The optional-model tests build a tiny Chronos model locally rather than
 downloading weights, so they exercise the adapter against the real library in

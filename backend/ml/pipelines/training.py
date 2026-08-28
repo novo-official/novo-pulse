@@ -673,6 +673,11 @@ class TrainingPipeline:
             )
             artefacts[name] = _repo_relative(path)
 
+        # The canonical panel travels with the run. Scenario simulation has to
+        # rebuild the feature tensor, and re-reading the original file is not an
+        # option once a run is copied to another machine (or once the source is
+        # a competition dataset nobody committed).
+        write_parquet("panel", kwargs["panel"].frame)
         write_parquet("forecast", kwargs["forecast"])
         write_parquet("backtest", kwargs["backtest"])
         write_parquet("history", kwargs["history"])
