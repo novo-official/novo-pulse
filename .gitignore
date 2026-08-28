@@ -47,3 +47,5 @@ models/local_*/
 
 # OS
 .DS_Store
+
+.claude
