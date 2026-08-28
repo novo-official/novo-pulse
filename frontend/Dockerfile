@@ -5,7 +5,10 @@ RUN npm ci --no-audit --no-fund
 
 FROM node:22-alpine AS builder
 WORKDIR /app
-ENV NEXT_TELEMETRY_DISABLED=1
+# Opt into the standalone bundle; `next start` cannot serve it, but the runner
+# stage below runs server.js directly, which can.
+ENV NEXT_TELEMETRY_DISABLED=1 \
+    NEXT_OUTPUT=standalone
 COPY --from=deps /app/node_modules ./node_modules
 COPY frontend/ ./
 # Baked into the client bundle at build time.

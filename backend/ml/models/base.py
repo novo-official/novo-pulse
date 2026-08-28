@@ -125,6 +125,20 @@ def postprocess(
     return out
 
 
+def enforce_monotone(quantiles: dict[float, np.ndarray]) -> dict[float, np.ndarray]:
+    """Sort quantile predictions so a lower level never exceeds a higher one.
+
+    Independently fitted quantile heads can cross, which would produce an
+    interval whose lower bound sits above its upper bound. Sorting each row is
+    the standard, distribution-free repair.
+    """
+    if len(quantiles) < 2:
+        return quantiles
+    keys = sorted(quantiles)
+    stacked = np.sort(np.vstack([np.asarray(quantiles[k], dtype=float) for k in keys]), axis=0)
+    return {key: stacked[index] for index, key in enumerate(keys)}
+
+
 class ModelUnavailable(RuntimeError):
     """Raised when an optional dependency or model weight is missing.
 

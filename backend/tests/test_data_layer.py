@@ -134,3 +134,70 @@ def test_validator_flags_a_sparse_target(contract, panel):
 
     report = DataValidator(contract).validate(sparse)
     assert "sparse_target" in {finding["code"] for finding in report["findings"]}
+
+
+# --------------------------------------------------- column-role matching
+@pytest.mark.parametrize(
+    ("column", "role", "should_match"),
+    [
+        # The bug this guards: "id" is a substring of "holiday", "valid",
+        # "video" and "width", which once made public_holiday the top entity id.
+        ("public_holiday", "entity_id", False),
+        ("is_valid", "entity_id", False),
+        ("video_views", "entity_id", False),
+        ("width", "entity_id", False),
+        ("humidity", "entity_id", False),
+        # Genuine identifiers must still be found, including unfamiliar suffixes.
+        ("accommodation_id", "entity_id", True),
+        ("listing_id", "entity_id", True),
+        ("unit_code", "entity_id", True),
+        ("property_key", "entity_id", True),
+        ("sku", "entity_id", True),
+        # Geography beyond the words we happened to think of first.
+        ("zone", "destination", True),
+        ("district", "destination", True),
+        ("region_name", "destination", True),
+        ("city", "destination", True),
+    ],
+)
+def test_column_role_matching_is_token_aware(column, role, should_match):
+    from ml.data.profiler import DESTINATION_HINTS, ENTITY_HINTS, _score
+
+    hints = {"entity_id": ENTITY_HINTS, "destination": DESTINATION_HINTS}[role]
+    score = _score(column, hints)
+    if should_match:
+        assert score >= 0.5, f"{column} should match {role} (scored {score})"
+    else:
+        assert score < 0.5, f"{column} must not match {role} (scored {score})"
+
+
+def test_profiler_detects_an_unfamiliar_schema(tmp_path):
+    """Column names we have never seen before must still map correctly."""
+    import numpy as np
+
+    rng = np.random.default_rng(0)
+    dates = pd.date_range("2025-01-01", periods=200)
+    frame = pd.concat(
+        [
+            pd.DataFrame(
+                {
+                    "booking_day": dates,
+                    "unit_code": f"U{i:02d}",
+                    "zone": f"zone_{i % 3}",
+                    "room_nights": rng.poisson(12, 200),
+                    "tariff": rng.normal(70, 4, 200).round(2),
+                    "public_holiday": (np.arange(200) % 40 < 2).astype(int),
+                }
+            )
+            for i in range(5)
+        ],
+        ignore_index=True,
+    )
+    path = tmp_path / "unfamiliar.csv"
+    frame.to_csv(path, index=False)
+
+    suggested = profile_dataset(path)["suggested_schema"]
+    assert suggested["timestamp"] == "booking_day"
+    assert suggested["target"] == "room_nights"
+    assert suggested["entity_id"] == "unit_code"
+    assert suggested["destination"] == "zone"

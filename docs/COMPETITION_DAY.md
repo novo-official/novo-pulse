@@ -234,6 +234,20 @@ Add `?presentation=true` for the judging session: bigger numbers, less chrome.
 
 ---
 
+## Verifying a fresh machine before the demo
+
+```bash
+make test            # 216 tests
+make dev             # start both services
+make audit           # 63 API calls + 45 semantic checks against the live API
+make e2e             # 46 browser interactions, including upload -> train
+```
+
+`make audit` is the fastest way to tell whether a machine is demo-ready: it
+checks that levels add up, that KPIs agree with the underlying series, that a
+price cut moves demand the right way, and that interval coverage is near
+nominal. If those pass, the dashboard will behave.
+
 ## Emergencies
 
 | Symptom | Fix |

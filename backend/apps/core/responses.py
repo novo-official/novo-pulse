@@ -34,5 +34,22 @@ def ok(data: Any, **extra: Any) -> Response:
     return Response(payload)
 
 
-def error(detail: str, http_status: int = status.HTTP_400_BAD_REQUEST) -> Response:
-    return Response({"available": False, "detail": detail, "data": None}, status=http_status)
+def error(
+    detail: str,
+    http_status: int = status.HTTP_400_BAD_REQUEST,
+    detail_fa: str | None = None,
+) -> Response:
+    """An error the UI can show verbatim.
+
+    `detail_fa` is what a Persian-speaking user actually reads; `detail` stays
+    English for logs and for anyone driving the API directly.
+    """
+    return Response(
+        {
+            "available": False,
+            "detail": detail,
+            "detail_fa": detail_fa or detail,
+            "data": None,
+        },
+        status=http_status,
+    )

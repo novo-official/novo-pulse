@@ -662,7 +662,13 @@ class TrainingPipeline:
         def write_json(name: str, payload: Any) -> None:
             path = run_dir / f"{name}.json"
             path.write_text(
-                json.dumps(payload, ensure_ascii=False, indent=2, default=_json_default),
+                json.dumps(
+                    sanitise_json(payload),
+                    ensure_ascii=False,
+                    indent=2,
+                    default=_json_default,
+                    allow_nan=False,
+                ),
                 encoding="utf-8",
             )
             artefacts[name] = _repo_relative(path)
@@ -889,6 +895,27 @@ def _segment_scores(backtest: pd.DataFrame, mapping: pd.DataFrame, metric: str) 
         for key, group in frame.groupby("horizon")
     ]
     return out
+
+
+def sanitise_json(value: Any) -> Any:
+    """Recursively replace NaN/Infinity with None.
+
+    `json.dumps` happily writes bare `NaN` and `Infinity`, which are not valid
+    JSON: SQLite's JSON_VALID rejects them and - far worse for a demo -
+    JavaScript's `JSON.parse` throws, so a single NaN anywhere in a run's
+    metrics would blank the entire dashboard.
+    """
+    if isinstance(value, dict):
+        return {k: sanitise_json(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [sanitise_json(v) for v in value]
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (float, np.floating)):
+        return float(value) if np.isfinite(value) else None
+    if isinstance(value, (int, np.integer)):
+        return int(value)
+    return value
 
 
 def _json_default(value: Any) -> Any:

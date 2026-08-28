@@ -287,15 +287,44 @@ def heatmap(store: ArtifactStore, level: str, horizon: int, top_n: int = 12) -> 
 
 
 def drivers(store: ArtifactStore, top_n: int = 8) -> dict[str, Any]:
-    """Driver groups behind the forecast, split into positive and negative."""
+    """Driver groups behind the forecast, split into positive and negative.
+
+    The list is truncated for readability, but the remainder is folded into an
+    explicit "other" group so the shares still sum to 100%. Silently dropping
+    the tail would make the chart read as though 93% were the whole story.
+    """
     importance = store.json("feature_importance", {})
     groups = importance.get("group_importance") or []
+    shown = groups[:top_n]
+    remainder = groups[top_n:]
+
+    if remainder:
+        residual_share = sum(g.get("contribution_share", 0.0) for g in remainder)
+        residual_effect = sum(g.get("signed_effect", 0.0) for g in remainder)
+        shown = [
+            *shown,
+            {
+                "group": "other",
+                "label_fa": f"سایر عوامل ({len(remainder)})",
+                "contribution_share": round(residual_share, 6),
+                "contribution_score": round(
+                    sum(g.get("contribution_score", 0.0) for g in remainder), 6
+                ),
+                "signed_effect": round(residual_effect, 6),
+                "direction": (
+                    "positive" if residual_effect > 0
+                    else "negative" if residual_effect < 0 else "neutral"
+                ),
+            },
+        ]
+
     positive = [g for g in groups if g.get("direction") == "positive"][:top_n]
     negative = [g for g in groups if g.get("direction") == "negative"][:top_n]
     return {
         "method": importance.get("method"),
         "base_value": importance.get("base_value"),
-        "groups": groups[:top_n],
+        "groups": shown,
+        "n_groups": len(groups),
         "positive": positive,
         "negative": negative,
         "features": (importance.get("global_importance") or [])[:20],

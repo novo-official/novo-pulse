@@ -19,7 +19,7 @@ METRIC  ?= wape
 .DEFAULT_GOAL := help
 .PHONY: help venv install install-optional migrate seed seed-data-only train demo dev \
         backend frontend frontend-install test test-backend test-frontend lint report \
-        clean download-models docker-up docker-down check profile validate
+        clean download-models docker-up docker-down check profile validate audit e2e
 
 help: ## Show this help
 	@grep -hE '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -97,6 +97,14 @@ test-backend: ## Backend test suite
 
 test-frontend: ## Frontend typecheck, lint and production build
 	cd frontend && npx tsc --noEmit && npm run lint && npm run build
+
+audit: ## Live API audit against a running backend (status codes + semantics)
+	$(PY) scripts/api_audit.py
+	$(PY) scripts/content_audit.py
+
+e2e: ## Browser end-to-end walkthrough (needs both servers running)
+	cd frontend && node e2e/ui_drive.mjs
+	cd frontend && node e2e/ui_upload.mjs
 
 lint: ## Lint the frontend
 	cd frontend && npm run lint

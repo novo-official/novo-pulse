@@ -16,7 +16,14 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from .base import FitContext, ForecastModel, ModelUnavailable, PredictContext, postprocess
+from .base import (
+    FitContext,
+    ForecastModel,
+    ModelUnavailable,
+    PredictContext,
+    enforce_monotone,
+    postprocess,
+)
 
 
 class _GBDTBase(ForecastModel):
@@ -131,7 +138,7 @@ class LightGBMModel(_GBDTBase):
                 out[float(quantile)] = self._finalise(model.predict(X))
         if out and 0.5 in [float(q) for q in quantiles] and 0.5 not in out:
             out[0.5] = self.predict(context)
-        return _enforce_monotone(out)
+        return enforce_monotone(out)
 
     def get_feature_importance(self) -> dict[str, float]:
         if self.model is None:
@@ -234,7 +241,7 @@ class CatBoostModel(_GBDTBase):
             model = self.quantile_models.get(float(quantile))
             if model is not None:
                 out[float(quantile)] = self._finalise(model.predict(X))
-        return _enforce_monotone(out)
+        return enforce_monotone(out)
 
     def get_feature_importance(self) -> dict[str, float]:
         if self.model is None:
@@ -249,11 +256,3 @@ class CatBoostModel(_GBDTBase):
         }
 
 
-def _enforce_monotone(quantiles: dict[float, np.ndarray]) -> dict[float, np.ndarray]:
-    """Quantile crossing is possible when heads are fitted independently."""
-    if len(quantiles) < 2:
-        return quantiles
-    keys = sorted(quantiles)
-    stacked = np.vstack([quantiles[k] for k in keys])
-    stacked = np.sort(stacked, axis=0)
-    return {key: stacked[i] for i, key in enumerate(keys)}

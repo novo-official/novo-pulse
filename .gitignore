@@ -35,6 +35,9 @@ data/uploads/*
 reports/*
 !reports/.gitkeep
 models/hf_cache/
+# Locally-built model scaffolding. The optional-model tests construct their own
+# tiny Chronos model at runtime, so nothing here needs committing.
+models/local_*/
 *.joblib
 *.cbm
 *.parquet

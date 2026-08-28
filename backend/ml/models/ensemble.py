@@ -12,7 +12,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from ..evaluation.metrics import get_metric
-from .base import FitContext, ForecastModel, PredictContext, postprocess
+from .base import FitContext, ForecastModel, PredictContext, enforce_monotone, postprocess
 
 
 @dataclass
@@ -73,7 +73,11 @@ class EnsembleModel(ForecastModel):
             for quantile, values in member_quantiles.items():
                 accumulated[quantile] = accumulated.get(quantile, 0.0) + weight * values
                 used[quantile] = used.get(quantile, 0.0) + weight
-        return {q: postprocess(v / used[q]) for q, v in accumulated.items() if used.get(q, 0) > 0}
+        # A weighted blend of members whose quantiles cross can itself cross.
+        blended = {
+            q: postprocess(v / used[q]) for q, v in accumulated.items() if used.get(q, 0) > 0
+        }
+        return enforce_monotone(blended)
 
     def get_feature_importance(self) -> dict[str, float]:
         """Weight-averaged importance across members that expose one."""

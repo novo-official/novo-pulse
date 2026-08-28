@@ -452,3 +452,112 @@ def test_upload_filename_keeps_a_legitimate_name_readable():
     assert safe_filename("../../evil.csv") == "evil.csv"
     assert safe_filename("/data/raw/Competition Data 2026.csv") == "Competition_Data_2026.csv"
     assert safe_filename("x/y/z.parquet") == "z.parquet"
+
+
+def test_validate_rejects_an_unknown_dataset_instead_of_answering_about_another(client):
+    """Silently validating the active contract would answer the wrong question."""
+    response = client.post(reverse("dataset-validate"), {"dataset_id": 999999}, format="json")
+    assert response.status_code == 404
+    assert "not found" in response.json()["detail"].lower()
+
+
+def test_upload_accepts_a_json_local_path(client, tmp_path, raw_frame, monkeypatch):
+    """Registering a file already on disk should not require a multipart body."""
+    from apps.datasets import services
+    from ml.paths import REPO_ROOT
+
+    target = REPO_ROOT / "data" / "raw" / "json_path_test.csv"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    raw_frame.head(500).to_csv(target, index=False)
+    try:
+        response = client.post(
+            reverse("dataset-upload"),
+            {"path": "data/raw/json_path_test.csv", "name": "JSON path"},
+            format="json",
+        )
+        assert response.status_code == 200, response.content
+        assert response.json()["data"]["profile"]["rows"] == 500
+    finally:
+        target.unlink(missing_ok=True)
+
+
+def test_upload_with_neither_file_nor_path_is_a_clear_400(client):
+    response = client.post(reverse("dataset-upload"), {}, format="json")
+    assert response.status_code == 400
+    assert "file" in response.json()["detail"].lower()
+
+
+def test_driver_shares_always_sum_to_one(client, trained_run):
+    """A truncated driver list must still account for 100% of the effect."""
+    data = client.get(reverse("forecast-drivers")).json()["data"]
+    total = sum(group["contribution_share"] for group in data["groups"])
+    assert total == pytest.approx(1.0, abs=0.005), f"shares sum to {total}"
+
+    if data["n_groups"] > len(data["groups"]) - 1:
+        assert any(group["group"] == "other" for group in data["groups"]), (
+            "the truncated remainder must be shown explicitly, not dropped"
+        )
+
+
+def test_training_accepts_the_mapping_inline(client, tmp_path, raw_frame):
+    """Training must use the mapping the user is looking at, not a stale one."""
+    csv = tmp_path / "inline.csv"
+    raw_frame.head(400).to_csv(csv, index=False)
+    with csv.open("rb") as handle:
+        dataset = client.post(
+            reverse("dataset-upload"), {"file": handle}, format="multipart"
+        ).json()["data"]["dataset"]
+
+    assert not dataset["mapping"], "the fixture should start with no stored mapping"
+
+    response = client.post(
+        reverse("training-run"),
+        {
+            "dataset_id": dataset["id"],
+            "profile": "demo",
+            "horizon": 7,
+            "mapping": {
+                "dataset_id": dataset["id"],
+                "timestamp": "date",
+                "target": "bookings",
+                "entity_id": "listing_id",
+                "primary_metric": "wape",
+                "horizons": [7],
+            },
+        },
+        format="json",
+    )
+    assert response.status_code == 200, response.content
+    assert response.json()["data"]["target"] == "bookings"
+
+
+def test_training_without_any_mapping_explains_what_to_do(client, tmp_path, raw_frame):
+    csv = tmp_path / "unmapped.csv"
+    raw_frame.head(200).to_csv(csv, index=False)
+    with csv.open("rb") as handle:
+        dataset = client.post(
+            reverse("dataset-upload"), {"file": handle}, format="multipart"
+        ).json()["data"]["dataset"]
+
+    response = client.post(
+        reverse("training-run"), {"dataset_id": dataset["id"]}, format="json"
+    )
+    assert response.status_code == 400
+    assert "mapping" in response.json()["detail"].lower()
+
+
+def test_training_rejects_an_invalid_inline_mapping(client, tmp_path, raw_frame):
+    csv = tmp_path / "badmap.csv"
+    raw_frame.head(200).to_csv(csv, index=False)
+    with csv.open("rb") as handle:
+        dataset = client.post(
+            reverse("dataset-upload"), {"file": handle}, format="multipart"
+        ).json()["data"]["dataset"]
+
+    response = client.post(
+        reverse("training-run"),
+        {"dataset_id": dataset["id"], "mapping": {"timestamp": "date"}},  # no target
+        format="json",
+    )
+    assert response.status_code == 400
+    assert "target" in response.json()["errors"]

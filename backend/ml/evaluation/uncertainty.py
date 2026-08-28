@@ -148,18 +148,36 @@ def coverage_by_horizon(
     out = []
     for low, high in buckets:
         window = backtest[(backtest["horizon"] >= low) & (backtest["horizon"] <= high)]
-        if window.empty or "lower" not in window.columns:
+        if window.empty or not {"lower", "upper"}.issubset(window.columns):
             continue
-        inside = (window["actual"] >= window["lower"]) & (window["actual"] <= window["upper"])
+        # A model without native quantiles leaves these bounds NaN. Reporting
+        # NaN would be both meaningless and invalid JSON, so those rows are
+        # dropped and the bucket is reported as having no measured interval.
+        bounded = window.dropna(subset=["lower", "upper", "actual"])
+        if bounded.empty:
+            out.append(
+                {
+                    "bucket": f"{low}-{high}",
+                    "horizon_min": low,
+                    "horizon_max": high,
+                    "n": int(len(window)),
+                    "nominal_coverage": nominal,
+                    "observed_coverage": None,
+                    "mean_width": None,
+                    "note": "this model produced no prediction interval to measure",
+                }
+            )
+            continue
+        inside = (bounded["actual"] >= bounded["lower"]) & (bounded["actual"] <= bounded["upper"])
         out.append(
             {
                 "bucket": f"{low}-{high}",
                 "horizon_min": low,
                 "horizon_max": high,
-                "n": int(len(window)),
+                "n": int(len(bounded)),
                 "nominal_coverage": nominal,
                 "observed_coverage": round(float(inside.mean()), 4),
-                "mean_width": round(float((window["upper"] - window["lower"]).mean()), 4),
+                "mean_width": round(float((bounded["upper"] - bounded["lower"]).mean()), 4),
             }
         )
     return out

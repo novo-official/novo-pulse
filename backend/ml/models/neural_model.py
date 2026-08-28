@@ -14,7 +14,14 @@ import numpy as np
 import pandas as pd
 
 from ..contract import ENTITY
-from .base import FitContext, ForecastModel, ModelUnavailable, PredictContext, postprocess
+from .base import (
+    FitContext,
+    ForecastModel,
+    ModelUnavailable,
+    PredictContext,
+    enforce_monotone,
+    postprocess,
+)
 
 log = logging.getLogger(__name__)
 
@@ -142,7 +149,7 @@ class _NeuralBase(ForecastModel):
             column = self._column(result, float(quantile))
             if column is not None:
                 out[float(quantile)] = self._gather(context, result, column)
-        return out
+        return enforce_monotone(out)
 
 
 class NHITSModel(_NeuralBase):

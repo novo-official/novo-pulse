@@ -67,9 +67,10 @@ async function request<T>(path: string, init?: RequestInit, query?: Query): Prom
   }
 
   if (!response.ok) {
+    // Prefer the Persian message; the English one is for logs and API users.
+    const body = payload as { detail?: string; detail_fa?: string } | null;
     const detail =
-      (payload as { detail?: string })?.detail ??
-      `درخواست با خطای ${response.status} مواجه شد`;
+      body?.detail_fa ?? body?.detail ?? `درخواست با خطای ${response.status} مواجه شد`;
     throw new ApiError(detail, response.status);
   }
   return payload as T;

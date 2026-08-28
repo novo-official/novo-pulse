@@ -276,12 +276,15 @@ export default function DataLabPage() {
   const [horizon, setHorizon] = useState(30);
 
   const train = useMutation({
+    // The mapping on screen is sent with the run, so what you see is what gets
+    // trained - no separate "save first" step to forget.
     mutationFn: () =>
       api.startTraining({
         dataset_id: datasetId ?? undefined,
         profile: profileName,
         horizon,
         metric: mapping.primary_metric,
+        mapping: { ...mapping, dataset_id: datasetId ?? undefined },
       }),
     onSuccess: (response) => {
       if (response.data) setRun(response.data);

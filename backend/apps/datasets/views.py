@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 
 from rest_framework.decorators import api_view, parser_classes
-from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
 from apps.core.responses import error, ok
@@ -32,7 +32,7 @@ def dataset_list(request):
 
 
 @api_view(["POST"])
-@parser_classes([MultiPartParser, FormParser])
+@parser_classes([MultiPartParser, FormParser, JSONParser])
 def dataset_upload(request):
     """Accept a CSV/Parquet/Excel upload and profile it immediately."""
     uploaded = request.FILES.get("file")
@@ -48,7 +48,10 @@ def dataset_upload(request):
             source = Dataset.Source.LOCAL
             original = str(local_path)
         else:
-            return error("Provide either a `file` upload or a `path` to a local file.")
+            return error(
+                "Provide either a `file` upload or a `path` to a local file.",
+                detail_fa="یک فایل انتخاب کنید یا مسیر یک فایل محلی را وارد کنید.",
+            )
     except (ValueError, FileNotFoundError) as exc:
         return error(str(exc))
 
@@ -56,7 +59,10 @@ def dataset_upload(request):
         profile = services.profile(path)
     except Exception as exc:  # noqa: BLE001 - a bad file must produce a message
         services.cleanup(path) if uploaded is not None else None
-        return error(f"Could not read the dataset: {exc}")
+        return error(
+            f"Could not read the dataset: {exc}",
+            detail_fa=f"خواندن دیتاست ممکن نشد: {exc}",
+        )
 
     existing = set(Dataset.objects.values_list("slug", flat=True))
     name = request.data.get("name") or path.stem
@@ -97,7 +103,10 @@ def dataset_profile(request):
     try:
         profile = services.profile(target)
     except Exception as exc:  # noqa: BLE001
-        return error(f"Could not read the dataset: {exc}")
+        return error(
+            f"Could not read the dataset: {exc}",
+            detail_fa=f"خواندن دیتاست ممکن نشد: {exc}",
+        )
 
     if dataset is not None:
         dataset.profile = profile
@@ -117,7 +126,11 @@ def dataset_map(request):
 
     dataset = Dataset.objects.filter(id=mapping.get("dataset_id")).first()
     if dataset is None:
-        return error("Dataset not found - upload it first.", 404)
+        return error(
+            "Dataset not found - upload it first.",
+            404,
+            detail_fa="دیتاست پیدا نشد؛ ابتدا آن را بارگذاری کنید.",
+        )
 
     contract = services.contract_from_mapping(mapping, dataset.path, dataset.name)
     dataset.mapping = {k: v for k, v in mapping.items() if k != "dataset_id"}
@@ -141,6 +154,14 @@ def dataset_validate(request):
     """Full data-quality report for a mapping, before anything is trained."""
     dataset_id = request.data.get("dataset_id")
     dataset = Dataset.objects.filter(id=dataset_id).first() if dataset_id else None
+    if dataset_id and dataset is None:
+        # Falling back to the active contract here would answer a question the
+        # caller did not ask - a report about a completely different dataset.
+        return error(
+            f"Dataset {dataset_id} not found",
+            404,
+            detail_fa=f"دیتاست با شناسه {dataset_id} پیدا نشد.",
+        )
 
     if request.data.get("mapping"):
         if dataset is None:
@@ -159,7 +180,10 @@ def dataset_validate(request):
     try:
         report = services.validate_contract(contract)
     except Exception as exc:  # noqa: BLE001 - report the failure, do not 500
-        return error(f"Validation failed: {exc}")
+        return error(
+            f"Validation failed: {exc}",
+            detail_fa=f"اعتبارسنجی داده با خطا مواجه شد: {exc}",
+        )
 
     if dataset is not None:
         dataset.validation = report

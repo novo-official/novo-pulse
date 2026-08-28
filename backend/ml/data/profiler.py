@@ -29,15 +29,17 @@ TARGET_HINTS = (
 )
 ENTITY_HINTS = (
     "accommodation_id", "listing_id", "hotel_id", "property_id", "unit_id",
-    "entity_id", "item_id", "sku", "id", "product_id", "series_id", "host_id",
+    "entity_id", "item_id", "product_id", "series_id", "host_id", "unit_code",
+    "property_code", "listing_key", "sku", "id", "code", "key", "uid", "guid",
 )
 DESTINATION_HINTS = (
     "destination_id", "destination", "city", "city_id", "region", "province",
-    "location", "area", "market", "geo",
+    "location", "area", "market", "geo", "zone", "district", "country",
+    "state", "site", "branch", "store", "cluster", "territory",
 )
 CATEGORY_HINTS = (
     "category", "accommodation_type", "property_type", "type", "segment",
-    "class", "group", "room_type",
+    "class", "group", "room_type", "tier", "brand", "family", "kind",
 )
 FUTURE_HINTS = (
     "price", "is_holiday", "holiday", "is_weekend", "weekend", "capacity",
@@ -66,16 +68,45 @@ def _normalise(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", str(name).strip().lower()).strip("_")
 
 
+# Below this length a substring match is meaningless: the bare hint "id"
+# matches "hol-id-ay", "val-id", "gu-id-e" and "w-id-th". Short hints are only
+# ever matched as whole tokens.
+MIN_SUBSTRING_HINT = 5
+
+
 def _score(name: str, hints: tuple[str, ...]) -> float:
-    """How strongly a column name matches a role's keyword table."""
+    """How strongly a column name matches a role's keyword table.
+
+    Matching is token-aware. A naive substring test is far too eager on short
+    keywords - it is what once made `public_holiday` the best "entity id"
+    candidate in a dataset, purely because "holiday" contains "id".
+    """
     norm = _normalise(name)
+    tokens = [t for t in norm.split("_") if t]
+    token_set = set(tokens)
     best = 0.0
+
     for hint in hints:
+        hint_tokens = [t for t in hint.split("_") if t]
+
         if norm == hint:
             return 1.0
-        if norm.endswith(f"_{hint}") or norm.startswith(f"{hint}_"):
+        # Every part of a multi-word hint present as a token: "unit_code"
+        # matching a column literally named "unit_code" is handled above; this
+        # catches "code_unit" and "unit code id".
+        if len(hint_tokens) > 1 and set(hint_tokens).issubset(token_set):
+            best = max(best, 0.92)
+            continue
+        # Single-word hint appearing as a whole token: "code" in "unit_code".
+        if len(hint_tokens) == 1 and hint in token_set:
+            best = max(best, 0.9 if tokens[-1] == hint else 0.82)
+            continue
+        # Affix match on a longer hint: "listing_identifier" for hint "listing".
+        if len(hint) >= 4 and (norm.startswith(f"{hint}_") or norm.endswith(f"_{hint}")):
             best = max(best, 0.85)
-        elif hint in norm:
+            continue
+        # Loose substring, only for hints long enough to be unambiguous.
+        if len(hint) >= MIN_SUBSTRING_HINT and hint in norm:
             best = max(best, 0.6)
     return best
 

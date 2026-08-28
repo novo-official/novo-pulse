@@ -165,7 +165,7 @@ scripts/             download_models.py
 | Backend | Python 3.12 · Django 5 · Django REST Framework |
 | Data | pandas · NumPy · PyArrow |
 | ML | LightGBM · CatBoost · scikit-learn · SHAP |
-| Optional ML | Chronos-2 · NeuralForecast (NHITS/NBEATSx) · PyTorch · Optuna |
+| Optional ML | Chronos-2 · NeuralForecast (NHITS/NBEATSx) · PyTorch · Optuna — all verified running |
 | Database | SQLite (dev) — Postgres via `DATABASE_URL` |
 | Frontend | Next.js 15 (App Router) · TypeScript · Tailwind · shadcn-style UI · TanStack Query · Recharts |
 | Deployment | Docker + docker compose |
@@ -348,6 +348,15 @@ If nothing is downloaded, the system runs on LightGBM, CatBoost and the
 baselines — which is the configuration the benchmark table above was produced
 with.
 
+**Verified status of the optional models** (run on a 4-core CPU, no GPU):
+
+| Model | Status | Note |
+|---|---|---|
+| NHITS | trains and forecasts | 79% empirical coverage on an 80% interval |
+| NBEATSx | trains and forecasts | joins the ensemble with a CV-derived weight |
+| Chronos-2 | adapter verified against the real library | pretrained weights need HuggingFace access |
+| Optuna | searches and improves | 40 trials in 26s took WAPE 0.163 → 0.159 |
+
 ---
 
 ## Failure handling
@@ -372,13 +381,29 @@ Every optional component fails soft. None of them can take the demo down.
 ```bash
 make test           # backend pytest + frontend typecheck/lint/build
 make test-backend
+make audit          # live API audit against a running backend
+make e2e            # browser walkthrough with real clicks
 ```
 
-128 tests covering: leakage guarantees, the data adapter, schema detection,
-validation, metrics, time-series splitting, conformal calibration, baselines,
-GBDT models, the registry, the full pipeline, reproducibility, hierarchy
-coherence, anomaly and peak detection, the narrator's anti-hallucination gate,
-and every API endpoint in both the empty and populated states.
+**216 unit/integration tests** covering: leakage guarantees, the data adapter,
+schema detection, validation, metrics, time-series splitting, conformal
+calibration, baselines, GBDT models, the optional Chronos/NHITS adapters, the
+registry, the full pipeline, reproducibility, hierarchy coherence, anomaly and
+peak detection, JSON safety, path-traversal defences, the narrator's
+anti-hallucination gate, and every API endpoint in both the empty and populated
+states.
+
+Three further layers run against a live system rather than fixtures:
+
+| Layer | What it does | Command |
+|---|---|---|
+| API audit | 63 calls across every endpoint, including malformed input and edge cases | `make audit` |
+| Semantic audit | 45 checks that the *numbers* are right - hierarchy coherence, KPI/series agreement, scenario direction, coverage vs. nominal | `make audit` |
+| Browser E2E | 46 real interactions: filters, entity selection, horizon switching, running a scenario, uploading a CSV and training from the UI | `make e2e` |
+
+The optional-model tests build a tiny Chronos model locally rather than
+downloading weights, so they exercise the adapter against the real library in
+any environment. Accuracy is not asserted there - the integration is.
 
 ---
 

@@ -118,6 +118,8 @@ export const api = {
     horizon?: number;
     metric?: string;
     experiment?: string;
+    /** Sent so the run uses the mapping currently on screen. */
+    mapping?: Record<string, unknown>;
   }) => postEnvelope<TrainingRun>('/training/run/', body),
 
   trainingRun: (runId: string) => getEnvelope<TrainingRun>(`/training/${runId}/`),

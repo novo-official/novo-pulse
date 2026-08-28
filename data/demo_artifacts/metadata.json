@@ -1,6 +1,6 @@
 {
-  "run_id": "2026-08-28_002",
-  "created_at": "2026-08-27T21:03:23.192182+00:00",
+  "run_id": "2026-08-28_008",
+  "created_at": "2026-08-28T15:12:38.244741+00:00",
   "champion": "lightgbm",
   "profile": "demo",
   "profile_config": {
@@ -129,12 +129,12 @@
     "end": "2026-08-26"
   },
   "models": {
-    "seasonal_naive_7": "runs/2026-08-28_002/models/seasonal_naive_7.joblib",
-    "seasonal_naive_30": "runs/2026-08-28_002/models/seasonal_naive_30.joblib",
-    "moving_average": "runs/2026-08-28_002/models/moving_average.joblib",
-    "historical_mean": "runs/2026-08-28_002/models/historical_mean.joblib",
-    "lightgbm": "runs/2026-08-28_002/models/lightgbm.joblib",
-    "catboost": "runs/2026-08-28_002/models/catboost.joblib"
+    "seasonal_naive_7": "runs/2026-08-28_008/models/seasonal_naive_7.joblib",
+    "seasonal_naive_30": "runs/2026-08-28_008/models/seasonal_naive_30.joblib",
+    "moving_average": "runs/2026-08-28_008/models/moving_average.joblib",
+    "historical_mean": "runs/2026-08-28_008/models/historical_mean.joblib",
+    "lightgbm": "runs/2026-08-28_008/models/lightgbm.joblib",
+    "catboost": "runs/2026-08-28_008/models/catboost.joblib"
   },
   "ensemble_weights": {
     "lightgbm": 0.5261,
@@ -149,7 +149,7 @@
     "cuda": false,
     "gpu_name": null,
     "vram_gb": null,
-    "torch": null,
+    "torch": "2.13.0+cu130",
     "recommended_profile": "competition",
     "device": "cpu"
   },

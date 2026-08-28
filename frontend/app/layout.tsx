@@ -16,11 +16,13 @@ const vazir = Vazirmatn({
 export const metadata: Metadata = {
   title: 'نوو پالس | هوش پیش‌بینی تقاضا',
   description: 'پیش‌بینی، تحلیل و شبیه‌سازی تقاضای بازار اقامت',
+  applicationName: 'Novo Pulse',
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  themeColor: '#3563e9',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

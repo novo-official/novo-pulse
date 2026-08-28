@@ -18,7 +18,12 @@ from django.utils.text import slugify
 from ml.contract import DataContract, load_profile
 from ml.models.registry import REGISTRY, is_baseline
 from ml.paths import REPO_ROOT
-from ml.pipelines.training import TrainingConfig, TrainingPipeline, load_future_overrides
+from ml.pipelines.training import (
+    TrainingConfig,
+    TrainingPipeline,
+    load_future_overrides,
+    sanitise_json,
+)
 
 from .models import Experiment, ModelResult, TrainingRun
 
@@ -174,14 +179,17 @@ def _persist(run_pk: int, result) -> None:
     run.n_entities = panel.get("entities", 0)
     run.n_features = (result.artefacts and metrics.get("panel", {}).get("rows") and 0) or 0
     run.frequency = panel.get("frequency", "D")
-    run.metrics = {
-        "leaderboard": leaderboard,
-        "intervals": metrics.get("intervals"),
-        "coverage_by_horizon": metrics.get("coverage_by_horizon"),
-        "ensemble_weights": metrics.get("ensemble_weights"),
-        "folds": metrics.get("folds"),
-    }
-    run.warnings = result.warnings
+    # SQLite enforces JSON_VALID on JSONFields, and NaN is not valid JSON.
+    run.metrics = sanitise_json(
+        {
+            "leaderboard": leaderboard,
+            "intervals": metrics.get("intervals"),
+            "coverage_by_horizon": metrics.get("coverage_by_horizon"),
+            "ensemble_weights": metrics.get("ensemble_weights"),
+            "folds": metrics.get("folds"),
+        }
+    )
+    run.warnings = sanitise_json(result.warnings)
     run.training_seconds = metrics.get("training_seconds")
     run.finished_at = datetime.now(timezone.utc)
 
@@ -208,8 +216,8 @@ def _persist(run_pk: int, result) -> None:
                 primary_metric=row.get("primary_metric", run.primary_metric),
                 primary_value=row.get("primary_value"),
                 improvement_vs_baseline=row.get("improvement_vs_baseline"),
-                metrics=row.get("metrics") or {},
-                by_horizon=row.get("by_horizon") or [],
+                metrics=sanitise_json(row.get("metrics") or {}),
+                by_horizon=sanitise_json(row.get("by_horizon") or []),
                 ensemble_weight=weights.get(row["model"]),
                 fit_seconds=row.get("fit_seconds"),
             )
