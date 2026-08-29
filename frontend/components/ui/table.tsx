@@ -29,14 +29,17 @@ export function Th({
   align = 'right',
   className,
   title,
+  scope = 'col',
 }: {
   children: ReactNode;
   align?: 'right' | 'left' | 'center';
   className?: string;
   title?: string;
+  scope?: 'col' | 'row' | 'colgroup' | 'rowgroup';
 }) {
   return (
     <th
+      scope={scope}
       title={title}
       className={cn(
         'whitespace-nowrap border-b border-line bg-slate-50/80 px-3 py-3 text-[11px] font-bold text-muted',

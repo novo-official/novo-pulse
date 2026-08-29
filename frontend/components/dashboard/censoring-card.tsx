@@ -7,15 +7,15 @@ import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { Td, TableWrap, Th } from '@/components/ui/table';
 import { InfoHint } from '@/components/ui/tooltip';
 import type { CensoringReport, TuningRun } from '@/lib/types/api';
-import { formatNumber, formatRatioAsPercent } from '@/lib/utils';
+import { cn, formatNumber, formatRatioAsPercent } from '@/lib/utils';
 
 /** Demand censoring: what the target hides when supply runs out. */
-export function CensoringCard({ report }: { report: CensoringReport }) {
+export function CensoringCard({ report, className }: { report: CensoringReport; className?: string }) {
   if (!report.enabled) return null;
   const heavy = report.censored_share > 0.25;
 
   return (
-    <Card className="signal-card bg-gradient-to-b from-amber-50/30 to-surface">
+    <Card className={cn('signal-card bg-gradient-to-b from-amber-50/30 to-surface', className)}>
       <CardHeader
         icon={<PackageOpen className="h-4.5 w-4.5" />}
         title="سانسور تقاضا (ظرفیت تکمیل)"
@@ -60,11 +60,11 @@ export function CensoringCard({ report }: { report: CensoringReport }) {
 }
 
 /** Hyper-parameter search outcome, including the runs that changed nothing. */
-export function TuningCard({ runs }: { runs: TuningRun[] }) {
+export function TuningCard({ runs, className }: { runs: TuningRun[]; className?: string }) {
   if (!runs.length) return null;
 
   return (
-    <Card className="signal-card">
+    <Card className={cn('signal-card', className)}>
       <CardHeader
         icon={<SlidersHorizontal className="h-4.5 w-4.5" />}
         title="جست‌وجوی ابرپارامترها"

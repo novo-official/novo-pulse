@@ -1,6 +1,7 @@
 'use client';
 
 import { Filter, Layers3, MapPin, Sparkles } from 'lucide-react';
+import type { CSSProperties } from 'react';
 
 import { Select } from '@/components/ui/select';
 import { useForecastFilters } from '@/hooks/useForecastFilters';
@@ -16,19 +17,35 @@ export function HorizonSelector({
 }) {
   const horizon = useForecastFilters((state) => state.horizon);
   const setHorizon = useForecastFilters((state) => state.setHorizon);
+  const activeIndex = Math.max(0, options.indexOf(horizon));
+
+  const move = (direction: 1 | -1) => {
+    const current = Math.max(0, options.indexOf(horizon));
+    setHorizon(options[(current + direction + options.length) % options.length]);
+  };
 
   return (
     <div
-      className={cn('forecast-segment inline-flex rounded-xl', className)}
-      role="group"
+      className={cn('forecast-segment inline-flex rounded-full', className)}
+      role="radiogroup"
       aria-label="افق پیش‌بینی"
+      onKeyDown={(event) => {
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') { event.preventDefault(); move(1); }
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') { event.preventDefault(); move(-1); }
+        if (event.key === 'Home') { event.preventDefault(); setHorizon(options[0]); }
+        if (event.key === 'End') { event.preventDefault(); setHorizon(options[options.length - 1]); }
+      }}
+      style={{ '--segment-index': activeIndex } as CSSProperties}
     >
+      <span className="forecast-segment__thumb" aria-hidden="true" />
       {options.map((option) => (
         <button
           key={option}
           type="button"
           onClick={() => setHorizon(option)}
-          aria-pressed={horizon === option}
+          role="radio"
+          aria-checked={horizon === option}
+          tabIndex={horizon === option ? 0 : -1}
           className={cn(
             'forecast-segment__option nums rounded-[9px] px-3 py-1.5 text-xs font-semibold transition duration-200',
             horizon === option
@@ -47,10 +64,12 @@ export function LevelEntityFilter({
   levels,
   members,
   className,
+  memberLabel,
 }: {
   levels: Level[];
   members: Member[];
   className?: string;
+  memberLabel?: string;
 }) {
   const { level, entityId, setLevel, setEntityId } = useForecastFilters();
 
@@ -71,7 +90,7 @@ export function LevelEntityFilter({
         ))}
       </Select>
       <Select
-        label={LEVEL_FA[level] ?? 'انتخاب'}
+        label={memberLabel ?? LEVEL_FA[level] ?? 'انتخاب'}
         icon={<MapPin className="h-3.5 w-3.5" aria-hidden="true" />}
         containerClassName="filter-bar__field"
         className="filter-bar__select"
@@ -94,20 +113,24 @@ export function FilterBar({
   levels,
   members,
   horizons,
+  label = 'فیلترهای تحلیل',
+  memberLabel,
 }: {
   levels: Level[];
   members: Member[];
   horizons: number[];
+  label?: string;
+  memberLabel?: string;
 }) {
   return (
     <section aria-label="فیلترهای پیش‌بینی" className="filter-bar relative flex flex-col gap-5 overflow-visible rounded-[20px] border border-slate-900/[0.07] bg-surface p-5 shadow-[0_1px_2px_rgb(15_23_42_/_0.02),0_14px_30px_-24px_rgb(15_23_42_/_0.24)] lg:flex-row lg:items-end lg:justify-between lg:px-6 lg:py-5">
       <div className="filter-bar__analysis min-w-0">
         <div className="filter-bar__context">
           <Filter className="h-3.5 w-3.5" aria-hidden="true" />
-          <span>فیلترهای تحلیل</span>
+          <span>{label}</span>
 
         </div>
-        <LevelEntityFilter levels={levels} members={members} className="mt-2.5 lg:w-[500px]" />
+        <LevelEntityFilter levels={levels} members={members} memberLabel={memberLabel} className="mt-2.5 lg:w-[500px]" />
       </div>
       <div className="filter-bar__horizon flex flex-col gap-2">
         <span className="flex items-center gap-1.5 px-0.5 text-xs font-semibold text-muted"><Sparkles className="h-3.5 w-3.5 text-brand-500/80" aria-hidden="true" />افق پیش‌بینی</span>

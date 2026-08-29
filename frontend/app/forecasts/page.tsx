@@ -1,11 +1,12 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { LineChart, ListTree } from 'lucide-react';
+import { LineChart } from 'lucide-react';
 
 import { ForecastChart } from '@/components/charts/forecast-chart';
 import { DemandHeatmap } from '@/components/charts/heatmap';
 import { OverviewTable } from '@/components/dashboard/overview-table';
+import { ForecastHierarchyCard } from '@/components/dashboard/forecast-hierarchy-card';
 import { PeaksCard } from '@/components/dashboard/peaks-card';
 import { FilterBar } from '@/components/filters/forecast-filters';
 import { Badge } from '@/components/ui/badge';
@@ -151,29 +152,7 @@ export default function ForecastsPage() {
         {heatmapQuery.data?.data ? <DemandHeatmap data={heatmapQuery.data.data} /> : null}
       </AsyncBoundary>
 
-      <Card className="debug-only signal-card bg-slate-50/50">
-        <CardHeader
-          icon={<ListTree className="h-4.5 w-4.5" />}
-          title="سلسله‌مراتب پیش‌بینی"
-          subtitle="پیش‌بینی در سطح اقامتگاه تولید و به سطوح بالاتر تجمیع می‌شود (Bottom-Up)"
-        />
-        <CardBody>
-          <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
-            {(timeseries?.levels ?? []).map((item, index, all) => (
-              <span key={item} className="flex items-center gap-2">
-                <span className="rounded-lg border border-line bg-surface px-2.5 py-1 font-medium text-ink shadow-sm">
-                  {LEVEL_FA[item]}
-                </span>
-                {index < all.length - 1 ? <span>←</span> : null}
-              </span>
-            ))}
-          </div>
-          <p className="mt-3 text-xs leading-6 text-muted">
-            بازه اطمینان سطوح بالاتر از جمع کران‌های سطح پایین به دست می‌آید. این کار همبستگی خطاها
-            را فرض می‌گیرد و پهنای بازه را محافظه‌کارانه بیش‌برآورد می‌کند.
-          </p>
-        </CardBody>
-      </Card>
+      <ForecastHierarchyCard levels={timeseries?.levels ?? []} />
     </div>
   );
 }

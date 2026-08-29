@@ -32,8 +32,8 @@ export default function ModelsPage() {
   }
 
   return (
-    <div className="page-stack">
-      <PageHeader eyebrow="موتور هوشمند" title="مدل‌ها و عملکرد" description="مدل منتخب، رتبه‌بندی و جزئیات فنی را شفاف ببینید؛ انتخاب برنده فقط بر پایه اعتبارسنجی زمانی انجام می‌شود." />
+    <main className="page-stack models-page">
+      <PageHeader className="models-header" eyebrow="موتور هوشمند" title="مدل‌ها و عملکرد" description="مدل منتخب، رتبه‌بندی و جزئیات فنی را شفاف ببینید؛ انتخاب برنده فقط بر پایه اعتبارسنجی زمانی انجام می‌شود." />
 
       {/* ------------------------------------------------ champion banner */}
       <AsyncBoundary
@@ -47,30 +47,30 @@ export default function ModelsPage() {
         }
       >
         {champion ? (
-          <Card className="overflow-hidden border-brand-200 bg-gradient-to-l from-brand-100/80 via-brand-50/50 to-surface shadow-lift">
-            <CardBody className="flex flex-wrap items-center justify-between gap-6 pt-5">
+          <Card className="models-champion">
+            <CardBody className="models-champion__body flex flex-wrap items-center justify-between gap-6">
               <div className="flex items-center gap-4">
-                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-card">
+                <span className="models-champion__icon flex h-14 w-14 items-center justify-center text-white">
                   <Trophy className="h-6 w-6" />
                 </span>
                 <div>
-                  <p className="text-xs font-medium text-brand-700">مدل منتخب</p>
-                  <p className="text-2xl font-bold text-ink">{champion.model}</p>
+                  <p className="models-champion__eyebrow">مدل منتخب</p>
+                  <p className="models-champion__name" dir="ltr">{champion.model}</p>
                   <p className="mt-0.5 text-xs text-muted">
                     {MODEL_KIND_FA[champion.is_baseline ? 'baseline' : 'ml']} · آموزش‌دیده روی کل
                     تاریخچه
                   </p>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-6">
-                <div>
+              <div className="models-champion__stats flex flex-wrap">
+                <div className="models-champion__stat">
                   <p className="text-xs text-muted">{metric.toUpperCase()}</p>
                   <p className="nums mt-1 text-2xl font-semibold text-ink">
                     {formatMetric(champion.primary_value, metric)}
                   </p>
                 </div>
                 {bestBaseline ? (
-                  <div>
+                  <div className="models-champion__stat">
                     <p className="text-xs text-muted">بهترین مدل پایه</p>
                     <p className="nums mt-1 text-2xl font-semibold text-muted">
                       {formatMetric(bestBaseline.primary_value, metric)}
@@ -79,7 +79,7 @@ export default function ModelsPage() {
                 ) : null}
                 {champion.improvement_vs_baseline !== null &&
                 champion.improvement_vs_baseline !== undefined ? (
-                  <div>
+                  <div className="models-champion__stat models-champion__stat--positive">
                     <p className="text-xs text-muted">بهبود</p>
                     <p className="nums mt-1 text-2xl font-semibold text-emerald-600">
                       {(champion.improvement_vs_baseline * 100).toFixed(1)}٪
@@ -93,7 +93,7 @@ export default function ModelsPage() {
       </AsyncBoundary>
 
       {/* ---------------------------------------------------- leaderboard */}
-      <Card className="signal-card overflow-hidden">
+      <Card className="models-card models-leaderboard">
         <CardHeader
           icon={<Award className="h-4.5 w-4.5" />}
           title="جدول رتبه‌بندی مدل‌ها"
@@ -111,65 +111,83 @@ export default function ModelsPage() {
           onRetry={() => leaderboardQuery.refetch()}
           skeleton={<CardSkeleton lines={8} />}
         >
-          <CardBody>
-            <TableWrap minWidth={980}>
+          <CardBody className="models-leaderboard__body">
+            <TableWrap className="models-table" minWidth={1080}>
+              <colgroup>
+                <col className="models-table__col-rank" />
+                <col className="models-table__col-model" />
+                <col className="models-table__col-kind" />
+                <col className="models-table__col-metric" />
+                <col className="models-table__col-value" />
+                <col className="models-table__col-value" />
+                {(board?.horizon_buckets ?? []).map((bucket) => (
+                  <col key={bucket} className="models-table__col-horizon" />
+                ))}
+                <col className="models-table__col-weight" />
+                <col className="models-table__col-improvement" />
+              </colgroup>
               <thead>
                 <tr>
-                  <Th align="right">#</Th>
+                  <Th align="center">رتبه</Th>
                   <Th align="right">مدل</Th>
-                  <Th>نوع</Th>
-                  <Th>{metric.toUpperCase()}</Th>
-                  <Th>MAE</Th>
-                  <Th>RMSE</Th>
+                  <Th align="center">نوع</Th>
+                  <Th align="center">{metric.toUpperCase()}</Th>
+                  <Th align="center">MAE</Th>
+                  <Th align="center">RMSE</Th>
                   {(board?.horizon_buckets ?? []).map((bucket) => (
-                    <Th key={bucket} title={`افق ${bucket} روز`}>
+                    <Th key={bucket} align="center" title={`افق ${bucket} روز`}>
                       {bucket}
                     </Th>
                   ))}
-                  <Th>وزن ترکیب</Th>
-                  <Th>بهبود</Th>
+                  <Th align="center">وزن ترکیب</Th>
+                  <Th align="center">بهبود</Th>
                 </tr>
               </thead>
               <tbody>
                 {(board?.leaderboard ?? []).map((row) => (
                   <tr
                     key={row.model}
-                    className={cn(row.is_champion && 'bg-brand-50/60 font-medium')}
+                    className={cn('models-table__row', row.is_champion && 'models-table__row--champion')}
                   >
-                    <Td align="right" className="nums text-muted">
-                      {row.rank}
+                    <Td align="center" className="nums models-table__rank-cell">
+                      <span className="models-table__rank">{row.rank}</span>
                     </Td>
                     <Td align="right">
-                      <span className="flex items-center gap-2">
+                      <span className="models-table__model flex items-center gap-2">
                         {row.is_champion ? <Trophy className="h-3.5 w-3.5 text-brand-600" /> : null}
                         <span dir="ltr">{row.model}</span>
                       </span>
                     </Td>
-                    <Td>
+                    <Td align="center">
                       <Badge tone={row.is_baseline ? 'neutral' : 'brand'}>
                         {row.is_baseline ? 'پایه' : row.model === 'ensemble' ? 'ترکیبی' : 'یادگیری'}
                       </Badge>
                     </Td>
-                    <Td className="nums font-semibold">
-                      {formatMetric(row.primary_value, metric)}
+                    <Td align="center" className="nums">
+                      <span className="models-table__primary">
+                        {formatMetric(row.primary_value, metric)}
+                      </span>
                     </Td>
-                    <Td className="nums text-muted">{formatNumber(row.metrics.mae, 2)}</Td>
-                    <Td className="nums text-muted">{formatNumber(row.metrics.rmse, 2)}</Td>
+                    <Td align="center" className="nums text-muted">{formatNumber(row.metrics.mae, 2)}</Td>
+                    <Td align="center" className="nums text-muted">{formatNumber(row.metrics.rmse, 2)}</Td>
                     {(board?.horizon_buckets ?? []).map((bucket) => {
                       const entry = row.by_horizon.find((item) => item.bucket === bucket);
                       return (
-                        <Td key={bucket} className="nums text-muted">
+                        <Td key={bucket} align="center" className="nums text-muted">
                           {entry ? formatMetric(Number(entry[metric]), metric) : '—'}
                         </Td>
                       );
                     })}
-                    <Td className="nums text-muted">
-                      {row.ensemble_weight ? `${(row.ensemble_weight * 100).toFixed(0)}٪` : '—'}
+                    <Td align="center" className="nums text-muted">
+                      {row.ensemble_weight !== null && row.ensemble_weight !== undefined
+                        ? `${(row.ensemble_weight * 100).toFixed(0)}٪`
+                        : '—'}
                     </Td>
                     <Td
+                      align="center"
                       className={cn(
-                        'nums',
-                        (row.improvement_vs_baseline ?? 0) > 0 ? 'text-emerald-600' : 'text-muted',
+                        'nums models-table__improvement',
+                        (row.improvement_vs_baseline ?? 0) > 0 && 'models-table__improvement--positive',
                       )}
                     >
                       {row.improvement_vs_baseline !== null &&
@@ -185,14 +203,14 @@ export default function ModelsPage() {
         </AsyncBoundary>
       </Card>
 
-      {registry?.trained?.tuning?.length ? <TuningCard runs={registry.trained.tuning} /> : null}
+      {registry?.trained?.tuning?.length ? <TuningCard className="models-card models-tuning" runs={registry.trained.tuning} /> : null}
       {registry?.trained?.censoring?.enabled ? (
-        <CensoringCard report={registry.trained.censoring} />
+        <CensoringCard className="models-card models-censoring" report={registry.trained.censoring} />
       ) : null}
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* ------------------------------------------- technical metadata */}
-        <Card className="signal-card">
+        <Card className="models-card models-meta-card">
           <CardHeader
             icon={<Info className="h-4.5 w-4.5" />}
             title="شفافیت فنی"
@@ -206,7 +224,7 @@ export default function ModelsPage() {
           >
             <CardBody>
               {registry?.trained ? (
-                <dl className="space-y-2.5 text-sm">
+                <dl className="models-metadata text-sm">
                   {[
                     ['شناسه اجرا', registry.trained.run_id],
                     ['مدل پیش‌بینی', registry.trained.champion],
@@ -224,7 +242,7 @@ export default function ModelsPage() {
                     ['پروفایل آموزش', registry.trained.profile],
                     ['آخرین آموزش', formatDateTime(registry.trained.last_trained)],
                   ].map(([label, value]) => (
-                    <div key={label} className="flex justify-between gap-4 border-b border-line/60 pb-2">
+                    <div key={label} className="models-metadata__row flex justify-between gap-4">
                       <dt className="shrink-0 text-muted">{label}</dt>
                       <dd className="truncate text-left text-ink" dir="auto">
                         {value ?? '—'}
@@ -251,7 +269,7 @@ export default function ModelsPage() {
         </Card>
 
         {/* ---------------------------------------------- model registry */}
-        <Card className="signal-card">
+        <Card className="models-card models-registry-card">
           <CardHeader
             icon={<Layers className="h-4.5 w-4.5" />}
             title="مدل‌های در دسترس"
@@ -262,11 +280,11 @@ export default function ModelsPage() {
             error={modelsQuery.error}
             skeleton={<CardSkeleton lines={8} />}
           >
-            <CardBody className="space-y-2">
+            <CardBody className="models-registry space-y-2">
               {(registry?.registry ?? []).map((model) => (
                 <div
                   key={model.name}
-                  className="insight-row flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5"
+                  className="models-registry__item flex flex-wrap items-center justify-between gap-2"
                 >
                   <span className="flex items-center gap-2.5">
                     <Cpu
@@ -296,6 +314,6 @@ export default function ModelsPage() {
           </AsyncBoundary>
         </Card>
       </div>
-    </div>
+    </main>
   );
 }

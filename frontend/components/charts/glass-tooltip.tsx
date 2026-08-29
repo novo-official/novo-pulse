@@ -13,7 +13,10 @@ const LABELS: Record<string, string> = {
 const number = new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 1 });
 const date = new Intl.DateTimeFormat('fa-IR', { weekday: 'long', day: 'numeric', month: 'long' });
 
-export function GlassTooltip({ active, payload, label }: { active?: boolean; payload?: Entry[]; label?: string | number }) {
+export function GlassTooltip({ active, payload, label, children }: { active?: boolean; payload?: Entry[]; label?: string | number; children?: ReactNode }) {
+  if (children) {
+    return <div dir="rtl" role="status" className="glass-chart-tooltip">{children}</div>;
+  }
   if (!active || !payload?.length) return null;
   const rows = payload.filter((item) => ['actual', 'backtest', 'forecast'].includes(String(item.dataKey)) && item.value !== null && item.value !== undefined);
   if (!rows.length) return null;

@@ -81,12 +81,13 @@ export function InfoHint({ children, label }: { children: ReactNode; label?: str
     const resizeObserver = new ResizeObserver(updatePosition);
     resizeObserver.observe(triggerRef.current);
     resizeObserver.observe(tooltipRef.current);
-    window.addEventListener('resize', updatePosition);
-    window.addEventListener('scroll', updatePosition, true);
+    const closeOnViewportChange = () => setOpen(false);
+    window.addEventListener('resize', closeOnViewportChange);
+    window.addEventListener('scroll', closeOnViewportChange, true);
     return () => {
       resizeObserver.disconnect();
-      window.removeEventListener('resize', updatePosition);
-      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', closeOnViewportChange);
+      window.removeEventListener('scroll', closeOnViewportChange, true);
     };
   }, [open, children]);
 
@@ -97,7 +98,7 @@ export function InfoHint({ children, label }: { children: ReactNode; label?: str
   ) : null;
 
   return <>
-    <button ref={triggerRef} type="button" className="info-hint" aria-label={label ?? 'توضیح تکمیلی'} aria-describedby={open ? tooltipId : undefined} onPointerEnter={show} onPointerLeave={hide} onFocus={show} onBlur={hide}>
+    <button ref={triggerRef} type="button" className="info-hint" aria-label={label ?? 'توضیح تکمیلی'} aria-describedby={open ? tooltipId : undefined} onPointerEnter={show} onPointerLeave={hide} onFocus={show} onBlur={hide} onKeyDown={(event) => { if (event.key === 'Escape') { event.preventDefault(); setOpen(false); } }}>
       <Info className="h-3.5 w-3.5" aria-hidden="true" />
     </button>
     {mounted ? createPortal(tooltip, document.body) : null}
