@@ -10,7 +10,7 @@ import { SEVERITY_FA, cn, formatFullDate, formatNumber, formatPercent } from '@/
 
 export function AnomalyPanel({ anomalies }: { anomalies: Anomaly[] }) {
   return (
-    <Card className="h-full">
+    <Card className="signal-card h-full">
       <CardHeader
         icon={<AlertTriangle className="h-4.5 w-4.5" />}
         title="ناهنجاری‌های تقاضا"
@@ -30,7 +30,7 @@ export function AnomalyPanel({ anomalies }: { anomalies: Anomaly[] }) {
               return (
                 <li
                   key={`${anomaly.entity_id}-${anomaly.ds}-${index}`}
-                  className="flex items-center gap-3 rounded-xl border border-line/70 px-3 py-2.5"
+                  className={cn('insight-row flex items-center gap-3', spike ? 'hover:border-emerald-200' : 'hover:border-rose-200')}
                 >
                   <span
                     className={cn(

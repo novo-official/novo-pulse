@@ -8,6 +8,7 @@ import { ScenarioChart } from '@/components/charts/scenario-chart';
 import { Badge, toneForChange } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
+import { PageHeader } from '@/components/ui/page-header';
 import { Select, TextInput } from '@/components/ui/select';
 import { AsyncBoundary, CardSkeleton, EmptyState, NoModelState } from '@/components/ui/states';
 import { InfoHint } from '@/components/ui/tooltip';
@@ -97,18 +98,12 @@ export default function ScenariosPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="section-title">شبیه‌سازی سناریو</h2>
-        <p className="mt-1 text-sm text-muted">
-          تغییر متغیرهای قابل‌برنامه‌ریزی آینده و مشاهده واکنش همان مدل آموزش‌دیده. مدل دوباره آموزش
-          نمی‌بیند؛ تنها ورودی‌های آینده تغییر می‌کنند.
-        </p>
-      </div>
+    <div className="page-stack">
+      <PageHeader eyebrow="آزمایش تصمیم" title="شبیه‌سازی سناریو" description="اثر تغییر متغیرهای قابل‌برنامه‌ریزی را پیش از اجرا بسنجید؛ مدل ثابت می‌ماند و تنها ورودی‌های آینده تغییر می‌کنند." />
 
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
         {/* ----------------------------------------------------- controls */}
-        <Card className="h-fit">
+        <Card className="h-fit overflow-visible border-violet-100 bg-gradient-to-b from-violet-50/50 to-surface shadow-lift">
           <CardHeader
             icon={<FlaskConical className="h-4.5 w-4.5" />}
             title="تنظیمات سناریو"
@@ -188,7 +183,7 @@ export default function ScenariosPage() {
                   if (item.mode === 'absolute' || item.is_binary) {
                     const on = value >= 0.5;
                     return (
-                      <div key={item.column} className="flex items-center justify-between gap-3">
+                      <div key={item.column} className="data-tile flex items-center justify-between gap-3">
                         <span className="text-sm text-ink">
                           {item.label_fa}
                           <span className="debug-only mr-1.5 text-[11px] text-muted" dir="ltr">
@@ -218,7 +213,7 @@ export default function ScenariosPage() {
                     );
                   }
                   return (
-                    <div key={item.column}>
+                    <div key={item.column} className="data-tile">
                       <div className="flex items-baseline justify-between">
                         <span className="text-sm text-ink">
                           {item.label_fa}
@@ -266,7 +261,7 @@ export default function ScenariosPage() {
                   <Play className="h-4 w-4" />
                   {simulate.isPending ? 'در حال محاسبه...' : 'اجرای سناریو'}
                 </Button>
-                <Button variant="secondary" onClick={reset} disabled={simulate.isPending}>
+                <Button variant="secondary" size="icon" onClick={reset} disabled={simulate.isPending} aria-label="بازنشانی سناریو" title="بازنشانی سناریو">
                   <RotateCcw className="h-4 w-4" />
                 </Button>
               </div>
@@ -276,7 +271,7 @@ export default function ScenariosPage() {
                 </p>
               ) : null}
               {simulate.isError ? (
-                <p className="text-xs text-rose-600">
+                <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
                   {(simulate.error as Error).message ?? 'اجرای سناریو با خطا مواجه شد.'}
                 </p>
               ) : null}
@@ -286,7 +281,7 @@ export default function ScenariosPage() {
 
         {/* ------------------------------------------------------ results */}
         <div className="space-y-6">
-          <Card>
+          <Card className="overflow-hidden border-brand-100/80 shadow-lift">
             <CardHeader
               title="پایه در برابر سناریو"
               subtitle={
@@ -306,7 +301,7 @@ export default function ScenariosPage() {
               {result ? (
                 <>
                   <div className="mb-5 grid gap-4 sm:grid-cols-3">
-                    <div className="rounded-xl border border-line/70 p-4">
+                    <div className="rounded-xl border border-line/70 bg-surface p-4 shadow-sm">
                       <p className="text-xs text-muted">تقاضای پایه</p>
                       <p className="nums mt-1.5 text-2xl font-semibold text-ink">
                         {formatNumber(result.baseline_total)}
@@ -318,7 +313,7 @@ export default function ScenariosPage() {
                         {formatNumber(result.scenario_total)}
                       </p>
                     </div>
-                    <div className="rounded-xl border border-line/70 p-4">
+                    <div className="rounded-xl border border-line/70 bg-surface p-4 shadow-sm">
                       <p className="text-xs text-muted">اختلاف</p>
                       <p
                         className={cn(

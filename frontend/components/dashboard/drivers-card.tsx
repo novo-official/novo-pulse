@@ -12,7 +12,7 @@ function DriverRow({ driver, max }: { driver: DriverGroup; max: number }) {
   const positive = driver.direction === 'positive';
   const width = max > 0 ? Math.max((driver.contribution_share / max) * 100, 3) : 0;
   return (
-    <li className="flex items-center gap-3">
+    <li className="insight-row flex items-center gap-3">
       <span
         className={cn(
           'flex h-6 w-6 shrink-0 items-center justify-center rounded-md',
@@ -44,7 +44,7 @@ export function DriversCard({ drivers }: { drivers: DriversResponse }) {
   const max = groups.reduce((acc, group) => Math.max(acc, group.contribution_share), 0);
 
   return (
-    <Card className="h-full">
+    <Card className="signal-card h-full">
       <CardHeader
         icon={<Lightbulb className="h-4.5 w-4.5" />}
         title="چه عواملی تقاضا را تغییر داده‌اند؟"

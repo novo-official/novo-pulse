@@ -7,7 +7,7 @@
  * The band is drawn as a stacked area (invisible base + visible span) because
  * Recharts has no native interval mark.
  */
-import { useMemo } from 'react';
+import { useMemo, type CSSProperties } from 'react';
 import {
   Area,
   CartesianGrid,
@@ -60,7 +60,10 @@ export function ForecastChart({
   );
 
   return (
-    <div className="chart-ltr w-full" style={{ height }}>
+    <div
+      className="chart-ltr chart-responsive w-full"
+      style={{ '--chart-height': `${height}px` } as CSSProperties}
+    >
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={rows} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
           <defs>

@@ -19,7 +19,7 @@ export function HorizonSelector({
 
   return (
     <div
-      className={cn('inline-flex rounded-xl border border-line bg-surface p-1', className)}
+      className={cn('inline-flex rounded-xl border border-line bg-slate-50/80 p-1 shadow-inner', className)}
       role="group"
       aria-label="افق پیش‌بینی"
     >
@@ -29,7 +29,7 @@ export function HorizonSelector({
           type="button"
           onClick={() => setHorizon(option)}
           className={cn(
-            'nums rounded-lg px-3 py-1.5 text-xs font-semibold transition',
+            'nums rounded-lg px-3 py-1.5 text-xs font-semibold transition duration-200',
             horizon === option
               ? 'bg-brand-600 text-white shadow-sm'
               : 'text-muted hover:bg-slate-50 hover:text-ink',
@@ -93,16 +93,17 @@ export function FilterBar({
   horizons: number[];
 }) {
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-line bg-surface p-4 shadow-card lg:flex-row lg:items-end lg:justify-between">
+    <section aria-label="فیلترهای پیش‌بینی" className="relative flex flex-col gap-4 overflow-visible rounded-2xl border border-line/90 bg-surface/95 p-4 shadow-card lg:flex-row lg:items-end lg:justify-between lg:p-5">
+      <span className="pointer-events-none absolute inset-y-0 right-0 w-1 bg-gradient-to-b from-brand-500 to-cyan-400" />
       <div className="flex items-center gap-2 lg:hidden">
         <Filter className="h-4 w-4 text-muted" />
         <span className="text-sm font-medium text-ink">فیلترها</span>
       </div>
-      <LevelEntityFilter levels={levels} members={members} className="lg:w-[420px]" />
+      <LevelEntityFilter levels={levels} members={members} className="lg:w-[460px]" />
       <div className="flex flex-col gap-1.5">
         <span className="text-xs font-medium text-muted">افق پیش‌بینی</span>
         <HorizonSelector options={horizons} />
       </div>
-    </div>
+    </section>
   );
 }

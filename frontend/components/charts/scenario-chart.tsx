@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import type { CSSProperties } from 'react';
 
 import { CHART, axisProps } from '@/components/charts/palette';
 import { ChartTooltip } from '@/components/charts/tooltip';
@@ -24,7 +25,10 @@ export function ScenarioChart({
   height?: number;
 }) {
   return (
-    <div className="chart-ltr w-full" style={{ height }}>
+    <div
+      className="chart-ltr chart-responsive w-full"
+      style={{ '--chart-height': `${height}px` } as CSSProperties}
+    >
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={series} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
           <defs>

@@ -64,10 +64,10 @@ export function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 px-6 py-12 text-center">
-      <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+      <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-line bg-gradient-to-br from-slate-50 to-brand-50 text-brand-500 shadow-sm">
         {icon ?? <Inbox className="h-6 w-6" />}
       </span>
-      <div>
+      <div className="max-w-lg">
         <p className="text-sm font-semibold text-ink">{title}</p>
         {description ? <p className="mt-1.5 max-w-md text-sm leading-6 text-muted">{description}</p> : null}
       </div>
@@ -111,7 +111,7 @@ export function ErrorState({
           <button
             type="button"
             onClick={onRetry}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 text-sm font-medium text-ink transition hover:bg-slate-50"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm font-medium text-ink transition hover:bg-slate-50"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             تلاش دوباره

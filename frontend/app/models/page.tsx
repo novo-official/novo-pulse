@@ -6,6 +6,7 @@ import { Award, Cpu, Info, Layers, Trophy } from 'lucide-react';
 import { CensoringCard, TuningCard } from '@/components/dashboard/censoring-card';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
+import { PageHeader } from '@/components/ui/page-header';
 import { AsyncBoundary, CardSkeleton, NoModelState } from '@/components/ui/states';
 import { Td, TableWrap, Th } from '@/components/ui/table';
 import { InfoHint } from '@/components/ui/tooltip';
@@ -31,14 +32,8 @@ export default function ModelsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="section-title">مدل‌ها</h2>
-        <p className="mt-1 text-sm text-muted">
-          مدل منتخب تنها بر اساس نتیجه اعتبارسنجی متحرک زمانی انتخاب می‌شود — هیچ مدلی از پیش برنده
-          فرض نشده است.
-        </p>
-      </div>
+    <div className="page-stack">
+      <PageHeader eyebrow="موتور هوشمند" title="مدل‌ها و عملکرد" description="مدل منتخب، رتبه‌بندی و جزئیات فنی را شفاف ببینید؛ انتخاب برنده فقط بر پایه اعتبارسنجی زمانی انجام می‌شود." />
 
       {/* ------------------------------------------------ champion banner */}
       <AsyncBoundary
@@ -52,7 +47,7 @@ export default function ModelsPage() {
         }
       >
         {champion ? (
-          <Card className="border-brand-200 bg-gradient-to-l from-brand-50 to-surface">
+          <Card className="overflow-hidden border-brand-200 bg-gradient-to-l from-brand-100/80 via-brand-50/50 to-surface shadow-lift">
             <CardBody className="flex flex-wrap items-center justify-between gap-6 pt-5">
               <div className="flex items-center gap-4">
                 <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-card">
@@ -98,7 +93,7 @@ export default function ModelsPage() {
       </AsyncBoundary>
 
       {/* ---------------------------------------------------- leaderboard */}
-      <Card>
+      <Card className="signal-card overflow-hidden">
         <CardHeader
           icon={<Award className="h-4.5 w-4.5" />}
           title="جدول رتبه‌بندی مدل‌ها"
@@ -197,7 +192,7 @@ export default function ModelsPage() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* ------------------------------------------- technical metadata */}
-        <Card>
+        <Card className="signal-card">
           <CardHeader
             icon={<Info className="h-4.5 w-4.5" />}
             title="شفافیت فنی"
@@ -256,7 +251,7 @@ export default function ModelsPage() {
         </Card>
 
         {/* ---------------------------------------------- model registry */}
-        <Card>
+        <Card className="signal-card">
           <CardHeader
             icon={<Layers className="h-4.5 w-4.5" />}
             title="مدل‌های در دسترس"
@@ -271,7 +266,7 @@ export default function ModelsPage() {
               {(registry?.registry ?? []).map((model) => (
                 <div
                   key={model.name}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-line/70 px-3.5 py-2.5"
+                  className="insight-row flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5"
                 >
                   <span className="flex items-center gap-2.5">
                     <Cpu

@@ -29,7 +29,7 @@ export function DemandHeatmap({ data }: { data: HeatmapResponse }) {
   const step = Math.max(1, Math.ceil(dates.length / 12));
 
   return (
-    <Card>
+    <Card className="signal-card overflow-hidden">
       <CardHeader
         icon={<Grid3x3 className="h-4.5 w-4.5" />}
         title="نقشه حرارتی تقاضا"
@@ -45,7 +45,7 @@ export function DemandHeatmap({ data }: { data: HeatmapResponse }) {
         {rows.length === 0 ? (
           <EmptyState title="داده‌ای برای نقشه حرارتی نیست" />
         ) : (
-          <div className="overflow-x-auto pb-1">
+          <div className="overflow-x-auto rounded-xl border border-line/60 bg-slate-50/50 p-3 pb-2">
             <div className="min-w-[720px]">
               <div
                 className="grid gap-[3px]"

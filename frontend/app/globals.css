@@ -4,11 +4,12 @@
 
 @layer base {
   :root {
-    --canvas: 248 250 252;
+    --canvas: 246 248 252;
     --surface: 255 255 255;
-    --ink: 15 23 42;
-    --muted: 100 116 139;
-    --line: 226 232 240;
+    --ink: 16 24 40;
+    --muted: 99 112 133;
+    --line: 224 229 239;
+    --brand-soft: 238 242 255;
   }
 
   .dark {
@@ -21,12 +22,25 @@
 
   html {
     -webkit-text-size-adjust: 100%;
+    overflow-x: hidden;
   }
 
   body {
     @apply bg-canvas text-ink antialiased;
     font-feature-settings: 'ss01';
+    min-width: 320px;
+    background-image:
+      radial-gradient(circle at 12% -10%, rgb(79 70 229 / 0.07), transparent 28rem),
+      radial-gradient(circle at 92% 8%, rgb(6 182 212 / 0.05), transparent 24rem);
+    background-attachment: fixed;
+    overflow-x: hidden;
   }
+
+  * { @apply border-line; }
+
+  ::selection { @apply bg-brand-200 text-brand-900; }
+
+  :focus-visible { outline: 2px solid rgb(79 70 229 / 0.75); outline-offset: 2px; }
 
   /* Latin numerals stay readable inside RTL prose. */
   .nums {
@@ -49,14 +63,106 @@
 
 @layer components {
   .kpi-value {
-    @apply text-2xl font-semibold leading-none tracking-tight text-ink lg:text-3xl;
+    @apply text-[32px] font-bold leading-[1.15] tracking-[-0.035em] text-ink sm:text-[34px];
+  }
+  .kpi-card {
+    @apply rounded-[20px] border-slate-900/[0.06] bg-white shadow-[0_1px_2px_rgb(15_23_42_/_0.02),0_12px_28px_-20px_rgb(15_23_42_/_0.16)] transition-[transform,border-color,box-shadow] duration-200 ease-out;
+    background-image: radial-gradient(circle at 100% 0%, rgb(99 102 241 / 0.045), transparent 42%);
+  }
+  .kpi-card:hover {
+    @apply -translate-y-0.5 border-slate-900/[0.10] shadow-[0_3px_8px_rgb(15_23_42_/_0.04),0_18px_34px_-20px_rgb(15_23_42_/_0.18)];
+  }
+  .kpi-card--success {
+    background-image: radial-gradient(circle at 100% 0%, rgb(16 185 129 / 0.055), transparent 42%);
+  }
+  .kpi-card--warning {
+    background-image: radial-gradient(circle at 100% 0%, rgb(245 158 11 / 0.055), transparent 42%);
+  }
+  .kpi-card--violet {
+    background-image: radial-gradient(circle at 100% 0%, rgb(124 58 237 / 0.055), transparent 42%);
+  }
+  .kpi-card--danger {
+    background-image: radial-gradient(circle at 100% 0%, rgb(225 29 72 / 0.05), transparent 42%);
+  }
+  .kpi-status > span {
+    @apply min-h-0 px-2 py-0.5 text-[11px] font-medium leading-5 shadow-none;
+  }
+  .kpi-percent {
+    @apply nums border border-transparent px-2 py-0.5 text-[11px] font-medium shadow-none;
+  }
+  .kpi-value--change,
+  .kpi-value--metric {
+    @apply inline-flex w-fit rounded-xl bg-brand-50 px-2.5 py-1.5 text-brand-800 ring-1 ring-inset ring-brand-100;
+  }
+  .kpi-value--change {
+    @apply bg-emerald-50 text-emerald-800 ring-emerald-100;
+  }
+  .kpi-value--change-negative {
+    @apply bg-rose-50 text-rose-800 ring-rose-100;
   }
   .section-title {
-    @apply text-lg font-semibold text-ink;
+    @apply text-xl font-bold tracking-tight text-ink;
+  }
+
+  .page-stack { @apply space-y-4 lg:space-y-5; }
+
+  .eyebrow { @apply text-[11px] font-bold uppercase tracking-[0.12em] text-brand-600; }
+
+  .data-tile {
+    @apply relative overflow-hidden rounded-xl border border-line/80 bg-surface px-3.5 py-3 shadow-sm;
+  }
+
+  .data-tile::after {
+    content: '';
+    @apply absolute inset-x-3 bottom-0 h-px bg-gradient-to-l from-transparent via-brand-200 to-transparent;
+  }
+
+  .insight-row {
+    @apply relative rounded-xl border border-line/70 bg-surface/80 px-3 py-2.5 transition duration-200;
+  }
+
+  .insight-row:hover {
+    @apply -translate-y-px border-brand-200 bg-white shadow-card;
+  }
+
+  .signal-card {
+    @apply relative overflow-hidden border-brand-100/90 shadow-card;
+  }
+
+  .signal-card::before {
+    content: '';
+    @apply absolute inset-x-0 top-0 h-0.5 bg-gradient-to-l from-brand-500 via-violet-500 to-cyan-400;
+  }
+
+  .subsection-label {
+    @apply mb-2 flex items-center gap-2 text-[11px] font-bold text-muted;
+  }
+
+  .subsection-label::before {
+    content: '';
+    @apply h-1.5 w-1.5 rounded-full bg-brand-500;
   }
   /* Recharts renders LTR internally; the wrapper opts its subtree out of RTL. */
   .chart-ltr {
     direction: ltr;
+  }
+
+  .chart-responsive {
+    height: min(300px, var(--chart-height));
+    min-height: 260px;
+  }
+}
+
+@media (min-width: 640px) {
+  .chart-responsive { height: var(--chart-height); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

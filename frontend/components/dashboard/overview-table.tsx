@@ -27,7 +27,7 @@ export function OverviewTable({
   title?: string;
 }) {
   return (
-    <Card>
+    <Card className="signal-card overflow-hidden">
       <CardHeader
         icon={<Map className="h-4.5 w-4.5" />}
         title={title}
@@ -54,7 +54,14 @@ export function OverviewTable({
                 <tr
                   key={row.entity_id}
                   onClick={() => onSelect?.(row.entity_id)}
-                  className={onSelect ? 'cursor-pointer transition hover:bg-slate-50' : undefined}
+                  tabIndex={onSelect ? 0 : undefined}
+                  onKeyDown={(event) => {
+                    if (onSelect && (event.key === 'Enter' || event.key === ' ')) {
+                      event.preventDefault();
+                      onSelect(row.entity_id);
+                    }
+                  }}
+                  className={onSelect ? 'cursor-pointer transition hover:bg-brand-50/50 focus:bg-brand-50/50 focus:outline-none' : undefined}
                 >
                   <Td align="right" className="font-medium">
                     {row.label}

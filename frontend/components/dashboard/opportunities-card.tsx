@@ -24,7 +24,7 @@ const TONES = {
 
 export function OpportunitiesCard({ opportunities }: { opportunities: Opportunity[] }) {
   return (
-    <Card className="h-full">
+    <Card className="signal-card h-full bg-gradient-to-b from-amber-50/30 to-surface">
       <CardHeader
         icon={<Lightbulb className="h-4.5 w-4.5" />}
         title="فرصت‌های قابل اقدام"
@@ -43,7 +43,7 @@ export function OpportunitiesCard({ opportunities }: { opportunities: Opportunit
               return (
                 <li
                   key={`${item.kind}-${item.entity_id}-${index}`}
-                  className="rounded-xl border border-line/70 p-3.5"
+                  className="insight-row overflow-hidden p-3.5 before:absolute before:inset-y-3 before:right-0 before:w-0.5 before:rounded-full before:bg-amber-400"
                 >
                   <div className="flex items-start gap-3">
                     <span

@@ -15,7 +15,7 @@ export function NarrativeCard({
   isLoading: boolean;
 }) {
   return (
-    <Card className="h-full border-brand-100 bg-gradient-to-br from-brand-50/60 to-surface">
+    <Card className="signal-card h-full bg-gradient-to-br from-brand-50/80 via-violet-50/30 to-surface">
       <CardHeader
         icon={<Bot className="h-4.5 w-4.5" />}
         title="تحلیل هوشمند"
@@ -37,9 +37,9 @@ export function NarrativeCard({
             <Skeleton className="h-3.5 w-9/12" />
           </div>
         ) : (
-          <p className="text-sm leading-7 text-ink">
+          <blockquote className="relative border-r-2 border-brand-300 pr-4 text-sm leading-7 text-ink">
             {narrative?.text ?? 'داده کافی برای تولید تحلیل در دسترس نیست.'}
-          </p>
+          </blockquote>
         )}
         {narrative ? (
           <p className="debug-only mt-4 text-[11px] text-muted" dir="ltr">

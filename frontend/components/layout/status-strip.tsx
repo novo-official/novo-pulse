@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { CircleDot, Cpu, WifiOff } from 'lucide-react';
+import { Cpu, WifiOff } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { api } from '@/lib/api/endpoints';
@@ -31,7 +31,10 @@ export function StatusStrip() {
     <div className="flex items-center gap-2">
       {data.demo_mode ? (
         <Badge tone="violet" title="داده‌های نمایشی مصنوعی فعال است">
-          <CircleDot className="h-3 w-3" />
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-400 opacity-60" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-500" />
+          </span>
           حالت دمو
         </Badge>
       ) : null}

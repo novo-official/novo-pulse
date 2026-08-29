@@ -2,272 +2,272 @@
   "global_importance": [
     {
       "feature": "y_roll_mean_56",
-      "importance": 0.322132,
-      "mean_abs_shap": 0.511544,
-      "mean_shap": 0.095377,
+      "importance": 0.310136,
+      "mean_abs_shap": 0.487361,
+      "mean_shap": 0.073374,
       "direction": "positive",
       "group": "demand_history"
     },
     {
       "feature": "y_roll_mean_28",
-      "importance": 0.075996,
-      "mean_abs_shap": 0.120682,
-      "mean_shap": 0.005346,
+      "importance": 0.109428,
+      "mean_abs_shap": 0.17196,
+      "mean_shap": 0.009701,
       "direction": "positive",
       "group": "demand_history"
     },
     {
       "feature": "fut_available_capacity",
-      "importance": 0.070297,
-      "mean_abs_shap": 0.111631,
-      "mean_shap": -0.038573,
+      "importance": 0.067567,
+      "mean_abs_shap": 0.106178,
+      "mean_shap": -0.041964,
       "direction": "negative",
       "group": "availability"
     },
     {
-      "feature": "past_search_count_mean_14",
-      "importance": 0.065257,
-      "mean_abs_shap": 0.103629,
-      "mean_shap": 0.017409,
-      "direction": "positive",
-      "group": "search_activity"
-    },
-    {
       "feature": "ent_entity",
-      "importance": 0.05338,
-      "mean_abs_shap": 0.084767,
-      "mean_shap": 0.015352,
+      "importance": 0.063746,
+      "mean_abs_shap": 0.100172,
+      "mean_shap": 0.016667,
       "direction": "positive",
       "group": "entity_profile"
     },
     {
       "feature": "fut_is_weekend",
-      "importance": 0.052448,
-      "mean_abs_shap": 0.083287,
-      "mean_shap": 0.008943,
-      "direction": "positive",
+      "importance": 0.046806,
+      "mean_abs_shap": 0.073553,
+      "mean_shap": -0.004054,
+      "direction": "negative",
       "group": "planned_covariates"
     },
     {
+      "feature": "past_search_count_mean_14",
+      "importance": 0.046525,
+      "mean_abs_shap": 0.073112,
+      "mean_shap": 0.019962,
+      "direction": "positive",
+      "group": "search_activity"
+    },
+    {
+      "feature": "past_search_count_mean_7",
+      "importance": 0.033059,
+      "mean_abs_shap": 0.05195,
+      "mean_shap": 0.008018,
+      "direction": "positive",
+      "group": "search_activity"
+    },
+    {
       "feature": "y_same_phase_mean",
-      "importance": 0.042583,
-      "mean_abs_shap": 0.067622,
-      "mean_shap": -0.014987,
+      "importance": 0.031918,
+      "mean_abs_shap": 0.050157,
+      "mean_shap": -0.008139,
       "direction": "negative",
       "group": "demand_history"
     },
     {
       "feature": "cal_cos_dow",
-      "importance": 0.03274,
-      "mean_abs_shap": 0.051991,
-      "mean_shap": 0.005627,
+      "importance": 0.030809,
+      "mean_abs_shap": 0.048415,
+      "mean_shap": 0.000699,
       "direction": "positive",
       "group": "weekday"
-    },
-    {
-      "feature": "past_search_count_mean_7",
-      "importance": 0.022798,
-      "mean_abs_shap": 0.036202,
-      "mean_shap": 0.00186,
-      "direction": "positive",
-      "group": "search_activity"
     },
     {
       "feature": "cal_day_of_week",
-      "importance": 0.019973,
-      "mean_abs_shap": 0.031718,
-      "mean_shap": 0.001592,
+      "importance": 0.023837,
+      "mean_abs_shap": 0.037458,
+      "mean_shap": 0.002799,
       "direction": "positive",
       "group": "weekday"
     },
     {
-      "feature": "fut_is_promotion",
-      "importance": 0.017555,
-      "mean_abs_shap": 0.027877,
-      "mean_shap": -0.001283,
-      "direction": "negative",
-      "group": "promotion"
-    },
-    {
       "feature": "fut_price_vs_recent_avg",
-      "importance": 0.017033,
-      "mean_abs_shap": 0.027048,
-      "mean_shap": 0.002952,
+      "importance": 0.018294,
+      "mean_abs_shap": 0.028748,
+      "mean_shap": 0.003745,
       "direction": "positive",
       "group": "price"
     },
     {
-      "feature": "entity_history_len",
-      "importance": 0.016694,
-      "mean_abs_shap": 0.02651,
-      "mean_shap": 0.023057,
-      "direction": "positive",
-      "group": "other"
-    },
-    {
-      "feature": "cal_is_holiday_days_to",
-      "importance": 0.016331,
-      "mean_abs_shap": 0.025933,
-      "mean_shap": -0.025557,
+      "feature": "fut_is_promotion",
+      "importance": 0.017215,
+      "mean_abs_shap": 0.027052,
+      "mean_shap": -0.000174,
       "direction": "negative",
-      "group": "holiday"
+      "group": "promotion"
     },
     {
       "feature": "y_roll_mean_14",
-      "importance": 0.011861,
-      "mean_abs_shap": 0.018835,
-      "mean_shap": -0.003279,
+      "importance": 0.015636,
+      "mean_abs_shap": 0.02457,
+      "mean_shap": -0.005103,
       "direction": "negative",
       "group": "demand_history"
     },
     {
+      "feature": "past_view_count_mean_14",
+      "importance": 0.015339,
+      "mean_abs_shap": 0.024104,
+      "mean_shap": 0.006104,
+      "direction": "positive",
+      "group": "search_activity"
+    },
+    {
+      "feature": "entity_history_len",
+      "importance": 0.012284,
+      "mean_abs_shap": 0.019304,
+      "mean_shap": 0.013925,
+      "direction": "positive",
+      "group": "other"
+    },
+    {
       "feature": "past_search_count_per_demand_14",
-      "importance": 0.010488,
-      "mean_abs_shap": 0.016656,
-      "mean_shap": 0.003277,
+      "importance": 0.008923,
+      "mean_abs_shap": 0.014021,
+      "mean_shap": 0.002405,
       "direction": "positive",
       "group": "search_activity"
     },
     {
       "feature": "fut_is_weekend_vs_origin",
-      "importance": 0.009862,
-      "mean_abs_shap": 0.01566,
-      "mean_shap": 0.001793,
-      "direction": "positive",
+      "importance": 0.008261,
+      "mean_abs_shap": 0.012981,
+      "mean_shap": -0.001172,
+      "direction": "negative",
       "group": "planned_covariates"
     },
     {
       "feature": "fut_is_event",
-      "importance": 0.008603,
-      "mean_abs_shap": 0.013662,
-      "mean_shap": 0.006881,
+      "importance": 0.007726,
+      "mean_abs_shap": 0.012141,
+      "mean_shap": 0.006214,
       "direction": "positive",
       "group": "holiday"
     },
     {
-      "feature": "cal_sin_doy",
-      "importance": 0.007535,
-      "mean_abs_shap": 0.011966,
-      "mean_shap": -0.011455,
+      "feature": "cal_is_holiday_days_to",
+      "importance": 0.007412,
+      "mean_abs_shap": 0.011648,
+      "mean_shap": -0.000166,
       "direction": "negative",
-      "group": "season"
+      "group": "holiday"
     },
     {
-      "feature": "fut_is_promotion_vs_origin",
-      "importance": 0.007198,
-      "mean_abs_shap": 0.011431,
-      "mean_shap": -0.000339,
+      "feature": "cal_sin_doy",
+      "importance": 0.006645,
+      "mean_abs_shap": 0.010443,
+      "mean_shap": -0.009585,
       "direction": "negative",
-      "group": "promotion"
+      "group": "season"
     }
   ],
   "group_importance": [
     {
       "group": "demand_history",
       "label_fa": "روند تاریخی تقاضا",
-      "contribution_share": 0.489428,
-      "contribution_score": 0.77721,
-      "signed_effect": 0.082391,
+      "contribution_share": 0.502061,
+      "contribution_score": 0.78896,
+      "signed_effect": 0.063901,
       "direction": "positive"
     },
     {
       "group": "search_activity",
       "label_fa": "جست‌وجو و بازدید کاربران",
-      "contribution_share": 0.124342,
-      "contribution_score": 0.197455,
-      "signed_effect": 0.030167,
+      "contribution_share": 0.121369,
+      "contribution_score": 0.190725,
+      "signed_effect": 0.040299,
       "direction": "positive"
     },
     {
       "group": "availability",
       "label_fa": "ظرفیت و موجودی",
-      "contribution_share": 0.073996,
-      "contribution_score": 0.117506,
-      "signed_effect": -0.034065,
+      "contribution_share": 0.072114,
+      "contribution_score": 0.113323,
+      "signed_effect": -0.03872,
       "direction": "negative"
     },
     {
-      "group": "planned_covariates",
-      "label_fa": "متغیرهای برنامه‌ریزی‌شده",
-      "contribution_share": 0.06231,
-      "contribution_score": 0.098948,
-      "signed_effect": 0.010735,
+      "group": "entity_profile",
+      "label_fa": "مشخصات اقامتگاه",
+      "contribution_share": 0.069486,
+      "contribution_score": 0.109193,
+      "signed_effect": 0.016501,
       "direction": "positive"
     },
     {
       "group": "weekday",
       "label_fa": "روز هفته و آخر هفته",
-      "contribution_share": 0.060007,
-      "contribution_score": 0.095291,
-      "signed_effect": 0.007794,
+      "contribution_share": 0.059113,
+      "contribution_score": 0.092893,
+      "signed_effect": 0.003491,
       "direction": "positive"
     },
     {
-      "group": "entity_profile",
-      "label_fa": "مشخصات اقامتگاه",
-      "contribution_share": 0.05843,
-      "contribution_score": 0.092787,
-      "signed_effect": 0.01586,
-      "direction": "positive"
+      "group": "planned_covariates",
+      "label_fa": "متغیرهای برنامه‌ریزی‌شده",
+      "contribution_share": 0.055067,
+      "contribution_score": 0.086534,
+      "signed_effect": -0.005226,
+      "direction": "negative"
     },
     {
       "group": "holiday",
       "label_fa": "تعطیلات و مناسبت‌ها",
-      "contribution_share": 0.041461,
-      "contribution_score": 0.06584,
-      "signed_effect": -0.025003,
-      "direction": "negative"
-    },
-    {
-      "group": "promotion",
-      "label_fa": "تخفیف و کمپین",
-      "contribution_share": 0.024753,
-      "contribution_score": 0.039308,
-      "signed_effect": -0.001622,
+      "contribution_share": 0.03505,
+      "contribution_score": 0.055079,
+      "signed_effect": -0.005169,
       "direction": "negative"
     },
     {
       "group": "price",
       "label_fa": "قیمت",
-      "contribution_share": 0.0218,
-      "contribution_score": 0.034618,
-      "signed_effect": 0.002526,
+      "contribution_share": 0.025792,
+      "contribution_score": 0.04053,
+      "signed_effect": 0.009021,
       "direction": "positive"
+    },
+    {
+      "group": "promotion",
+      "label_fa": "تخفیف و کمپین",
+      "contribution_share": 0.023361,
+      "contribution_score": 0.036711,
+      "signed_effect": -0.000572,
+      "direction": "negative"
     },
     {
       "group": "season",
       "label_fa": "فصل و الگوی سالانه",
-      "contribution_share": 0.019249,
-      "contribution_score": 0.030567,
-      "signed_effect": -0.019917,
+      "contribution_share": 0.01648,
+      "contribution_score": 0.025897,
+      "signed_effect": -0.015002,
       "direction": "negative"
     },
     {
       "group": "other",
       "label_fa": "سایر",
-      "contribution_share": 0.016694,
-      "contribution_score": 0.02651,
-      "signed_effect": 0.023057,
+      "contribution_share": 0.012284,
+      "contribution_score": 0.019304,
+      "signed_effect": 0.013925,
       "direction": "positive"
     },
     {
       "group": "calendar",
       "label_fa": "تقویم",
-      "contribution_share": 0.005634,
-      "contribution_score": 0.008947,
-      "signed_effect": -0.001915,
-      "direction": "negative"
+      "contribution_share": 0.005641,
+      "contribution_score": 0.008865,
+      "signed_effect": 0.006502,
+      "direction": "positive"
     },
     {
       "group": "horizon",
       "label_fa": "افق پیش‌بینی",
-      "contribution_share": 0.001896,
-      "contribution_score": 0.00301,
-      "signed_effect": 0.000574,
-      "direction": "positive"
+      "contribution_share": 0.002181,
+      "contribution_score": 0.003428,
+      "signed_effect": -0.000302,
+      "direction": "negative"
     }
   ],
-  "base_value": 1.211234,
+  "base_value": 1.218076,
   "method": "lightgbm.pred_contrib",
   "n_samples": 4000,
   "note": ""

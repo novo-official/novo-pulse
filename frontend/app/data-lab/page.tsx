@@ -26,6 +26,7 @@ import { DataQualityCard } from '@/components/dashboard/data-quality';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
+import { PageHeader } from '@/components/ui/page-header';
 import { Select, TextInput } from '@/components/ui/select';
 import { EmptyState, Skeleton } from '@/components/ui/states';
 import { Td, TableWrap, Th } from '@/components/ui/table';
@@ -142,7 +143,7 @@ function MultiSelect({
         {label}
         <InfoHint>{hint}</InfoHint>
       </p>
-      <div className="flex max-h-36 flex-wrap gap-1.5 overflow-y-auto rounded-xl border border-line p-2.5">
+      <div className="flex max-h-36 min-h-12 flex-wrap gap-1.5 overflow-y-auto rounded-xl border border-line bg-slate-50/60 p-2.5 shadow-inner">
         {columns.length === 0 ? (
           <span className="text-xs text-muted">ستونی موجود نیست</span>
         ) : null}
@@ -155,8 +156,8 @@ function MultiSelect({
             className={cn(
               'rounded-lg px-2 py-1 text-[11px] font-medium transition',
               selected.includes(column.name)
-                ? 'bg-brand-600 text-white'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200',
+                ? 'bg-brand-600 text-white shadow-sm'
+                : 'border border-line bg-surface text-slate-600 hover:border-brand-200 hover:text-brand-700',
             )}
           >
             {column.name}
@@ -307,15 +308,10 @@ export default function DataLabPage() {
   const step = !profile ? 1 : !mapped ? 2 : !validation ? 3 : 4;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="section-title">آزمایشگاه داده</h2>
-        <p className="mt-1 text-sm text-muted">
-          دیتاست جدید را وارد کنید، ستون‌ها را نگاشت کنید و مدل را آموزش دهید — بدون تغییر در کد.
-        </p>
-      </div>
+    <div className="page-stack">
+      <PageHeader eyebrow="خط تولید داده" title="آزمایشگاه داده" description="داده را وارد و پروفایل کنید، قرارداد ستون‌ها را بسازید و بدون تغییر کد یک مدل قابل‌اعتماد آموزش دهید." />
 
-      <Card>
+      <Card className="overflow-hidden border-brand-100 bg-gradient-to-l from-brand-50/60 via-surface to-surface">
         <CardBody className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-5">
           <Step index={1} title="بارگذاری دیتاست" done={step > 1} active={step === 1} />
           <span className="hidden h-px w-8 bg-line sm:block" />
@@ -328,14 +324,14 @@ export default function DataLabPage() {
       </Card>
 
       {message ? (
-        <div className="rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-800">
+        <div role="status" className="rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-800 shadow-sm">
           {message}
         </div>
       ) : null}
 
       {/* --------------------------------------------------------- upload */}
       <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
-        <Card>
+        <Card className="border-brand-100/80 shadow-lift">
           <CardHeader
             icon={<Upload className="h-4.5 w-4.5" />}
             title="۱. بارگذاری دیتاست"
@@ -356,12 +352,12 @@ export default function DataLabPage() {
               type="button"
               onClick={() => fileRef.current?.click()}
               disabled={upload.isPending}
-              className="flex w-full flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-line px-6 py-8 transition hover:border-brand-400 hover:bg-brand-50/40 disabled:opacity-60"
+              className="group flex w-full flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-brand-200 bg-gradient-to-b from-brand-50/60 to-surface px-6 py-8 transition hover:border-brand-400 hover:shadow-card disabled:opacity-60"
             >
               {upload.isPending ? (
                 <Loader2 className="h-7 w-7 animate-spin text-brand-500" />
               ) : (
-                <FileSpreadsheet className="h-7 w-7 text-slate-400" />
+                <FileSpreadsheet className="h-7 w-7 text-brand-500 transition group-hover:scale-110" />
               )}
               <span className="text-sm font-medium text-ink">
                 {upload.isPending ? 'در حال پردازش...' : 'انتخاب فایل دیتاست'}
@@ -413,7 +409,7 @@ export default function DataLabPage() {
         </Card>
 
         {/* ------------------------------------------------------ preview */}
-        <Card>
+        <Card className="overflow-hidden border-cyan-100/80 shadow-lift">
           <CardHeader
             icon={<Table2 className="h-4.5 w-4.5" />}
             title="پیش‌نمایش و پروفایل داده"
@@ -482,7 +478,7 @@ export default function DataLabPage() {
 
       {/* -------------------------------------------------------- mapping */}
       {profile ? (
-        <Card>
+        <Card className="signal-card">
           <CardHeader
             icon={<Columns3 className="h-4.5 w-4.5" />}
             title="۲. نگاشت ستون‌ها"
@@ -638,7 +634,7 @@ export default function DataLabPage() {
 
       {/* -------------------------------------------------------- training */}
       {profile ? (
-        <Card>
+        <Card className="signal-card bg-gradient-to-b from-brand-50/25 to-surface">
           <CardHeader
             icon={<Play className="h-4.5 w-4.5" />}
             title="۴. آموزش مدل"
@@ -684,7 +680,7 @@ export default function DataLabPage() {
             </div>
 
             {run ? (
-              <div className="rounded-xl border border-line/70 p-4">
+              <div className="data-tile p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="nums text-sm font-medium text-ink" dir="ltr">
                     {run.run_id}

@@ -37,7 +37,7 @@ export function DataQualityCard({ report }: { report: ValidationReport }) {
   const tone = score >= 85 ? 'emerald' : score >= 65 ? 'amber' : 'rose';
 
   return (
-    <Card>
+    <Card className="signal-card">
       <CardHeader
         icon={<ShieldAlert className="h-4.5 w-4.5" />}
         title="کیفیت داده"
@@ -45,7 +45,7 @@ export function DataQualityCard({ report }: { report: ValidationReport }) {
         action={<Badge tone="neutral">{report.n_findings} یافته</Badge>}
       />
       <CardBody>
-        <div className="mb-5 flex items-center gap-4">
+        <div className="mb-5 flex items-center gap-4 rounded-2xl border border-line/70 bg-surface p-4 shadow-sm">
           <div className="relative h-20 w-20 shrink-0">
             <svg viewBox="0 0 36 36" className="h-20 w-20 -rotate-90">
               <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e2e8f0" strokeWidth="3" />
@@ -87,7 +87,7 @@ export function DataQualityCard({ report }: { report: ValidationReport }) {
               <li
                 key={`${finding.code}-${index}`}
                 className={cn(
-                  'rounded-xl border px-3.5 py-3',
+                  'insight-row px-3.5 py-3',
                   finding.severity === 'critical' || finding.severity === 'high'
                     ? 'border-rose-200 bg-rose-50/50'
                     : 'border-line/70',

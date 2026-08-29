@@ -3,12 +3,15 @@
 import {
   Activity,
   BarChart3,
+  ChevronLeft,
+  ChevronRight,
   Database,
   FlaskConical,
   LayoutDashboard,
   LineChart,
   Menu,
   Presentation,
+  Sparkles,
   X,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -41,6 +44,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [compact, setCompact] = useState(true);
   const presentation = useForecastFilters((state) => state.presentation);
   const setPresentation = useForecastFilters((state) => state.setPresentation);
 
@@ -56,7 +60,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className={cn('flex min-h-screen', presentation && 'presentation')}>
+    <div className={cn('flex min-h-screen bg-transparent', presentation && 'presentation')}>
       <Suspense fallback={null}>
         <PresentationSync />
       </Suspense>
@@ -64,34 +68,49 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* ------------------------------------------------------- sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 right-0 z-40 w-72 shrink-0 border-l border-line bg-surface transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0',
+          'fixed inset-y-0 right-0 z-40 w-[276px] shrink-0 border-l border-white/10 bg-slate-950 text-white shadow-2xl transition-all duration-200 lg:h-screen lg:translate-x-0',
+          compact ? 'lg:w-[88px]' : 'lg:w-[248px]',
           open ? 'translate-x-0' : 'translate-x-full',
         )}
       >
         <div className="flex h-full flex-col">
-          <div className="flex items-center justify-between px-5 py-5">
+          <div className={cn('flex items-center justify-between px-5 pb-4 pt-5', compact && 'lg:justify-center lg:px-3')}>
             <Link href="/dashboard" className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-accent-violet text-white shadow-card">
-                <Activity className="h-5 w-5" />
+              <span className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-[14px] bg-gradient-to-br from-indigo-400 via-brand-500 to-cyan-400 text-white shadow-lg shadow-indigo-950/40">
+                <Activity className="relative z-10 h-5 w-5" />
+                <span className="absolute inset-x-0 top-1/2 h-px bg-white/30" />
               </span>
-              <span>
-                <span className="block text-base font-bold leading-tight text-ink">نوو پالس</span>
-                <span className="block text-[11px] leading-tight text-muted">
-                  AI Demand Intelligence
+              <span className={cn(compact && 'lg:hidden')}>
+                <span className="block text-base font-bold leading-tight text-white">نووُ پالس</span>
+                <span className="mt-1 block text-[10px] font-medium tracking-wide text-slate-400" dir="ltr">
+                  MARKET INTELLIGENCE
                 </span>
               </span>
             </Link>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="rounded-lg p-1.5 text-muted hover:bg-slate-100 lg:hidden"
+              className="rounded-lg p-1.5 text-slate-400 hover:bg-white/10 hover:text-white lg:hidden"
               aria-label="بستن منو"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
-          <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-4">
+          <button
+            type="button"
+            onClick={() => setCompact((value) => !value)}
+            className="absolute -left-3 top-20 z-10 hidden h-7 w-7 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-slate-300 shadow-lg transition hover:border-slate-500 hover:text-white lg:flex"
+            aria-label={compact ? 'باز کردن سایدبار' : 'جمع کردن سایدبار'}
+          >
+            {compact ? <ChevronLeft className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+          </button>
+
+          <div className={cn('mx-4 mb-4 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5', compact && 'lg:hidden')}>
+            <p className="flex items-center gap-2 text-xs text-slate-300"><Sparkles className="h-3.5 w-3.5 text-cyan-400" />نبض بازار را در دست بگیر</p>
+          </div>
+          <p className={cn('px-5 pb-2 text-[10px] font-bold tracking-wider text-slate-500', compact && 'lg:hidden')}>فضای تحلیل</p>
+          <nav className={cn('flex-1 space-y-1 overflow-y-auto px-3 pb-4', compact && 'lg:px-2')}>
             {NAV.map((item) => {
               const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
               const Icon = item.icon;
@@ -99,17 +118,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.href}
                   href={item.href}
+                  title={compact ? item.label : undefined}
                   className={cn(
-                    'group flex items-start gap-3 rounded-xl px-3 py-2.5 transition',
+                    'group relative flex items-start gap-3 rounded-xl px-3 py-2.5 transition duration-200',
+                    compact && 'lg:justify-center lg:px-2 lg:py-3',
                     active
-                      ? 'bg-brand-50 text-brand-700'
-                      : 'text-muted hover:bg-slate-50 hover:text-ink',
+                      ? 'bg-white/[0.09] text-white shadow-inner shadow-white/5'
+                      : 'text-slate-400 hover:bg-white/[0.05] hover:text-white',
                   )}
                 >
-                  <Icon className={cn('mt-0.5 h-4.5 w-4.5 shrink-0', active && 'text-brand-600')} />
-                  <span className="min-w-0">
+                  {active ? <span className="absolute inset-y-2 -right-3 w-0.5 rounded-full bg-cyan-400" /> : null}
+                  <Icon className={cn('mt-0.5 h-4.5 w-4.5 shrink-0', active && 'text-cyan-400')} />
+                  <span className={cn('min-w-0', compact && 'lg:hidden')}>
                     <span className="block text-sm font-medium">{item.label}</span>
-                    <span className="debug-only block truncate text-[11px] text-muted/80">
+                    <span className="debug-only block truncate text-[11px] text-slate-500 group-hover:text-slate-400">
                       {item.story}
                     </span>
                   </span>
@@ -118,19 +140,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          <div className="border-t border-line px-3 py-3">
+          <div className={cn('border-t border-white/10 px-3 py-3', compact && 'lg:px-2')}>
             <button
               type="button"
               onClick={togglePresentation}
+              title={compact ? (presentation ? 'خروج از حالت ارائه' : 'حالت ارائه') : undefined}
               className={cn(
                 'flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition',
+                compact && 'lg:justify-center lg:px-2',
                 presentation
-                  ? 'bg-accent-violet/10 text-accent-violet'
-                  : 'text-muted hover:bg-slate-50 hover:text-ink',
+                  ? 'bg-violet-500/15 text-violet-300'
+                  : 'text-slate-400 hover:bg-white/[0.05] hover:text-white',
               )}
             >
               <Presentation className="h-4 w-4" />
-              {presentation ? 'خروج از حالت ارائه' : 'حالت ارائه'}
+              <span className={cn(compact && 'lg:hidden')}>{presentation ? 'خروج از حالت ارائه' : 'حالت ارائه'}</span>
             </button>
           </div>
         </div>
@@ -146,9 +170,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       ) : null}
 
       {/* ---------------------------------------------------------- main */}
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 border-b border-line bg-canvas/85 backdrop-blur">
-          <div className="flex items-center gap-3 px-4 py-3 lg:px-8">
+      <div className={cn('flex min-w-0 flex-1 flex-col transition-[margin] duration-200', compact ? 'lg:mr-[88px]' : 'lg:mr-[248px]')}>
+        <header className="sticky top-0 z-20 border-b border-line/80 bg-canvas/80 backdrop-blur-xl">
+          <div className="mx-auto flex max-w-[1600px] items-center gap-3 px-4 py-3 lg:px-8">
             <button
               type="button"
               onClick={() => setOpen(true)}
@@ -158,12 +182,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Menu className="h-5 w-5" />
             </button>
             <div className="min-w-0 flex-1">
-              <h1 className="truncate text-lg font-bold leading-tight text-ink lg:text-xl">
-                پل چهارم — هوش پیش‌بینی تقاضا
-              </h1>
-              <p className="truncate text-xs text-muted lg:text-sm">
-                پیش‌بینی، تحلیل و شبیه‌سازی تقاضای بازار اقامت
-              </p>
+              <h1 className="truncate text-sm font-semibold leading-tight text-ink sm:text-base">مرکز فرمان هوشمند بازار</h1>
+              <p className="mt-0.5 hidden truncate text-xs text-muted sm:block">تصمیم دقیق‌تر با سیگنال‌های زنده و پیش‌بینی داده‌محور</p>
             </div>
             <Suspense fallback={null}>
               <StatusStrip />
@@ -171,7 +191,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 px-4 py-6 lg:px-8 lg:py-8">
+        <main className="flex-1 px-4 py-5 sm:px-6 lg:px-8 lg:py-7">
           <div className="mx-auto w-full max-w-[1500px]">{children}</div>
         </main>
 

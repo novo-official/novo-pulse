@@ -15,7 +15,7 @@ export function CensoringCard({ report }: { report: CensoringReport }) {
   const heavy = report.censored_share > 0.25;
 
   return (
-    <Card>
+    <Card className="signal-card bg-gradient-to-b from-amber-50/30 to-surface">
       <CardHeader
         icon={<PackageOpen className="h-4.5 w-4.5" />}
         title="سانسور تقاضا (ظرفیت تکمیل)"
@@ -28,26 +28,26 @@ export function CensoringCard({ report }: { report: CensoringReport }) {
       />
       <CardBody className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-xl border border-line/70 p-3.5">
+          <div className="data-tile">
             <p className="text-xs text-muted">دوره‌های سانسورشده</p>
             <p className="nums mt-1 text-xl font-semibold text-ink">
               {formatNumber(report.censored_periods)}
             </p>
           </div>
-          <div className="rounded-xl border border-line/70 p-3.5">
+          <div className="data-tile">
             <p className="text-xs text-muted">اقامتگاه‌های متأثر</p>
             <p className="nums mt-1 text-xl font-semibold text-ink">
               {formatNumber(report.affected_entities)}
             </p>
           </div>
-          <div className="rounded-xl border border-line/70 p-3.5">
+          <div className="data-tile border-amber-200 bg-amber-50/50">
             <p className="text-xs text-muted">برآورد تقاضای پنهان</p>
             <p className="nums mt-1 text-xl font-semibold text-amber-600">
               {formatRatioAsPercent(report.mean_uplift)}
             </p>
           </div>
         </div>
-        <p className="rounded-xl bg-amber-50 px-3.5 py-3 text-xs leading-6 text-amber-800">
+        <p className="rounded-xl border border-amber-200/70 bg-amber-50 px-3.5 py-3 text-xs leading-6 text-amber-900">
           پیش‌بینی این سیستم «تقاضای قابل‌فروش» را نشان می‌دهد، نه تقاضای نامحدود بازار. در
           دوره‌هایی که ظرفیت تکمیل می‌شود، تقاضای واقعی بالاتر از عدد ثبت‌شده بوده است.
         </p>
@@ -64,7 +64,7 @@ export function TuningCard({ runs }: { runs: TuningRun[] }) {
   if (!runs.length) return null;
 
   return (
-    <Card>
+    <Card className="signal-card">
       <CardHeader
         icon={<SlidersHorizontal className="h-4.5 w-4.5" />}
         title="جست‌وجوی ابرپارامترها"

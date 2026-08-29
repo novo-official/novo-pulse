@@ -21,6 +21,7 @@ import { ChartTooltip } from '@/components/charts/tooltip';
 import { FilterBar } from '@/components/filters/forecast-filters';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
+import { PageHeader } from '@/components/ui/page-header';
 import { AsyncBoundary, CardSkeleton, ChartSkeleton, NoModelState } from '@/components/ui/states';
 import { Td, TableWrap, Th } from '@/components/ui/table';
 import { InfoHint } from '@/components/ui/tooltip';
@@ -100,14 +101,8 @@ export default function BacktestingPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="section-title">اعتبارسنجی گذشته‌نگر</h2>
-        <p className="mt-1 text-sm text-muted">
-          مدل روی داده‌هایی که هرگز ندیده بود ارزیابی می‌شود — با اعتبارسنجی متحرک زمانی، نه تقسیم
-          تصادفی.
-        </p>
-      </div>
+    <div className="page-stack">
+      <PageHeader eyebrow="اعتماد به مدل" title="اعتبارسنجی گذشته‌نگر" description="عملکرد واقعی مدل را روی بازه‌هایی که هرگز ندیده است، با اعتبارسنجی متحرک زمانی بررسی کنید." />
 
       {timeseriesQuery.data?.data ? (
         <FilterBar
@@ -128,7 +123,7 @@ export default function BacktestingPage() {
           </Card>
         }
       >
-        <Card>
+        <Card className="overflow-hidden border-cyan-100 bg-gradient-to-l from-cyan-50/50 to-surface shadow-lift">
           <CardHeader
             icon={<GitCompare className="h-4.5 w-4.5" />}
             title="طرح اعتبارسنجی"
@@ -143,7 +138,7 @@ export default function BacktestingPage() {
           <CardBody>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {(metrics?.folds ?? []).map((fold) => (
-                <div key={fold.fold} className="rounded-xl border border-line/70 p-3.5">
+                <div key={fold.fold} className="relative overflow-hidden rounded-xl border border-line/70 bg-surface p-3.5 shadow-sm before:absolute before:inset-y-0 before:right-0 before:w-1 before:bg-gradient-to-b before:from-brand-500 before:to-cyan-400">
                   <p className="text-xs font-semibold text-muted">تا {fold.fold}</p>
                   <p className="nums mt-1.5 text-xs text-ink" dir="ltr">
                     train ≤ {fold.train_end}
@@ -159,7 +154,7 @@ export default function BacktestingPage() {
       </AsyncBoundary>
 
       {/* ------------------------------------------- actual vs predicted */}
-      <Card>
+      <Card className="signal-card overflow-hidden">
         <CardHeader
           icon={<Activity className="h-4.5 w-4.5" />}
           title="مقدار واقعی در برابر پیش‌بینی"
@@ -213,7 +208,7 @@ export default function BacktestingPage() {
 
       {/* -------------------------------------- horizon + coverage tables */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
+        <Card className="signal-card">
           <CardHeader
             icon={<Target className="h-4.5 w-4.5" />}
             title="خطا بر حسب افق"
@@ -247,7 +242,7 @@ export default function BacktestingPage() {
           </CardBody>
         </Card>
 
-        <Card>
+        <Card className="signal-card">
           <CardHeader
             title="پوشش بازه اطمینان"
             subtitle={`روش: ${metrics?.uncertainty_method ?? '—'}`}
@@ -297,7 +292,7 @@ export default function BacktestingPage() {
       {/* ------------------------------------------------------- segments */}
       <div className="grid gap-6 lg:grid-cols-2">
         {metrics?.segments?.by_destination?.length ? (
-          <Card>
+          <Card className="signal-card">
             <CardHeader title="خطا بر حسب مقصد" subtitle="کدام مقاصد سخت‌تر پیش‌بینی می‌شوند؟" />
             <CardBody>
               <SegmentChart
@@ -310,7 +305,7 @@ export default function BacktestingPage() {
         ) : null}
 
         {metrics?.segments?.by_weekday?.length ? (
-          <Card>
+          <Card className="signal-card">
             <CardHeader title="خطا بر حسب روز هفته" />
             <CardBody>
               <SegmentChart
@@ -323,7 +318,7 @@ export default function BacktestingPage() {
         ) : null}
 
         {metrics?.segments?.by_month?.length ? (
-          <Card>
+          <Card className="signal-card">
             <CardHeader title="خطا بر حسب ماه" />
             <CardBody>
               <SegmentChart
@@ -336,7 +331,7 @@ export default function BacktestingPage() {
         ) : null}
 
         {metrics?.segments?.by_horizon?.length ? (
-          <Card>
+          <Card className="signal-card">
             <CardHeader title="خطا بر حسب گام افق" subtitle="روز به روز" />
             <CardBody>
               <SegmentChart

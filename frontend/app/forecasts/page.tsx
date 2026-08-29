@@ -10,6 +10,7 @@ import { PeaksCard } from '@/components/dashboard/peaks-card';
 import { FilterBar } from '@/components/filters/forecast-filters';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
+import { PageHeader } from '@/components/ui/page-header';
 import {
   AsyncBoundary,
   CardSkeleton,
@@ -54,13 +55,8 @@ export default function ForecastsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="section-title">پیش‌بینی‌ها</h2>
-        <p className="mt-1 text-sm text-muted">
-          تقاضای آینده در هر سطح از سلسله‌مراتب: اقامتگاه، مقصد، دسته‌بندی و کل بازار.
-        </p>
-      </div>
+    <div className="page-stack">
+      <PageHeader eyebrow="چشم‌انداز بازار" title="پیش‌بینی تقاضا" description="تقاضای آینده را در سطح اقامتگاه، مقصد، دسته‌بندی یا کل بازار ببینید و عدم‌قطعیت را در تصمیم لحاظ کنید." />
 
       {timeseries ? (
         <FilterBar
@@ -72,7 +68,7 @@ export default function ForecastsPage() {
         <Skeleton className="h-24 w-full rounded-2xl" />
       )}
 
-      <Card>
+      <Card className="overflow-hidden border-brand-100/80 shadow-lift">
         <CardHeader
           icon={<LineChart className="h-4.5 w-4.5" />}
           title={timeseries?.label ?? LEVEL_FA[level]}
@@ -155,7 +151,7 @@ export default function ForecastsPage() {
         {heatmapQuery.data?.data ? <DemandHeatmap data={heatmapQuery.data.data} /> : null}
       </AsyncBoundary>
 
-      <Card className="debug-only">
+      <Card className="debug-only signal-card bg-slate-50/50">
         <CardHeader
           icon={<ListTree className="h-4.5 w-4.5" />}
           title="سلسله‌مراتب پیش‌بینی"
@@ -165,7 +161,7 @@ export default function ForecastsPage() {
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
             {(timeseries?.levels ?? []).map((item, index, all) => (
               <span key={item} className="flex items-center gap-2">
-                <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-ink">
+                <span className="rounded-lg border border-line bg-surface px-2.5 py-1 font-medium text-ink shadow-sm">
                   {LEVEL_FA[item]}
                 </span>
                 {index < all.length - 1 ? <span>←</span> : null}

@@ -11,7 +11,7 @@ import { CONFIDENCE_FA, cn, formatDate, formatPercent } from '@/lib/utils';
 function PeakRow({ period }: { period: PeakPeriod }) {
   const up = period.type === 'peak';
   return (
-    <li className="flex items-center gap-3 rounded-xl border border-line/70 px-3 py-2.5">
+    <li className={cn('insight-row flex items-center gap-3', up ? 'hover:border-emerald-200' : 'hover:border-sky-200')}>
       <span
         className={cn(
           'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
@@ -52,7 +52,7 @@ export function PeaksCard({
 }) {
   const empty = peaks.length === 0 && troughs.length === 0;
   return (
-    <Card className="h-full">
+    <Card className="signal-card h-full">
       <CardHeader
         icon={<CalendarRange className="h-4.5 w-4.5" />}
         title="دوره‌های اوج و افت پیش‌رو"
@@ -67,7 +67,7 @@ export function PeaksCard({
         ) : null}
         {peaks.length > 0 ? (
           <div>
-            <p className="mb-2 text-xs font-semibold text-muted">اوج تقاضا</p>
+            <p className="subsection-label">اوج تقاضا</p>
             <ul className="space-y-2.5">
               {peaks.map((period, index) => (
                 <PeakRow key={`${period.entity_id}-${period.start}-${index}`} period={period} />
@@ -77,7 +77,7 @@ export function PeaksCard({
         ) : null}
         {troughs.length > 0 ? (
           <div>
-            <p className="mb-2 text-xs font-semibold text-muted">افت تقاضا</p>
+            <p className="subsection-label">افت تقاضا</p>
             <ul className="space-y-2.5">
               {troughs.map((period, index) => (
                 <PeakRow key={`${period.entity_id}-${period.start}-${index}`} period={period} />
