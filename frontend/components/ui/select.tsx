@@ -34,8 +34,10 @@ function readOptions(children: ReactNode): SelectOption[] {
 
 export function Select({
   className,
+  containerClassName,
   children,
   label,
+  icon,
   value = '',
   onChange,
   disabled = false,
@@ -43,8 +45,10 @@ export function Select({
   id,
 }: {
   className?: string;
+  containerClassName?: string;
   children: ReactNode;
   label?: string;
+  icon?: ReactNode;
   value?: string | number | readonly string[];
   onChange?: (event: ChangeEvent<HTMLSelectElement>) => void;
   disabled?: boolean;
@@ -74,8 +78,13 @@ export function Select({
   };
 
   return (
-    <label className="flex min-w-0 flex-col gap-1.5">
-      {label ? <span className="px-0.5 text-xs font-semibold text-muted">{label}</span> : null}
+    <label className={cn('flex min-w-0 flex-col gap-1.5', containerClassName)}>
+      {label ? (
+        <span className="flex items-center gap-1.5 px-0.5 text-xs font-semibold text-muted">
+          {icon ? <span className="text-brand-500/80">{icon}</span> : null}
+          {label}
+        </span>
+      ) : null}
       <div ref={rootRef} className={cn('relative', open && 'z-[9998]')}>
         {name ? <input type="hidden" name={name} value={selectedValue} /> : null}
         <button

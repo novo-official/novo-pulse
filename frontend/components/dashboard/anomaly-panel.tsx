@@ -2,39 +2,46 @@
 
 import { AlertTriangle, TrendingDown, TrendingUp } from 'lucide-react';
 
-import { Badge, toneForSeverity } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/states';
+import { ScrollList } from '@/components/ui/scroll-list';
+import { TypePill } from '@/components/ui/type-pill';
 import type { Anomaly } from '@/lib/types/api';
-import { SEVERITY_FA, cn, formatFullDate, formatNumber, formatPercent } from '@/lib/utils';
+import { SEVERITY_FA, cn } from '@/lib/utils';
+
+const faNumber = new Intl.NumberFormat('fa-IR');
+const faDate = new Intl.DateTimeFormat('fa-IR-u-ca-gregory', { day: 'numeric', month: 'long', year: 'numeric' });
+const faPercent = new Intl.NumberFormat('fa-IR', { style: 'percent', signDisplay: 'always', maximumFractionDigits: 0 });
 
 export function AnomalyPanel({ anomalies }: { anomalies: Anomaly[] }) {
   return (
-    <Card className="signal-card h-full">
+    <Card className="scroll-card anomaly-card h-full">
       <CardHeader
         icon={<AlertTriangle className="h-4.5 w-4.5" />}
         title="ناهنجاری‌های تقاضا"
         subtitle="انحراف معنادار از انتظار مدل، بر پایه امتیاز Z مقاوم (MAD)"
-        action={<Badge tone="neutral">{formatNumber(anomalies.length)} مورد</Badge>}
+        action={<Badge className="anomaly-card__count" tone="neutral">{faNumber.format(anomalies.length)} مورد</Badge>}
       />
-      <CardBody className="max-h-[420px] overflow-y-auto">
+      <CardBody className="scroll-card__body">
         {anomalies.length === 0 ? (
           <EmptyState
             title="ناهنجاری مهمی شناسایی نشد"
             description="تقاضا در محدوده مورد انتظار مدل قرار دارد."
           />
         ) : (
-          <ul className="space-y-2.5">
+          <ScrollList label="ناهنجاری‌های تقاضا"><ul className="scroll-card-list">
             {anomalies.map((anomaly, index) => {
               const spike = anomaly.type === 'spike';
               return (
                 <li
                   key={`${anomaly.entity_id}-${anomaly.ds}-${index}`}
-                  className={cn('insight-row flex items-center gap-3', spike ? 'hover:border-emerald-200' : 'hover:border-rose-200')}
+                  className={cn('scroll-card-row anomaly-row', spike ? 'anomaly-row--up' : 'anomaly-row--down')}
+                  tabIndex={0}
                 >
                   <span
                     className={cn(
-                      'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
+                      'scroll-card-row__icon flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px]',
                       spike ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600',
                     )}
                   >
@@ -45,25 +52,25 @@ export function AnomalyPanel({ anomalies }: { anomalies: Anomaly[] }) {
                     )}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="flex items-center gap-2 text-sm font-medium text-ink">
+                    <p className="flex items-center gap-2 text-[13.5px] font-bold text-ink">
                       <span className="truncate">{anomaly.label}</span>
-                      <span className="nums shrink-0 text-xs font-semibold text-muted">
+                      <span className="scroll-card-row__delta shrink-0 text-xs font-extrabold text-muted">
                         {anomaly.deviation !== null
-                          ? formatPercent(anomaly.deviation * 100, 0)
-                          : `Z=${anomaly.score.toFixed(1)}`}
+                          ? <bdi dir="ltr">{faPercent.format(anomaly.deviation)}</bdi>
+                          : <bdi dir="ltr">Z={anomaly.score.toFixed(1)}</bdi>}
                       </span>
                     </p>
                     <p className="mt-0.5 text-xs text-muted">
-                      {anomaly.type_fa} · {formatFullDate(anomaly.ds)}
+                      {anomaly.type_fa} · {faDate.format(new Date(anomaly.ds))}
                     </p>
                   </div>
-                  <Badge tone={toneForSeverity(anomaly.severity)} className="shrink-0">
+                  <TypePill tone={anomaly.severity === 'low' ? 'neutral' : anomaly.severity === 'medium' ? 'warn' : 'bad'} className="shrink-0">
                     {SEVERITY_FA[anomaly.severity] ?? anomaly.severity}
-                  </Badge>
+                  </TypePill>
                 </li>
               );
             })}
-          </ul>
+          </ul></ScrollList>
         )}
       </CardBody>
     </Card>

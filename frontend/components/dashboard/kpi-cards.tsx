@@ -48,15 +48,15 @@ function Kpi({
   return (
     <Card
       className={cn(
-        'group kpi-card relative flex min-h-[188px] flex-col overflow-visible p-5 sm:p-5',
+        'group kpi-card relative flex min-h-[202px] flex-col p-5 sm:p-5.5',
         `kpi-card--${tone}`,
       )}
     >
-      <div className="relative flex min-h-8 items-start">
+      <div className="relative flex min-h-9 items-start">
         <div className="flex min-w-0 items-center gap-2.5 text-[13px] font-semibold leading-5 text-muted">
           <span
             className={cn(
-              'flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px]',
+              'kpi-icon flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px]',
               tone === 'success' && 'bg-emerald-50 text-emerald-600',
               tone === 'danger' && 'bg-rose-50 text-rose-600',
               tone === 'warning' && 'bg-amber-50 text-amber-600',
@@ -76,7 +76,7 @@ function Kpi({
       <div className="relative mt-6 flex flex-1 flex-col justify-end">
         <p className={cn('kpi-value max-w-full break-words nums', valueClassName)}>{value}</p>
         {footnote || badge ? (
-          <div className="mt-3.5 flex flex-col gap-2.5">
+          <div className="kpi-meta mt-4 flex flex-col gap-2.5">
             {footnote ? <p className="line-clamp-2 text-[12px] leading-5 text-muted">{footnote}</p> : null}
             {badge ? <span className="kpi-status w-fit max-w-full">{badge}</span> : null}
           </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Filter } from 'lucide-react';
+import { Filter, Layers3, MapPin, Sparkles } from 'lucide-react';
 
 import { Select } from '@/components/ui/select';
 import { useForecastFilters } from '@/hooks/useForecastFilters';
@@ -19,7 +19,7 @@ export function HorizonSelector({
 
   return (
     <div
-      className={cn('inline-flex rounded-xl border border-line bg-slate-50/80 p-1 shadow-inner', className)}
+      className={cn('forecast-segment inline-flex rounded-xl', className)}
       role="group"
       aria-label="افق پیش‌بینی"
     >
@@ -28,11 +28,12 @@ export function HorizonSelector({
           key={option}
           type="button"
           onClick={() => setHorizon(option)}
+          aria-pressed={horizon === option}
           className={cn(
-            'nums rounded-lg px-3 py-1.5 text-xs font-semibold transition duration-200',
+            'forecast-segment__option nums rounded-[9px] px-3 py-1.5 text-xs font-semibold transition duration-200',
             horizon === option
-              ? 'bg-brand-600 text-white shadow-sm'
-              : 'text-muted hover:bg-slate-50 hover:text-ink',
+              ? 'forecast-segment__option--active bg-brand-600 text-white'
+              : 'text-muted hover:text-ink',
           )}
         >
           {option}D
@@ -57,6 +58,9 @@ export function LevelEntityFilter({
     <div className={cn('grid gap-3 sm:grid-cols-2', className)}>
       <Select
         label="سطح تحلیل"
+        icon={<Layers3 className="h-3.5 w-3.5" aria-hidden="true" />}
+        containerClassName="filter-bar__field"
+        className="filter-bar__select"
         value={level}
         onChange={(event) => setLevel(event.target.value as Level)}
       >
@@ -68,6 +72,9 @@ export function LevelEntityFilter({
       </Select>
       <Select
         label={LEVEL_FA[level] ?? 'انتخاب'}
+        icon={<MapPin className="h-3.5 w-3.5" aria-hidden="true" />}
+        containerClassName="filter-bar__field"
+        className="filter-bar__select"
         value={entityId ?? ''}
         onChange={(event) => setEntityId(event.target.value || null)}
         disabled={members.length === 0}
@@ -93,15 +100,17 @@ export function FilterBar({
   horizons: number[];
 }) {
   return (
-    <section aria-label="فیلترهای پیش‌بینی" className="relative flex flex-col gap-4 overflow-visible rounded-2xl border border-line/90 bg-surface/95 p-4 shadow-card lg:flex-row lg:items-end lg:justify-between lg:p-5">
-      <span className="pointer-events-none absolute inset-y-0 right-0 w-1 bg-gradient-to-b from-brand-500 to-cyan-400" />
-      <div className="flex items-center gap-2 lg:hidden">
-        <Filter className="h-4 w-4 text-muted" />
-        <span className="text-sm font-medium text-ink">فیلترها</span>
+    <section aria-label="فیلترهای پیش‌بینی" className="filter-bar relative flex flex-col gap-5 overflow-visible rounded-[20px] border border-slate-900/[0.07] bg-surface p-5 shadow-[0_1px_2px_rgb(15_23_42_/_0.02),0_14px_30px_-24px_rgb(15_23_42_/_0.24)] lg:flex-row lg:items-end lg:justify-between lg:px-6 lg:py-5">
+      <div className="filter-bar__analysis min-w-0">
+        <div className="filter-bar__context">
+          <Filter className="h-3.5 w-3.5" aria-hidden="true" />
+          <span>فیلترهای تحلیل</span>
+
+        </div>
+        <LevelEntityFilter levels={levels} members={members} className="mt-2.5 lg:w-[500px]" />
       </div>
-      <LevelEntityFilter levels={levels} members={members} className="lg:w-[460px]" />
-      <div className="flex flex-col gap-1.5">
-        <span className="text-xs font-medium text-muted">افق پیش‌بینی</span>
+      <div className="filter-bar__horizon flex flex-col gap-2">
+        <span className="flex items-center gap-1.5 px-0.5 text-xs font-semibold text-muted"><Sparkles className="h-3.5 w-3.5 text-brand-500/80" aria-hidden="true" />افق پیش‌بینی</span>
         <HorizonSelector options={horizons} />
       </div>
     </section>

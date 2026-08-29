@@ -1,7 +1,6 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { LineChart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { DemandHeatmap } from '@/components/charts/heatmap';
@@ -14,7 +13,8 @@ import { OpportunitiesCard } from '@/components/dashboard/opportunities-card';
 import { OverviewTable } from '@/components/dashboard/overview-table';
 import { PeaksCard } from '@/components/dashboard/peaks-card';
 import { FilterBar } from '@/components/filters/forecast-filters';
-import { Card, CardBody, CardHeader } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
+import { TrendCard } from '@/components/dashboard/trend-card';
 import { PageHeader } from '@/components/ui/page-header';
 import {
   AsyncBoundary,
@@ -119,12 +119,7 @@ export default function DashboardPage() {
       )}
 
       {/* ------------------------------------------------- forecast chart */}
-      <Card className="overflow-hidden border-brand-100/80 shadow-lift">
-        <CardHeader
-          icon={<LineChart className="h-4.5 w-4.5" />}
-          title={`روند تقاضا — ${timeseries?.label ?? LEVEL_FA[level]}`}
-          subtitle="تاریخچه واقعی، پیش‌بینی گذشته‌نگر و پیش‌بینی آینده به همراه بازه اطمینان ۸۰٪"
-        />
+      <TrendCard title={`روند تقاضا — ${timeseries?.label ?? LEVEL_FA[level]}`}>
         <AsyncBoundary
           isLoading={timeseriesQuery.isLoading}
           error={timeseriesQuery.error}
@@ -132,7 +127,7 @@ export default function DashboardPage() {
           onRetry={() => timeseriesQuery.refetch()}
           skeleton={<ChartSkeleton height={340} />}
         >
-          <CardBody>
+          <>
             {timeseries ? (
               <ForecastChart
                 series={timeseries.series}
@@ -140,12 +135,12 @@ export default function DashboardPage() {
                 height={380}
               />
             ) : null}
-          </CardBody>
+          </>
         </AsyncBoundary>
-      </Card>
+      </TrendCard>
 
       {/* ------------------------------------- narrative + drivers + opps */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="insights-section">
         <NarrativeCard
           narrative={narrativeQuery.data?.data ?? null}
           isLoading={!loadDetails || narrativeQuery.isLoading}
