@@ -24,7 +24,8 @@ import {
 import { CHART, axisProps } from '@/components/charts/palette';
 import { ChartTooltip } from '@/components/charts/tooltip';
 import type { SeriesPoint } from '@/lib/types/api';
-import { formatCompact, formatDate } from '@/lib/utils';
+import { useCalendar } from '@/hooks/useCalendar';
+import { formatCompact } from '@/lib/utils';
 
 interface Row extends SeriesPoint {
   bandBase?: number | null;
@@ -42,6 +43,7 @@ export function ForecastChart({
   height?: number;
   showBacktest?: boolean;
 }) {
+  const calendar = useCalendar();
   const rows = useMemo<Row[]>(
     () =>
       series.map((point) => {
@@ -71,7 +73,7 @@ export function ForecastChart({
           </defs>
 
           <CartesianGrid stroke={CHART.grid} strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey="ds" {...axisProps} tickFormatter={formatDate} minTickGap={28} />
+          <XAxis dataKey="ds" {...axisProps} tickFormatter={calendar.date} minTickGap={28} />
           <YAxis {...axisProps} tickFormatter={(value: number) => formatCompact(value)} width={48} />
           <Tooltip content={<ChartTooltip />} />
           <Legend

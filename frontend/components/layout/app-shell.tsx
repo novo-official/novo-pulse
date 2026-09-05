@@ -16,7 +16,8 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
 import { StatusStrip } from '@/components/layout/status-strip';
-import { useForecastFilters } from '@/hooks/useForecastFilters';
+import { useCalendar } from '@/hooks/useCalendar';
+import { storedCalendar, useForecastFilters } from '@/hooks/useForecastFilters';
 import { cn } from '@/lib/utils';
 
 const NAV = [
@@ -27,6 +28,16 @@ const NAV = [
   { href: '/models', label: 'مدل‌ها', icon: BarChart3, story: 'کدام مدل برنده است؟' },
   { href: '/data-lab', label: 'آزمایشگاه داده', icon: Database, story: 'دیتاست جدید' },
 ];
+
+/** Restore the reader's calendar choice once the browser is available. */
+function CalendarSync() {
+  const setCalendar = useForecastFilters((state) => state.setCalendar);
+  useEffect(() => {
+    const saved = storedCalendar();
+    if (saved !== 'jalali') setCalendar(saved);
+  }, [setCalendar]);
+  return null;
+}
 
 function PresentationSync() {
   const params = useSearchParams();
@@ -43,6 +54,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const presentation = useForecastFilters((state) => state.presentation);
   const setPresentation = useForecastFilters((state) => state.setPresentation);
+  const calendar = useCalendar();
 
   useEffect(() => setOpen(false), [pathname]);
 
@@ -57,6 +69,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={cn('flex min-h-screen', presentation && 'presentation')}>
+      <CalendarSync />
       <Suspense fallback={null}>
         <PresentationSync />
       </Suspense>
@@ -132,6 +145,36 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Presentation className="h-4 w-4" />
               {presentation ? 'خروج از حالت ارائه' : 'حالت ارائه'}
             </button>
+
+            {/* Shamsi is the calendar the audience plans in; Gregorian stays a
+                click away for anyone reading the raw dates alongside. */}
+            <div
+              className="mt-2 flex rounded-xl border border-line bg-surface p-1"
+              role="group"
+              aria-label="تقویم نمایش تاریخ‌ها"
+            >
+              {(
+                [
+                  ['jalali', 'شمسی'],
+                  ['gregorian', 'میلادی'],
+                ] as const
+              ).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => calendar.setCalendar(value)}
+                  aria-pressed={calendar.calendar === value}
+                  className={cn(
+                    'flex-1 rounded-lg px-2 py-1.5 text-xs font-semibold transition',
+                    calendar.calendar === value
+                      ? 'bg-brand-600 text-white shadow-sm'
+                      : 'text-muted hover:bg-slate-50 hover:text-ink',
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </aside>

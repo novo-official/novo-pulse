@@ -1,3 +1,9 @@
+import {
+  GREGORIAN_MONTHS_FA,
+  JALALI_MONTHS,
+  toJalali,
+  type CalendarName,
+} from './calendar.ts';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -56,32 +62,54 @@ export function toPersianDigits(input: string | number): string {
   return String(input).replace(/\d/g, (d) => FA_DIGITS[Number(d)]);
 }
 
-const FA_MONTHS = [
-  'ژانویه', 'فوریه', 'مارس', 'آوریل', 'مه', 'ژوئن',
-  'ژوئیه', 'اوت', 'سپتامبر', 'اکتبر', 'نوامبر', 'دسامبر',
-];
-
-/** Short readable date. The ML pipeline never sees this - display only. */
-export function formatDate(iso: string | null | undefined): string {
-  if (!iso) return '—';
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return iso;
-  return `${date.getDate()} ${FA_MONTHS[date.getMonth()]}`;
+/**
+ * Dates are formatted in the calendar the reader plans in. Iranian tourism runs
+ * on Shamsi months - a peak in مرداد is a fact someone can act on, "اوت" is a
+ * translation of one. The pipeline is Gregorian end to end; this is the edge.
+ *
+ * Prefer `useCalendar()` in components so a change of calendar re-renders them.
+ * These take the calendar explicitly so they stay pure and testable.
+ */
+export function formatDate(
+  iso: string | null | undefined,
+  calendar: CalendarName = 'jalali',
+): string {
+  const date = parseIso(iso);
+  if (!date) return iso ? iso : '—';
+  if (calendar === 'jalali') {
+    const jalali = toJalali(date);
+    return `${jalali.day} ${JALALI_MONTHS[jalali.month - 1]}`;
+  }
+  return `${date.getDate()} ${GREGORIAN_MONTHS_FA[date.getMonth()]}`;
 }
 
-export function formatFullDate(iso: string | null | undefined): string {
-  if (!iso) return '—';
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return iso;
-  return `${date.getDate()} ${FA_MONTHS[date.getMonth()]} ${date.getFullYear()}`;
+export function formatFullDate(
+  iso: string | null | undefined,
+  calendar: CalendarName = 'jalali',
+): string {
+  const date = parseIso(iso);
+  if (!date) return iso ? iso : '—';
+  if (calendar === 'jalali') {
+    const jalali = toJalali(date);
+    return `${jalali.day} ${JALALI_MONTHS[jalali.month - 1]} ${jalali.year}`;
+  }
+  return `${date.getDate()} ${GREGORIAN_MONTHS_FA[date.getMonth()]} ${date.getFullYear()}`;
 }
 
-export function formatDateTime(iso: string | null | undefined): string {
-  if (!iso) return '—';
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return iso;
+export function formatDateTime(
+  iso: string | null | undefined,
+  calendar: CalendarName = 'jalali',
+): string {
+  const date = parseIso(iso);
+  if (!date) return iso ? iso : '—';
   const time = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-  return `${formatFullDate(iso)} - ${time}`;
+  return `${formatFullDate(iso, calendar)} - ${time}`;
+}
+
+function parseIso(iso: string | null | undefined): Date | null {
+  if (!iso) return null;
+  const date = new Date(iso);
+  return Number.isNaN(date.getTime()) ? null : date;
 }
 
 export const CONFIDENCE_FA: Record<string, string> = {

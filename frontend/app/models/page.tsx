@@ -10,9 +10,11 @@ import { AsyncBoundary, CardSkeleton, NoModelState } from '@/components/ui/state
 import { Td, TableWrap, Th } from '@/components/ui/table';
 import { InfoHint } from '@/components/ui/tooltip';
 import { api } from '@/lib/api/endpoints';
-import { MODEL_KIND_FA, cn, formatDateTime, formatMetric, formatNumber } from '@/lib/utils';
+import { useCalendar } from '@/hooks/useCalendar';
+import { MODEL_KIND_FA, cn, formatMetric, formatNumber } from '@/lib/utils';
 
 export default function ModelsPage() {
+  const calendar = useCalendar();
   const leaderboardQuery = useQuery({ queryKey: ['leaderboard'], queryFn: api.leaderboard });
   const modelsQuery = useQuery({ queryKey: ['models'], queryFn: api.models });
 
@@ -227,7 +229,7 @@ export default function ModelsPage() {
                     ],
                     ['روش عدم‌قطعیت', registry.trained.uncertainty_method],
                     ['پروفایل آموزش', registry.trained.profile],
-                    ['آخرین آموزش', formatDateTime(registry.trained.last_trained)],
+                    ['آخرین آموزش', calendar.dateTime(registry.trained.last_trained)],
                   ].map(([label, value]) => (
                     <div key={label} className="flex justify-between gap-4 border-b border-line/60 pb-2">
                       <dt className="shrink-0 text-muted">{label}</dt>

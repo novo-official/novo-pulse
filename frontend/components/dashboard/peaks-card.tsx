@@ -6,9 +6,11 @@ import { Badge, toneForConfidence } from '@/components/ui/badge';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/states';
 import type { PeakPeriod } from '@/lib/types/api';
-import { CONFIDENCE_FA, cn, formatDate, formatPercent } from '@/lib/utils';
+import { useCalendar } from '@/hooks/useCalendar';
+import { CONFIDENCE_FA, cn, formatPercent } from '@/lib/utils';
 
 function PeakRow({ period }: { period: PeakPeriod }) {
+  const calendar = useCalendar();
   const up = period.type === 'peak';
   return (
     <li className="flex items-center gap-3 rounded-xl border border-line/70 px-3 py-2.5">
@@ -23,7 +25,7 @@ function PeakRow({ period }: { period: PeakPeriod }) {
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-ink">{period.label}</p>
         <p className="nums mt-0.5 text-xs text-muted">
-          {formatDate(period.start)} تا {formatDate(period.end)} · {period.days} روز
+          {calendar.date(period.start)} تا {calendar.date(period.end)} · {period.days} روز
         </p>
       </div>
       <div className="shrink-0 text-left">

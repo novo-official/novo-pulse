@@ -6,9 +6,11 @@ import { Badge, toneForSeverity } from '@/components/ui/badge';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/states';
 import type { Anomaly } from '@/lib/types/api';
-import { SEVERITY_FA, cn, formatFullDate, formatNumber, formatPercent } from '@/lib/utils';
+import { useCalendar } from '@/hooks/useCalendar';
+import { SEVERITY_FA, cn, formatNumber, formatPercent } from '@/lib/utils';
 
 export function AnomalyPanel({ anomalies }: { anomalies: Anomaly[] }) {
+  const calendar = useCalendar();
   return (
     <Card className="h-full">
       <CardHeader
@@ -54,7 +56,7 @@ export function AnomalyPanel({ anomalies }: { anomalies: Anomaly[] }) {
                       </span>
                     </p>
                     <p className="mt-0.5 text-xs text-muted">
-                      {anomaly.type_fa} · {formatFullDate(anomaly.ds)}
+                      {anomaly.type_fa} · {calendar.fullDate(anomaly.ds)}
                     </p>
                   </div>
                   <Badge tone={toneForSeverity(anomaly.severity)} className="shrink-0">

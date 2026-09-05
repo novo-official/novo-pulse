@@ -95,8 +95,8 @@ test: test-backend test-frontend ## Run everything
 test-backend: ## Backend test suite
 	$(PY) -m pytest
 
-test-frontend: ## Frontend typecheck, lint and production build
-	cd frontend && npx tsc --noEmit && npm run lint && npm run build
+test-frontend: ## Frontend unit tests, typecheck, lint and production build
+	cd frontend && npm test && npx tsc --noEmit && npm run lint && npm run build
 
 audit: ## Live API audit against a running backend (status codes + semantics)
 	$(PY) scripts/api_audit.py

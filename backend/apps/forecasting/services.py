@@ -295,8 +295,18 @@ def drivers(store: ArtifactStore, top_n: int = 8) -> dict[str, Any]:
     """
     importance = store.json("feature_importance", {})
     groups = importance.get("group_importance") or []
-    shown = groups[:top_n]
-    remainder = groups[top_n:]
+    shown = list(groups[:top_n])
+    remainder = list(groups[top_n:])
+
+    # The explainer already emits its own "other" group for features that match
+    # no known family. Folding the truncated tail into a *second* group of the
+    # same name would collide their ids and show two rows both labelled سایر,
+    # so the two are merged into one honest remainder.
+    if remainder or any(g.get("group") == "other" for g in shown):
+        existing = next((g for g in shown if g.get("group") == "other"), None)
+        if existing is not None:
+            shown = [g for g in shown if g is not existing]
+            remainder = [existing, *remainder]
 
     if remainder:
         residual_share = sum(g.get("contribution_share", 0.0) for g in remainder)

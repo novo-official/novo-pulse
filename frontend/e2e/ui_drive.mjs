@@ -99,6 +99,12 @@ const sliderCount = await sliders.count();
 check('scenario levers present', sliderCount > 0, `${sliderCount} sliders`);
 const runButton = page.getByRole('button', { name: /اجرای سناریو/ });
 check('run button disabled before any change', await runButton.isDisabled());
+// A dataset with no adjustable covariate has nothing to simulate. Report that
+// as a failed check rather than dying on a locator timeout, so the rest of the
+// walkthrough still runs and still says what it found.
+if (sliderCount === 0) {
+  check('scenario simulation skipped: this run exposes no adjustable levers', false);
+} else {
 // move the first slider (price)
 await sliders.first().evaluate((el) => {
   const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
@@ -116,6 +122,7 @@ const scenarioNums = await page.locator('.nums').allInnerTexts();
 check('baseline and scenario totals shown', scenarioNums.filter((t) => /[0-9],?[0-9]/.test(t)).length >= 3);
 check('scenario chart drawn', (await page.locator('svg.recharts-surface').count()) > 0);
 await page.screenshot({ path: `${SP}/ui_scenario.png`, fullPage: true });
+}
 
 // -------------------------------------------------------------- backtesting
 console.log('\n=== BACKTESTING');
@@ -169,6 +176,32 @@ check('presentation class applied', (await page.locator('.presentation').count()
 const hiddenDebug = await page.locator('.debug-only').first().isVisible().catch(() => false);
 check('debug chrome hidden', hiddenDebug === false);
 await page.screenshot({ path: `${SP}/ui_presentation.png`, fullPage: true });
+
+// --------------------------------------------------------------- calendar
+console.log('\n=== CALENDAR');
+const JALALI = /فروردین|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند/;
+const GREGORIAN = /ژانویه|فوریه|مارس|آوریل|ژوئن|ژوئیه|اوت|سپتامبر|اکتبر|نوامبر|دسامبر/;
+const axisText = async () =>
+  (await page.locator('svg.recharts-surface text').allTextContents()).join(' ');
+
+await go('/dashboard');
+const shamsiAxis = await axisText();
+check('dates default to Shamsi', JALALI.test(shamsiAxis) && !GREGORIAN.test(shamsiAxis),
+      (shamsiAxis.match(JALALI) || ['none'])[0]);
+
+await page.getByRole('button', { name: 'میلادی' }).click();
+await page.waitForTimeout(1200);
+const gregorianAxis = await axisText();
+check('switching to Gregorian re-renders the charts', GREGORIAN.test(gregorianAxis),
+      (gregorianAxis.match(GREGORIAN) || ['none'])[0]);
+
+await page.reload({ waitUntil: 'networkidle' });
+await page.waitForTimeout(2500);
+check('the calendar choice survives a reload', GREGORIAN.test(await axisText()));
+
+await page.getByRole('button', { name: 'شمسی' }).click();
+await page.waitForTimeout(1200);
+check('switching back to Shamsi re-renders the charts', JALALI.test(await axisText()));
 
 // ---------------------------------------------------------------- 404 page
 console.log('\n=== ERROR STATES');

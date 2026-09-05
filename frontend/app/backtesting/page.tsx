@@ -27,7 +27,8 @@ import { InfoHint } from '@/components/ui/tooltip';
 import { useForecastFilters } from '@/hooks/useForecastFilters';
 import { api } from '@/lib/api/endpoints';
 import type { SegmentScore } from '@/lib/types/api';
-import { formatCompact, formatDate, formatMetric, formatNumber } from '@/lib/utils';
+import { useCalendar } from '@/hooks/useCalendar';
+import { formatCompact, formatMetric, formatNumber } from '@/lib/utils';
 
 const WEEKDAY_FA = ['دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه', 'یکشنبه'];
 const MONTH_FA = [
@@ -75,6 +76,7 @@ function SegmentChart({
 }
 
 export default function BacktestingPage() {
+  const calendar = useCalendar();
   const { level, entityId, horizon } = useForecastFilters();
 
   const metricsQuery = useQuery({ queryKey: ['backtest-metrics'], queryFn: api.backtestMetrics });
@@ -177,7 +179,7 @@ export default function BacktestingPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={series} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
                   <CartesianGrid stroke={CHART.grid} strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="ds" {...axisProps} tickFormatter={formatDate} minTickGap={28} />
+                  <XAxis dataKey="ds" {...axisProps} tickFormatter={calendar.date} minTickGap={28} />
                   <YAxis {...axisProps} width={48} tickFormatter={(v: number) => formatCompact(v)} />
                   <Tooltip content={<ChartTooltip />} />
                   <Legend

@@ -1,6 +1,7 @@
 'use client';
 
-import { formatDate, formatNumber } from '@/lib/utils';
+import { useCalendar } from '@/hooks/useCalendar';
+import { formatNumber } from '@/lib/utils';
 
 interface Entry {
   name?: string;
@@ -28,7 +29,7 @@ export function ChartTooltip({
   payload,
   label,
   valueDigits = 1,
-  formatLabel = formatDate,
+  formatLabel,
 }: {
   active?: boolean;
   payload?: Entry[];
@@ -36,6 +37,8 @@ export function ChartTooltip({
   valueDigits?: number;
   formatLabel?: (value: string) => string;
 }) {
+  const calendar = useCalendar();
+  const label_ = formatLabel ?? calendar.date;
   if (!active || !payload?.length) return null;
 
   const rows = payload.filter(
@@ -45,7 +48,7 @@ export function ChartTooltip({
 
   return (
     <div dir="rtl" className="rounded-xl border border-line bg-surface/98 px-3 py-2 shadow-lift">
-      <p className="mb-1.5 text-xs font-semibold text-ink">{formatLabel(String(label ?? ''))}</p>
+      <p className="mb-1.5 text-xs font-semibold text-ink">{label_(String(label ?? ''))}</p>
       <ul className="space-y-1">
         {rows.map((entry) => (
           <li key={String(entry.dataKey)} className="flex items-center gap-2 text-xs">

@@ -12,7 +12,8 @@ import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/states';
 import { InfoHint } from '@/components/ui/tooltip';
 import type { HeatmapResponse } from '@/lib/types/api';
-import { formatDate, formatNumber } from '@/lib/utils';
+import { useCalendar } from '@/hooks/useCalendar';
+import { formatNumber } from '@/lib/utils';
 
 function cellColor(intensity: number | null): string {
   if (intensity === null || !Number.isFinite(intensity)) return 'rgb(241 245 249)';
@@ -25,6 +26,7 @@ function cellColor(intensity: number | null): string {
 }
 
 export function DemandHeatmap({ data }: { data: HeatmapResponse }) {
+  const calendar = useCalendar();
   const { dates, rows } = data;
   const step = Math.max(1, Math.ceil(dates.length / 12));
 
@@ -72,7 +74,7 @@ export function DemandHeatmap({ data }: { data: HeatmapResponse }) {
                         key={`${row.entity_id}-${dates[index]}`}
                         className="h-6 rounded-[3px] transition hover:ring-2 hover:ring-brand-400"
                         style={{ backgroundColor: cellColor(row.intensity[index]) }}
-                        title={`${row.label} · ${formatDate(dates[index])} · ${formatNumber(value, 1)}`}
+                        title={`${row.label} · ${calendar.date(dates[index])} · ${formatNumber(value, 1)}`}
                       />
                     ))}
                   </div>

@@ -14,7 +14,8 @@ import {
 
 import { CHART, axisProps } from '@/components/charts/palette';
 import { ChartTooltip } from '@/components/charts/tooltip';
-import { formatCompact, formatDate } from '@/lib/utils';
+import { useCalendar } from '@/hooks/useCalendar';
+import { formatCompact } from '@/lib/utils';
 
 export function ScenarioChart({
   series,
@@ -23,6 +24,7 @@ export function ScenarioChart({
   series: { ds: string; baseline: number; scenario: number; delta: number }[];
   height?: number;
 }) {
+  const calendar = useCalendar();
   return (
     <div className="chart-ltr w-full" style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
@@ -34,7 +36,7 @@ export function ScenarioChart({
             </linearGradient>
           </defs>
           <CartesianGrid stroke={CHART.grid} strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey="ds" {...axisProps} tickFormatter={formatDate} minTickGap={28} />
+          <XAxis dataKey="ds" {...axisProps} tickFormatter={calendar.date} minTickGap={28} />
           <YAxis {...axisProps} tickFormatter={(value: number) => formatCompact(value)} width={48} />
           <Tooltip content={<ChartTooltip />} />
           <Legend

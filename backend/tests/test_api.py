@@ -864,3 +864,17 @@ def test_training_keeps_the_joins_it_was_given(client, tmp_path, raw_frame):
     assert contract.joins[0].keys == ["listing_id"]
     # Uploads are de-duplicated with a numeric suffix, so match the stem.
     assert "listings" in Path(contract.joins[0].path).stem
+
+
+def test_driver_group_ids_are_unique(client, trained_run):
+    """Regression: two groups could both be called "other".
+
+    The explainer emits one for features matching no known family, and the
+    truncation fold added a second. They collide as React keys, so the chart
+    can drop or duplicate a row - and the same label appears twice.
+    """
+    data = client.get(reverse("forecast-drivers")).json()["data"]
+    ids = [group["group"] for group in data["groups"]]
+    assert len(ids) == len(set(ids)), f"duplicate driver group id in {ids}"
+    labels = [group["label_fa"] for group in data["groups"]]
+    assert len(labels) == len(set(labels)), f"duplicate driver label in {labels}"
