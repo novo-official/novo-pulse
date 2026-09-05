@@ -1,6 +1,6 @@
 {
-  "run_id": "2026-08-28_003",
-  "created_at": "2026-08-28T15:23:04.280002+00:00",
+  "run_id": "2026-09-05_014",
+  "created_at": "2026-09-05T16:17:14.840978+00:00",
   "champion": "lightgbm",
   "profile": "demo",
   "profile_config": {
@@ -23,7 +23,7 @@
   "dataset_path": "data/synthetic/daily_demand.csv",
   "target": "booking_count",
   "primary_metric": "wape",
-  "horizon": 30,
+  "horizon": 90,
   "levels": [
     "listing",
     "destination",
@@ -125,16 +125,16 @@
     "stat_province"
   ],
   "training_window": {
-    "start": "2024-03-10",
-    "end": "2026-08-26"
+    "start": "2024-03-19",
+    "end": "2026-09-04"
   },
   "models": {
-    "seasonal_naive_7": "runs/2026-08-28_003/models/seasonal_naive_7.joblib",
-    "seasonal_naive_30": "runs/2026-08-28_003/models/seasonal_naive_30.joblib",
-    "moving_average": "runs/2026-08-28_003/models/moving_average.joblib",
-    "historical_mean": "runs/2026-08-28_003/models/historical_mean.joblib",
-    "lightgbm": "runs/2026-08-28_003/models/lightgbm.joblib",
-    "catboost": "runs/2026-08-28_003/models/catboost.joblib"
+    "seasonal_naive_7": "runs/2026-09-05_014/models/seasonal_naive_7.joblib",
+    "seasonal_naive_30": "runs/2026-09-05_014/models/seasonal_naive_30.joblib",
+    "moving_average": "runs/2026-09-05_014/models/moving_average.joblib",
+    "historical_mean": "runs/2026-09-05_014/models/historical_mean.joblib",
+    "lightgbm": "runs/2026-09-05_014/models/lightgbm.joblib",
+    "catboost": "runs/2026-09-05_014/models/catboost.joblib"
   },
   "ensemble_weights": {
     "lightgbm": 0.5261,

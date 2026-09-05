@@ -48,6 +48,12 @@ def start_training(
     horizon = int(horizon or contract.evaluation.max_horizon)
     seed = int(seed if seed is not None else settings.RANDOM_SEED)
 
+    # A count-aggregation contract has no target column: demand is the number
+    # of rows. The field is display-only, so it carries that instead of a blank.
+    target_label = contract.target or (
+        "count of rows" if contract.aggregation == "count" else ""
+    )
+
     experiment = None
     if experiment_name:
         experiment, _ = Experiment.objects.get_or_create(
@@ -55,7 +61,7 @@ def start_training(
             defaults={
                 "name": experiment_name,
                 "dataset_name": contract.name,
-                "target": contract.target,
+                "target": target_label,
             },
         )
 
@@ -64,7 +70,7 @@ def start_training(
         run_id=_reserve_run_id(),
         status=TrainingRun.Status.PENDING,
         profile=profile_name,
-        target=contract.target,
+        target=target_label,
         primary_metric=contract.evaluation.primary_metric,
         horizon=horizon,
         frequency=contract.frequency or "D",

@@ -14,6 +14,7 @@ schema:
   entity_id: accommodation_id
   frequency: D
   aggregation: sum
+  calendar: auto
 hierarchy:
   destination: destination_id
   category: category

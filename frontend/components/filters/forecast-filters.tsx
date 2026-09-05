@@ -1,6 +1,7 @@
 'use client';
 
 import { Filter } from 'lucide-react';
+import { useEffect } from 'react';
 
 import { Select } from '@/components/ui/select';
 import { useForecastFilters } from '@/hooks/useForecastFilters';
@@ -16,6 +17,14 @@ export function HorizonSelector({
 }) {
   const horizon = useForecastFilters((state) => state.horizon);
   const setHorizon = useForecastFilters((state) => state.setHorizon);
+
+  // A run trained to 30 days cannot answer a 90-day question, so a horizon the
+  // current run does not cover snaps down to the longest one it does.
+  useEffect(() => {
+    if (options.length > 0 && !options.includes(horizon)) {
+      setHorizon(Math.max(...options));
+    }
+  }, [options, horizon, setHorizon]);
 
   return (
     <div

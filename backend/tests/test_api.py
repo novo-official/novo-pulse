@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import shutil
+from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -788,3 +789,78 @@ def test_a_join_with_neither_id_nor_path_is_rejected(client, tmp_path, raw_frame
         format="json",
     )
     assert response.status_code == 400
+
+
+def test_training_starts_for_a_count_contract_with_no_target(client, tmp_path):
+    """Regression: `target` is non-null in the DB, so a count run used to 500.
+
+    Demand is the row count, so there is no target column to store - and the
+    field is display-only anyway.
+    """
+    rows = []
+    for day in pd.date_range("2024-01-01", periods=150):
+        for listing in ("ACC-1", "ACC-2"):
+            for _ in range((day.dayofyear + len(listing)) % 3 + 1):
+                rows.append({"booked_on": day.date().isoformat(), "unit_code": listing})
+    csv = tmp_path / "bookings.csv"
+    pd.DataFrame(rows).to_csv(csv, index=False)
+    dataset = _upload(client, csv)["dataset"]
+
+    response = client.post(
+        reverse("training-run"),
+        {
+            "dataset_id": dataset["id"],
+            "mapping": {
+                "dataset_id": dataset["id"],
+                "timestamp": "booked_on",
+                "entity_id": "unit_code",
+                "aggregation": "count",
+                "horizons": [7],
+            },
+            "horizon": 7,
+        },
+        format="json",
+    )
+    assert response.status_code == 200, response.json()
+    assert response.json()["data"]["target"] == "count of rows"
+
+
+def test_training_keeps_the_joins_it_was_given(client, tmp_path, raw_frame):
+    """Regression: joins were resolved in the mapping view only.
+
+    Training from an inline mapping therefore built a contract with its side
+    tables silently dropped - a run that looks fine and quietly ignores two
+    thirds of the competition data. Resolution now lives inside
+    `contract_from_mapping`, so every caller gets it.
+    """
+    from apps.datasets.services import contract_from_mapping
+
+    small = raw_frame.head(400)
+    main = tmp_path / "main.csv"
+    small.drop(columns=["capacity"]).to_csv(main, index=False)
+    main_dataset = _upload(client, main)["dataset"]
+
+    side = tmp_path / "listings.csv"
+    pd.DataFrame(
+        {
+            "listing_id": sorted(small["listing_id"].unique()),
+            "capacity": range(small["listing_id"].nunique()),
+        }
+    ).to_csv(side, index=False)
+    side_dataset = _upload(client, side)["dataset"]
+
+    mapping = {
+        "dataset_id": main_dataset["id"],
+        "timestamp": "date",
+        "target": "bookings",
+        "entity_id": "listing_id",
+        "static_features": ["capacity"],
+        "joins": [{"dataset_id": side_dataset["id"], "on": ["listing_id"]}],
+        "horizons": [7],
+    }
+
+    contract = contract_from_mapping(mapping, main_dataset["path"], main_dataset["name"])
+    assert len(contract.joins) == 1, "the side table must survive into the contract"
+    assert contract.joins[0].keys == ["listing_id"]
+    # Uploads are de-duplicated with a numeric suffix, so match the stem.
+    assert "listings" in Path(contract.joins[0].path).stem

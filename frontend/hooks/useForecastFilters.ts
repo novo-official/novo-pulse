@@ -19,7 +19,10 @@ interface FilterState {
 export const useForecastFilters = create<FilterState>((set) => ({
   level: 'destination',
   entityId: null,
-  horizon: 30,
+  // Long horizons are the hard part of this problem and what the product is
+  // built to answer, so the dashboard opens on one. HorizonSelector snaps this
+  // down if the published run was trained shorter.
+  horizon: 90,
   presentation: false,
   // Changing the level invalidates the selected entity.
   setLevel: (level) => set({ level, entityId: null }),

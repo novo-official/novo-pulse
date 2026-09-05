@@ -73,6 +73,35 @@ def profile(path: str | Path) -> dict[str, Any]:
     return profile_dataset(path)
 
 
+def resolve_joins(joins) -> list[dict]:
+    """Turn the Data Lab's join rows into the `{path, on}` a contract wants.
+
+    A side table is normally another uploaded dataset, referenced by id; a
+    literal path is accepted too, but only from inside the project. Resolution
+    lives here rather than in a view so that no caller can build a contract
+    that quietly drops its joins.
+    """
+    from .models import Dataset
+
+    resolved = []
+    for join in joins or []:
+        keys = [k for k in (join.get("on") or []) if k]
+        if not keys:
+            continue
+        path = join.get("path")
+        if join.get("dataset_id"):
+            side = Dataset.objects.filter(id=join["dataset_id"]).first()
+            if side is None:
+                raise ValueError(f"Join dataset {join['dataset_id']} not found")
+            path = side.path
+        elif path:
+            path = str(register_local_file(path))
+        if not path:
+            continue
+        resolved.append({"path": path, "on": keys})
+    return resolved
+
+
 def contract_from_mapping(
     mapping: dict[str, Any], dataset_path: str, name: str = "uploaded_dataset"
 ) -> DataContract:
@@ -86,11 +115,7 @@ def contract_from_mapping(
             # The competition ships demand, accommodation/destination and
             # booking data as separate files. Each join is merged onto the main
             # frame before the panel is built.
-            "joins": [
-                {"path": join["path"], "on": join["on"]}
-                for join in (mapping.get("joins") or [])
-                if join.get("path") and join.get("on")
-            ],
+            "joins": resolve_joins(mapping.get("joins")),
         },
         "schema": {
             "timestamp": mapping["timestamp"],

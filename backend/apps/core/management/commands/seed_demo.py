@@ -27,7 +27,7 @@ class Command(BaseCommand):
         parser.add_argument("--days", type=int, default=900, help="Days of history to generate.")
         parser.add_argument("--accommodations", type=int, default=140)
         parser.add_argument("--profile", default="demo", help="demo | competition | full")
-        parser.add_argument("--horizon", type=int, default=30)
+        parser.add_argument("--horizon", type=int, default=90)
         parser.add_argument("--seed", type=int, default=42)
         parser.add_argument(
             "--skip-data", action="store_true", help="Reuse the existing synthetic dataset."

@@ -12,8 +12,18 @@ function check(name, ok, detail = '') {
 
 const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
 const page = await browser.newPage({ viewport: { width: 1500, height: 1000 } });
+// The 404 page is visited on purpose, and the browser always logs a failed
+// resource for it. Counting that as a runtime error would mean the suite can
+// never pass.
+let expectFailedNavigation = false;
 page.on('pageerror', (e) => errors.push(`PAGEERROR ${page.url()}: ${e.message}`));
-page.on('console', (m) => { if (m.type() === 'error' && !m.text().includes('favicon')) errors.push(`CONSOLE ${page.url()}: ${m.text()}`); });
+page.on('console', (m) => {
+  if (m.type() !== 'error') return;
+  const text = m.text();
+  if (text.includes('favicon')) return;
+  if (expectFailedNavigation && text.includes('404')) return;
+  errors.push(`CONSOLE ${page.url()}: ${text}`);
+});
 
 const go = async (path) => {
   await page.goto(`${BASE}${path}`, { waitUntil: 'networkidle', timeout: 60000 });
@@ -131,6 +141,11 @@ console.log('\n=== DATA LAB');
 await go('/data-lab');
 check('upload step shown', (await page.locator('text=بارگذاری دیتاست').count()) > 0);
 // A bare clone has no registered dataset yet; that is correct, not a defect.
+const search = page.getByLabel('جست‌وجوی دیتاست');
+if (await search.count()) {
+  await search.fill('synthetic');
+  await page.waitForTimeout(400);
+}
 const registered = await page.locator('button').filter({ hasText: 'synthetic_pol_e_chaharom' }).count();
 if (registered === 0) {
   check('empty dataset list explains what to do',
@@ -157,6 +172,7 @@ await page.screenshot({ path: `${SP}/ui_presentation.png`, fullPage: true });
 
 // ---------------------------------------------------------------- 404 page
 console.log('\n=== ERROR STATES');
+expectFailedNavigation = true;
 await go('/no-such-page');
 check('404 page renders', (await page.locator('text=صفحه پیدا نشد').count()) > 0);
 

@@ -189,6 +189,7 @@ export default function DataLabPage() {
   const [validation, setValidation] = useState<ValidationReport | null>(null);
   const [run, setRun] = useState<TrainingRun | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [datasetSearch, setDatasetSearch] = useState('');
 
   const datasetsQuery = useQuery({ queryKey: ['datasets'], queryFn: api.datasets });
   const trainingQuery = useQuery({ queryKey: ['training'], queryFn: api.training });
@@ -357,6 +358,16 @@ export default function DataLabPage() {
     onError: (error: Error) => setMessage(error.message),
   });
 
+  const allDatasets = useMemo(
+    () => datasetsQuery.data?.data?.datasets ?? [],
+    [datasetsQuery.data],
+  );
+  const visibleDatasets = useMemo(() => {
+    const needle = datasetSearch.trim().toLowerCase();
+    if (!needle) return allDatasets;
+    return allDatasets.filter((dataset) => dataset.name.toLowerCase().includes(needle));
+  }, [allDatasets, datasetSearch]);
+
   const columns = useMemo(() => profile?.columns ?? [], [profile]);
   const numeric = useMemo(() => columns.filter((c) => c.kind === 'numeric'), [columns]);
   const nonKey = useMemo(
@@ -436,9 +447,23 @@ export default function DataLabPage() {
             </button>
 
             <div className="border-t border-line pt-4">
-              <p className="mb-2 text-xs font-medium text-muted">یا دیتاست موجود را انتخاب کنید</p>
-              <div className="space-y-1.5">
-                {(datasetsQuery.data?.data?.datasets ?? []).slice(0, 6).map((dataset) => (
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <p className="text-xs font-medium text-muted">یا دیتاست موجود را انتخاب کنید</p>
+                {allDatasets.length > 6 ? (
+                  <TextInput
+                    aria-label="جست‌وجوی دیتاست"
+                    placeholder="جست‌وجو…"
+                    className="h-8 w-40 text-xs"
+                    value={datasetSearch}
+                    onChange={(event) => setDatasetSearch(event.target.value)}
+                  />
+                ) : null}
+              </div>
+              {/* Every registered file stays reachable: uploading three
+                  competition files plus a few retries must not push the one you
+                  need out of the list. */}
+              <div className="max-h-72 space-y-1.5 overflow-y-auto pl-1">
+                {visibleDatasets.map((dataset) => (
                   <button
                     key={dataset.id}
                     type="button"
@@ -460,8 +485,12 @@ export default function DataLabPage() {
                   </button>
                 ))}
                 {datasetsQuery.isLoading ? <Skeleton className="h-12 w-full" /> : null}
-                {!datasetsQuery.isLoading &&
-                (datasetsQuery.data?.data?.datasets ?? []).length === 0 ? (
+                {!datasetsQuery.isLoading && allDatasets.length > 0 && visibleDatasets.length === 0 ? (
+                  <p className="px-3 py-3 text-xs text-muted">
+                    دیتاستی با این نام پیدا نشد.
+                  </p>
+                ) : null}
+                {!datasetsQuery.isLoading && allDatasets.length === 0 ? (
                   <p className="rounded-xl border border-dashed border-line px-3 py-3 text-xs leading-6 text-muted">
                     هنوز دیتاستی ثبت نشده است. فایل خود را بارگذاری کنید، یا برای ساخت داده
                     نمونه این دستور را اجرا کنید:

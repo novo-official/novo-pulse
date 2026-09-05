@@ -249,17 +249,34 @@ Metrics: `mae`, `rmse`, `wape`, `mape`, `smape`, `rmsle`, `r2`, `bias`,
 `mase`, `poisson_deviance`. Selecting one re-orients the leaderboard, champion
 selection, ensemble weighting and all reported scores.
 
-Example run (synthetic dataset, `demo` profile, 30-day horizon, listing level):
+Example run (synthetic dataset, `demo` profile, 90-day horizon, listing level):
 
 | Model | WAPE | vs. baseline |
 |---|---:|---:|
-| **LightGBM (champion)** | **25.4%** | **+19.7%** |
-| Ensemble | 25.4% | +19.6% |
-| CatBoost | 26.1% | +17.7% |
-| Moving average *(best baseline)* | 31.6% | — |
-| Seasonal naive (7) | 38.0% | −20.2% |
+| **LightGBM (champion)** | **25.5%** | **+19.7%** |
+| Ensemble | 25.6% | +19.5% |
+| CatBoost | 26.2% | +17.6% |
+| Moving average *(best baseline)* | 31.8% | — |
+| Seasonal naive (7) | 39.4% | −23.8% |
 
-Observed 80% interval coverage: 77–79% across every horizon bucket.
+### Long horizons
+
+The brief names long forecast horizons as the central difficulty, so the
+product defaults to 90 days and the accuracy is reported per horizon bucket
+rather than as a single headline number:
+
+| Days ahead | 1–7 | 8–14 | 15–30 | 31–60 | 61–90 |
+|---|---:|---:|---:|---:|---:|
+| WAPE | 25.5% | 24.9% | 24.8% | 25.7% | 26.0% |
+| 80% interval coverage | 78.7% | 78.8% | 79.9% | 79.2% | 78.7% |
+
+Accuracy is nearly flat from a week out to a quarter out because each horizon
+is predicted **directly** — one sample is `(entity, forecast origin, horizon)`
+and the horizon is an explicit feature — so a 90-day forecast is a single
+prediction rather than 90 chained ones, and there is no error to compound.
+Coverage is measured, not assumed: the served interval is whichever of the
+model's own quantiles or conformal residual bounds lands closer to nominal on
+held-out folds, and the run records which one it picked and why.
 
 `reports/model_report.md` is regenerated automatically after each run.
 
@@ -270,11 +287,19 @@ Observed 80% interval coverage: 77–79% across every horizon bucket.
 The only thing that changes when the real dataset arrives:
 
 ```yaml
+dataset:
+  path: data/raw/bookings.csv
+  joins:                       # the other competition files
+    - {path: data/raw/accommodations.csv, on: accommodation_id}
+    - {path: data/raw/holidays.csv,       on: date}
+
 schema:
   timestamp: date
   target: booking_count        # any KPI: demand, occupancy, revenue, ...
   entity_id: accommodation_id  # or null for a single series
   frequency: D                 # or null to auto-detect
+  aggregation: sum             # "count" when demand is the number of rows
+  calendar: auto               # auto | jalali | gregorian
 
 hierarchy:
   destination: destination_id
@@ -289,6 +314,24 @@ evaluation:
   primary_metric: wape
   horizons: [7, 14, 30, 60, 90]
 ```
+
+### Data shapes it already handles
+
+The dataset is expected to arrive the way an Iranian marketplace exports one.
+Each of these fails silently rather than loudly if it is not handled, so each
+is detected, converted, and *reported* — never applied behind your back.
+
+| Shape | What happens |
+|---|---|
+| **Jalali dates** — `1403/05/12`, or `۱۴۰۳/۰۵/۱۲` with Persian digits | Detected from the year field, converted to Gregorian, raised as a validation finding. `schema.calendar` overrides the guess. |
+| **A raw booking log** — one row per booking, no demand column | `aggregation: count` makes demand the row count. The profiler suggests it and disables the target selector, so a plausible-looking amount column cannot be summed by mistake. |
+| **Several separate files** — demand, accommodation/destination, bookings | `dataset.joins`, or **فایل‌های جانبی** in the Data Lab. Match rates are reported per join; date keys are parsed on both sides, so a Jalali booking file joins a Gregorian holiday calendar correctly. |
+| **Persian column headers** — `تاریخ_رزرو`, `کد_اقامتگاه`, `شهر` | Recognised alongside the English names, including `ی`/`ي`, `ک`/`ك` and zero-width non-joiner variants. |
+
+Verified end to end through the browser: `frontend/e2e/ui_competition.mjs`
+uploads a 10k-row Jalali booking log with Persian headers, joins an
+accommodation table and a holiday calendar to it, trains, and checks the
+Persian destinations reach the dashboard.
 
 See `config/data_contract.example.yaml` and **[docs/COMPETITION_DAY.md](docs/COMPETITION_DAY.md)**.
 

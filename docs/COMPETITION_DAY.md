@@ -21,6 +21,7 @@ column name, a target, a metric, or a hierarchy level.
 | 6 | Set the frequency | auto-detected; override if wrong | 1 min |
 | 7 | Set the hierarchy | Data Lab → destination / category | 1 min |
 | 8 | Set the official metric | Data Lab → *معیار رسمی مسابقه* | 1 min |
+| 8b | Awkward shape? | Jalali dates / booking log / several files — see below | 5 min |
 | 9 | Check for leakage | `make validate` → read the report | 3 min |
 | 10 | Run the baselines | `make train PROFILE=demo` | ~2 min |
 | 11 | Run the real profile | `make train PROFILE=competition` | 10–40 min |
@@ -70,13 +71,19 @@ The fields that matter:
 ```yaml
 dataset:
   path: data/raw/competition_data.csv
+  joins:                              # other files, merged on a shared key
+    - path: data/raw/accommodations.csv
+      on: accommodation_id
+    - path: data/raw/holidays.csv
+      on: date
 
 schema:
   timestamp: <the date column>
   target: <THE OFFICIAL TARGET>       # booking_count | demand | occupancy | ...
   entity_id: <listing/hotel id, or null for a single series>
   frequency: D                        # null => auto-detect
-  aggregation: sum                    # how to collapse duplicate rows
+  aggregation: sum                    # sum | mean | max | min | first | count
+  calendar: auto                      # auto | jalali | gregorian
 
 hierarchy:
   destination: <city/region column>   # optional
@@ -109,6 +116,68 @@ model that scores brilliantly in validation and fails on the leaderboard. When
 unsure, put it in `historical` — you lose a little accuracy and keep your
 integrity.
 
+---
+
+## When the data arrives in an awkward shape
+
+Four shapes are common in Iranian marketplace exports and each one silently
+destroys a run rather than failing loudly. All four are handled, and the
+profiler detects all four — but check that it got them right.
+
+### Jalali (Shamsi) dates
+
+`1403/05/12`, sometimes written with Persian digits (`۱۴۰۳/۰۵/۱۲`).
+`pandas.to_datetime` returns NaT for every one of those, which would drop the
+entire dataset at the first step.
+
+The profiler reads the year field: 1300–1500 is Jalali, because no Gregorian
+dataset contains year 1403. The Data Lab shows a **تقویم شمسی** badge and a
+note naming the sample values it converted, and the validation report raises a
+`calendar_converted` finding so the conversion cannot be scrolled past.
+
+If the guess is wrong, set it explicitly — `schema.calendar: gregorian`, or the
+**تقویم ستون تاریخ** selector in the Data Lab. Everything downstream works in
+Gregorian; the calendar is an input format, never a modelling concern.
+
+### A raw booking log with no demand column
+
+If the file has one row per booking — a booking id, a date, an accommodation
+code, an amount — there is nothing to sum. Demand *is* the number of rows.
+
+Set `schema.aggregation: count` and leave `schema.target` empty. The Data Lab
+suggests this automatically when it sees many rows repeating an
+`(entity, date)` pair, shows a **جدول خام رزرو** badge, and disables the target
+selector so a plausible-looking numeric column (`مبلغ`, `تعداد_شب`) cannot be
+summed by mistake — that would be measuring rials or nights, not demand.
+
+Verify afterwards that the panel total equals the source row count; the adapter
+reports both in its notes.
+
+### Several files instead of one
+
+The brief splits the data three ways: demand, accommodation/destination
+information, and bookings. Nothing has to be pre-joined outside the product.
+
+In the Data Lab, **فایل‌های جانبی → افزودن فایل جانبی** uploads each extra file
+and picks the key column; only columns present in both files are offered. In
+YAML it is `dataset.joins`, as above.
+
+The adapter reports the match rate for every join, and says so loudly when a
+join matched nothing — the failure mode is a key that exists on both sides with
+values that never line up. Date keys are parsed on both sides before matching,
+so a Jalali booking file joins correctly to a Gregorian holiday calendar. A
+side table with duplicate keys is collapsed rather than allowed to multiply the
+main frame's rows.
+
+### Persian column headers
+
+`تاریخ_رزرو`, `کد_اقامتگاه`, `شهر`, `تعداد_رزرو` are recognised alongside their
+English equivalents, including the `ی`/`ي` and `ک`/`ك` variants and zero-width
+non-joiners. Confirm the suggestions in the Data Lab as you would for any
+dataset — they are suggestions, not decisions.
+
+---
+
 ## 9. Check for leakage
 
 ```bash
@@ -128,7 +197,7 @@ Also check the **Data Health Score**. Below 60, fix the data before training.
 ## 10. Run the baselines first
 
 ```bash
-make train PROFILE=demo HORIZON=30
+make train PROFILE=demo HORIZON=90
 ```
 
 Two minutes. This tells you:

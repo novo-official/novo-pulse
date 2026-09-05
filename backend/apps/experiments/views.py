@@ -73,7 +73,10 @@ def training_run(request):
                     "نگاشت کنید."
                 ),
             )
-        contract = contract_from_mapping(mapping, dataset.path, dataset.name)
+        try:
+            contract = contract_from_mapping(mapping, dataset.path, dataset.name)
+        except ValueError as exc:
+            return error(str(exc), 400, detail_fa=f"فایل جانبی پیدا نشد: {exc}")
     else:
         contract = DataContract.load()
 

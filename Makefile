@@ -13,7 +13,7 @@ PIP   := $(VENV)/bin/pip
 MANAGE := $(PY) backend/manage.py
 
 PROFILE ?= demo
-HORIZON ?= 30
+HORIZON ?= 90
 METRIC  ?= wape
 
 .DEFAULT_GOAL := help
@@ -105,6 +105,7 @@ audit: ## Live API audit against a running backend (status codes + semantics)
 e2e: ## Browser end-to-end walkthrough (needs both servers running)
 	cd frontend && node e2e/ui_drive.mjs
 	cd frontend && node e2e/ui_upload.mjs
+	cd frontend && node e2e/ui_competition.mjs
 
 lint: ## Lint the frontend
 	cd frontend && npm run lint
