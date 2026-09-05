@@ -51,3 +51,6 @@ models/local_*/
 
 # Screenshots the browser walkthroughs write next to themselves
 frontend/e2e/*.png
+
+.claude
+
