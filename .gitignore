@@ -47,3 +47,7 @@ models/local_*/
 
 # OS
 .DS_Store
+
+
+# Screenshots the browser walkthroughs write next to themselves
+frontend/e2e/*.png
