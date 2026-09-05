@@ -26,6 +26,7 @@ from ..contract import (
     DataContract,
 )
 from ..paths import REPO_ROOT
+from .dates import normalise_digit_series, parse_timestamps
 from .frequency import detect_frequency
 
 log = logging.getLogger(__name__)
@@ -175,11 +176,28 @@ class Panel:
 
 
 # --------------------------------------------------------------------------
+def _looks_like_date(series: pd.Series) -> bool:
+    """True when a join key holds dates rather than ids.
+
+    Numeric ids are excluded outright: a 4-digit accommodation code would
+    otherwise be read as a year.
+    """
+    if pd.api.types.is_datetime64_any_dtype(series):
+        return True
+    if not pd.api.types.is_object_dtype(series) and not pd.api.types.is_string_dtype(series):
+        return False
+    sample = series.dropna().astype(str).head(200)
+    if sample.empty:
+        return False
+    return bool(sample.str.contains(r"\d{4}\s*[-/._]\s*\d{1,2}").mean() > 0.8)
+
+
 class DataAdapter:
     """Turn raw files + a contract into a `Panel`."""
 
     def __init__(self, contract: DataContract):
         self.contract = contract
+        self.join_notes: list[str] = []
 
     # ------------------------------------------------------------- loading
     def load_raw(self) -> pd.DataFrame:
@@ -187,27 +205,84 @@ class DataAdapter:
             raise ValueError("Contract has no dataset path")
         frame = read_tabular(self.contract.path)
         for join in self.contract.joins:
-            path = Path(join.path)
-            if not path.is_absolute():
-                path = REPO_ROOT / path
-            if not path.exists():
-                log.warning("Join source missing, skipping: %s", path)
-                continue
-            side = read_tabular(path)
-            keys = [k for k in join.keys if k in frame.columns and k in side.columns]
-            if not keys:
-                log.warning("Join key(s) %s absent, skipping %s", join.keys, path)
-                continue
-            overlap = [
-                c for c in side.columns if c in frame.columns and c not in keys
-            ]
-            side = side.drop(columns=overlap)
-            if keys == ["date"] or any("date" in k.lower() for k in keys):
-                for key in keys:
-                    frame[key] = pd.to_datetime(frame[key], errors="coerce")
-                    side[key] = pd.to_datetime(side[key], errors="coerce")
-            frame = frame.merge(side, on=keys, how="left")
+            frame = self._merge_side(frame, join)
         return frame
+
+    def _merge_side(self, frame: pd.DataFrame, join) -> pd.DataFrame:
+        """Left-merge one side table, reporting anything that went wrong.
+
+        A join that silently does nothing is the worst outcome on competition
+        day, so every skip and every unmatched row becomes a note the Data Lab
+        shows rather than a log line nobody reads.
+        """
+        path = Path(join.path)
+        if not path.is_absolute():
+            path = REPO_ROOT / path
+        if not path.exists():
+            self.join_notes.append(f"join skipped - file not found: {path.name}")
+            log.warning("Join source missing, skipping: %s", path)
+            return frame
+
+        side = read_tabular(path)
+        keys = [k for k in join.keys if k in frame.columns and k in side.columns]
+        if not keys:
+            missing = [
+                k for k in join.keys if k not in frame.columns or k not in side.columns
+            ]
+            self.join_notes.append(
+                f"join with {path.name} skipped - key(s) {missing} are not in both files"
+            )
+            log.warning("Join key(s) %s absent, skipping %s", join.keys, path)
+            return frame
+
+        overlap = [c for c in side.columns if c in frame.columns and c not in keys]
+        side = side.drop(columns=overlap)
+
+        # Two files can spell the same day differently - Jalali on one side,
+        # Gregorian on the other, or just a different separator. Matching those
+        # as raw strings joins nothing, so date-like keys are parsed on both
+        # sides first and compared as real dates.
+        for key in keys:
+            if not _looks_like_date(frame[key]) or not _looks_like_date(side[key]):
+                continue
+            left, left_cal = parse_timestamps(frame[key])
+            right, right_cal = parse_timestamps(side[key])
+            if left.notna().sum() == 0 or right.notna().sum() == 0:
+                continue
+            frame[key] = left.dt.normalize()
+            side[key] = right.dt.normalize()
+            if left_cal.calendar != right_cal.calendar:
+                self.join_notes.append(
+                    f"join key '{key}': {path.name} uses the "
+                    f"{right_cal.calendar} calendar and the main file "
+                    f"{left_cal.calendar}; both were converted before matching"
+                )
+
+        # A side table with duplicate keys would multiply the main frame's rows
+        # and inflate every count that follows. Collapse it instead.
+        duplicated = int(side.duplicated(subset=keys).sum())
+        if duplicated:
+            side = side.drop_duplicates(subset=keys, keep="first")
+            self.join_notes.append(
+                f"{path.name} had {duplicated} duplicate row(s) for {keys}; "
+                "kept the first of each so the join cannot multiply rows"
+            )
+
+        before = len(frame)
+        merged = frame.merge(side, on=keys, how="left", validate="m:1")
+        added = [c for c in side.columns if c not in keys]
+        if added:
+            matched = merged[added[0]].notna().mean() if before else 0.0
+            self.join_notes.append(
+                f"joined {path.name} on {keys}: "
+                f"{len(added)} column(s) added, {matched:.0%} of rows matched"
+            )
+            if matched == 0:
+                self.join_notes.append(
+                    f"WARNING: no row matched {path.name} - check the key values, "
+                    "not just the key names"
+                )
+        return merged
 
     def build(self, frame: pd.DataFrame | None = None) -> Panel:
         raw = self.load_raw() if frame is None else frame.copy()
@@ -216,9 +291,17 @@ class DataAdapter:
     # --------------------------------------------------------- normalising
     def normalise(self, raw: pd.DataFrame) -> Panel:
         contract = self.contract
-        notes: list[str] = []
+        notes: list[str] = list(self.join_notes)
 
-        missing = [c for c in (contract.timestamp, contract.target) if c not in raw.columns]
+        counting = contract.aggregation == "count"
+        if not counting and not contract.target:
+            raise ValueError(
+                "The contract declares no target column. Either name one, or set "
+                'aggregation="count" if demand is the number of rows (a raw '
+                "booking table)."
+            )
+        required = [contract.timestamp] if counting else [contract.timestamp, contract.target]
+        missing = [c for c in required if c and c not in raw.columns]
         if missing:
             raise ValueError(
                 f"Contract references column(s) {missing} which are not in the dataset. "
@@ -226,17 +309,44 @@ class DataAdapter:
             )
 
         work = raw.copy()
-        work[TS] = pd.to_datetime(work[contract.timestamp], errors="coerce")
+        # Iranian exports are frequently Jalali (1403/05/12), sometimes with
+        # Persian digits. Parsing those as Gregorian yields NaT for every row,
+        # which would silently discard the entire dataset.
+        calendar = None if contract.calendar in (None, "auto") else contract.calendar
+        work[TS], detection = parse_timestamps(work[contract.timestamp], calendar)
+        if detection.calendar == "jalali":
+            notes.append(
+                f"timestamps read as Jalali dates and converted to Gregorian "
+                f"({detection.reason}); sample {detection.sample}"
+            )
+        elif detection.calendar == "unknown":
+            notes.append(
+                f"calendar could not be determined ({detection.reason}) - "
+                "set schema.calendar explicitly if the dates look wrong"
+            )
         bad_dates = int(work[TS].isna().sum())
         if bad_dates:
             notes.append(f"dropped {bad_dates} rows with unparseable timestamps")
             work = work.dropna(subset=[TS])
 
-        work[TARGET] = pd.to_numeric(work[contract.target], errors="coerce")
-        bad_target = int(work[TARGET].isna().sum())
-        if bad_target:
-            notes.append(f"dropped {bad_target} rows with non-numeric target")
-            work = work.dropna(subset=[TARGET])
+        if counting:
+            # A booking table is one row per booking: demand is the row count,
+            # not the value of any column. Each row contributes 1.
+            work[TARGET] = 1.0
+            notes.append(
+                "aggregation='count': demand is the number of rows per "
+                "(entity, period), which is how a transactional booking table "
+                "becomes a demand series"
+            )
+        else:
+            # Numeric columns can carry Persian digits too.
+            work[TARGET] = pd.to_numeric(
+                normalise_digit_series(work[contract.target]), errors="coerce"
+            )
+            bad_target = int(work[TARGET].isna().sum())
+            if bad_target:
+                notes.append(f"dropped {bad_target} rows with non-numeric target")
+                work = work.dropna(subset=[TARGET])
 
         if contract.entity_id and contract.entity_id in work.columns:
             work[ENTITY] = work[contract.entity_id].astype(str)
@@ -339,10 +449,14 @@ class DataAdapter:
         group_cols = [ENTITY, TS]
         n_before = len(work)
         duplicated = int(work.duplicated(subset=group_cols).sum())
-        if duplicated == 0:
+        if duplicated == 0 and self.contract.aggregation != "count":
             return work, None
 
-        agg: dict[str, Any] = {TARGET: self.contract.aggregation}
+        # "count" is expressed as summing the per-row 1s assigned above, which
+        # keeps one code path for every aggregation.
+        agg: dict[str, Any] = {
+            TARGET: "sum" if self.contract.aggregation == "count" else self.contract.aggregation
+        }
         for column in covariates:
             if column in static:
                 agg[column] = "first"

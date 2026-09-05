@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import shutil
 
+import pandas as pd
 import pytest
 from django.urls import reverse
 from rest_framework.test import APIClient
@@ -633,3 +634,157 @@ def test_a_published_run_does_not_need_its_source_file(
     options = client.get(reverse("scenario-options")).json()
     assert options["available"] is True, "the run must be self-contained"
     assert options["data"]["adjustable"]
+
+
+# ------------------------------------------------- competition-day mapping
+def _upload(client, path):
+    with path.open("rb") as handle:
+        response = client.post(
+            reverse("dataset-upload"), {"file": handle}, format="multipart"
+        )
+    assert response.status_code == 200, response.json()
+    return response.json()["data"]
+
+
+def test_mapping_accepts_count_aggregation_without_a_target(client, tmp_path):
+    """A raw booking table has no demand column: demand is the row count."""
+    rows = []
+    for day in pd.date_range("2024-01-01", periods=90):
+        for listing in ("ACC-1", "ACC-2", "ACC-3"):
+            for _ in range((day.dayofyear + len(listing)) % 4 + 1):
+                rows.append({"booked_on": day.date().isoformat(), "unit_code": listing})
+    csv = tmp_path / "bookings.csv"
+    pd.DataFrame(rows).to_csv(csv, index=False)
+    dataset = _upload(client, csv)["dataset"]
+
+    response = client.post(
+        reverse("dataset-map"),
+        {
+            "dataset_id": dataset["id"],
+            "timestamp": "booked_on",
+            "entity_id": "unit_code",
+            "aggregation": "count",
+            "save_as_active": False,
+        },
+        format="json",
+    )
+    assert response.status_code == 200, response.json()
+    schema = response.json()["data"]["contract"]["schema"]
+    assert schema["aggregation"] == "count"
+    assert schema["target"] is None
+
+
+def test_mapping_without_a_target_is_rejected_unless_counting(client, tmp_path, raw_frame):
+    csv = tmp_path / "needs_target.csv"
+    raw_frame.to_csv(csv, index=False)
+    dataset = _upload(client, csv)["dataset"]
+
+    response = client.post(
+        reverse("dataset-map"),
+        {"dataset_id": dataset["id"], "timestamp": "date", "save_as_active": False},
+        format="json",
+    )
+    assert response.status_code == 400
+    assert "target" in response.json()["errors"]
+
+
+def test_the_profiler_reports_a_jalali_calendar_through_the_api(client, tmp_path):
+    jdatetime = pytest.importorskip("jdatetime")
+    days = pd.date_range("2024-01-01", periods=60)
+    frame = pd.DataFrame(
+        {
+            "تاریخ": [
+                "{0.year:04d}/{0.month:02d}/{0.day:02d}".format(
+                    jdatetime.date.fromgregorian(date=day.date())
+                )
+                for day in days
+            ],
+            "تعداد_رزرو": [(index % 7) + 1 for index in range(60)],
+        }
+    )
+    csv = tmp_path / "jalali.csv"
+    frame.to_csv(csv, index=False)
+
+    profile = _upload(client, csv)["profile"]
+    assert profile["calendar"]["calendar"] == "jalali"
+    assert profile["suggested_schema"]["calendar"] == "jalali"
+
+
+def test_a_side_table_is_joined_by_dataset_id(client, tmp_path, raw_frame):
+    """The competition ships several files; the Data Lab stitches them together."""
+    main = tmp_path / "main.csv"
+    raw_frame.drop(columns=["capacity"]).to_csv(main, index=False)
+    main_dataset = _upload(client, main)["dataset"]
+
+    side = tmp_path / "listings.csv"
+    pd.DataFrame(
+        {
+            "listing_id": sorted(raw_frame["listing_id"].unique()),
+            "capacity": range(len(raw_frame["listing_id"].unique())),
+        }
+    ).to_csv(side, index=False)
+    side_dataset = _upload(client, side)["dataset"]
+
+    mapping = {
+        "dataset_id": main_dataset["id"],
+        "timestamp": "date",
+        "target": "bookings",
+        "entity_id": "listing_id",
+        "static_features": ["capacity"],
+        "joins": [{"dataset_id": side_dataset["id"], "on": ["listing_id"]}],
+        "save_as_active": False,
+    }
+    mapped = client.post(reverse("dataset-map"), mapping, format="json")
+    assert mapped.status_code == 200, mapped.json()
+    joins = mapped.json()["data"]["contract"]["dataset"]["joins"]
+    assert len(joins) == 1
+    assert joins[0]["on"] == ["listing_id"]
+
+    # The joined column must survive all the way into the validated panel.
+    validated = client.post(
+        reverse("dataset-validate"),
+        {"dataset_id": main_dataset["id"], "mapping": mapping},
+        format="json",
+    )
+    assert validated.status_code == 200, validated.json()
+    notes = validated.json()["data"]["adapter_notes"]
+    assert any("100% of rows matched" in note for note in notes)
+
+
+def test_a_join_pointing_at_a_missing_dataset_is_a_clear_400(client, tmp_path, raw_frame):
+    main = tmp_path / "main.csv"
+    raw_frame.to_csv(main, index=False)
+    dataset = _upload(client, main)["dataset"]
+
+    response = client.post(
+        reverse("dataset-map"),
+        {
+            "dataset_id": dataset["id"],
+            "timestamp": "date",
+            "target": "bookings",
+            "joins": [{"dataset_id": 999_999, "on": ["listing_id"]}],
+            "save_as_active": False,
+        },
+        format="json",
+    )
+    assert response.status_code == 400
+    assert "999999" in response.json()["detail"]
+
+
+def test_a_join_with_neither_id_nor_path_is_rejected(client, tmp_path, raw_frame):
+    main = tmp_path / "main.csv"
+    raw_frame.to_csv(main, index=False)
+    dataset = _upload(client, main)["dataset"]
+
+    response = client.post(
+        reverse("dataset-map"),
+        {
+            "dataset_id": dataset["id"],
+            "timestamp": "date",
+            "target": "bookings",
+            "joins": [{"on": ["listing_id"]}],
+            "save_as_active": False,
+        },
+        format="json",
+    )
+    assert response.status_code == 400

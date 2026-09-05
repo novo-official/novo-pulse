@@ -80,13 +80,25 @@ def contract_from_mapping(
     horizons = sorted({int(h) for h in (mapping.get("horizons") or [])}) or [7, 14, 30, 60, 90]
     buckets = _buckets_for(horizons)
     raw = {
-        "dataset": {"name": name, "path": dataset_path, "joins": []},
+        "dataset": {
+            "name": name,
+            "path": dataset_path,
+            # The competition ships demand, accommodation/destination and
+            # booking data as separate files. Each join is merged onto the main
+            # frame before the panel is built.
+            "joins": [
+                {"path": join["path"], "on": join["on"]}
+                for join in (mapping.get("joins") or [])
+                if join.get("path") and join.get("on")
+            ],
+        },
         "schema": {
             "timestamp": mapping["timestamp"],
-            "target": mapping["target"],
+            "target": mapping.get("target") or None,
             "entity_id": mapping.get("entity_id") or None,
             "frequency": mapping.get("frequency") or None,
             "aggregation": mapping.get("aggregation") or "sum",
+            "calendar": mapping.get("calendar") or "auto",
         },
         "hierarchy": {
             "destination": mapping.get("destination") or None,
@@ -133,6 +145,27 @@ def validate_contract(contract: DataContract) -> dict[str, Any]:
     report = DataValidator(contract).validate(panel.frame)
     report["panel"] = panel.summary()
     report["adapter_notes"] = panel.notes
+
+    # A silent calendar conversion is dangerous: if the guess is wrong, every
+    # date is wrong. Raise it to a finding so it cannot be scrolled past.
+    calendar_note = next((n for n in panel.notes if "Jalali" in n), None)
+    if calendar_note:
+        report["findings"].insert(
+            0,
+            {
+                "code": "calendar_converted",
+                "severity": "medium",
+                "title": "Dates were read as Jalali and converted to Gregorian",
+                "detail": calendar_note,
+                "recommendation": (
+                    "Check the converted range looks right. If the dataset is actually "
+                    "Gregorian, set the calendar explicitly instead of leaving it on auto."
+                ),
+                "context": {"calendar": "jalali"},
+            },
+        )
+        report["n_findings"] = len(report["findings"])
+        report["by_severity"]["medium"] = report["by_severity"].get("medium", 0) + 1
     return report
 
 

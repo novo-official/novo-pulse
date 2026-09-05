@@ -48,6 +48,7 @@ interface Mapping {
   category: string;
   frequency: string;
   aggregation: string;
+  calendar: string;
   future_features: string[];
   historical_features: string[];
   static_features: string[];
@@ -55,6 +56,15 @@ interface Mapping {
   horizons: number[];
   non_negative: boolean;
   integer: boolean;
+  joins: JoinRow[];
+}
+
+/** One side table merged onto the main file before the panel is built. */
+interface JoinRow {
+  dataset_id: number;
+  name: string;
+  columns: string[];
+  on: string[];
 }
 
 const EMPTY_MAPPING: Mapping = {
@@ -65,6 +75,7 @@ const EMPTY_MAPPING: Mapping = {
   category: '',
   frequency: '',
   aggregation: 'sum',
+  calendar: 'auto',
   future_features: [],
   historical_features: [],
   static_features: [],
@@ -72,6 +83,7 @@ const EMPTY_MAPPING: Mapping = {
   horizons: [7, 14, 30, 60, 90],
   non_negative: true,
   integer: false,
+  joins: [],
 };
 
 const KIND_FA: Record<string, string> = {
@@ -199,7 +211,7 @@ export default function DataLabPage() {
     }
   }, [runQuery.data, queryClient]);
 
-  const applySuggestion = (next: DatasetProfile) => {
+  const applySuggestion = (next: DatasetProfile, keepJoins: JoinRow[] = []) => {
     const suggested = next.suggested_schema;
     setMapping({
       ...EMPTY_MAPPING,
@@ -209,11 +221,18 @@ export default function DataLabPage() {
       destination: suggested.destination ?? '',
       category: suggested.category ?? '',
       frequency: next.frequency?.frequency ?? '',
+      // The profiler reports "count" when the file is a raw booking log: one
+      // row per booking and no demand column to sum.
+      aggregation: suggested.aggregation ?? 'sum',
+      calendar: suggested.calendar ?? next.calendar?.calendar ?? 'auto',
       future_features: suggested.future_features,
       historical_features: suggested.historical_features,
       static_features: suggested.static_features,
       non_negative: suggested.non_negative,
       integer: suggested.integer,
+      // Joins describe *which files* to combine, not how to read this one, so
+      // re-running the column suggestion must not throw them away.
+      joins: keepJoins,
     });
   };
 
@@ -234,6 +253,51 @@ export default function DataLabPage() {
       } else {
         setMessage(response.detailFa ?? response.detail ?? 'بارگذاری ناموفق بود.');
       }
+      queryClient.invalidateQueries({ queryKey: ['datasets'] });
+    },
+    onError: (error: Error) => setMessage(error.message),
+  });
+
+  // The competition ships demand, accommodation/destination and booking data as
+  // separate files. A side file is uploaded like any other dataset, then merged
+  // onto the main one by a shared key.
+  const addJoin = useMutation({
+    mutationFn: (file: File) => {
+      const form = new FormData();
+      form.append('file', file);
+      return api.uploadDataset(form);
+    },
+    onSuccess: (response) => {
+      if (!response.data) {
+        setMessage(response.detailFa ?? response.detail ?? 'بارگذاری فایل جانبی ناموفق بود.');
+        return;
+      }
+      const sideColumns = response.data.profile.columns.map((column) => column.name);
+      const shared = sideColumns.filter((name) =>
+        (profile?.columns ?? []).some((column) => column.name === name),
+      );
+      if (shared.length === 0) {
+        setMessage(
+          `«${response.data.dataset.name}» هیچ ستون مشترکی با فایل اصلی ندارد؛ ` +
+            'برای اتصال دو فایل باید دست‌کم یک ستون کلید مشترک وجود داشته باشد.',
+        );
+        return;
+      }
+      setMessage(null);
+      setValidation(null);
+      setMapping((current) => ({
+        ...current,
+        joins: [
+          ...current.joins,
+          {
+            dataset_id: response.data!.dataset.id,
+            name: response.data!.dataset.name,
+            columns: sideColumns,
+            // Default to the single obvious key; the user can change it.
+            on: [shared[0]],
+          },
+        ],
+      }));
       queryClient.invalidateQueries({ queryKey: ['datasets'] });
     },
     onError: (error: Error) => setMessage(error.message),
@@ -303,7 +367,9 @@ export default function DataLabPage() {
     [columns, mapping.timestamp, mapping.target, mapping.entity_id],
   );
 
-  const mapped = Boolean(mapping.timestamp && mapping.target);
+  // A raw booking log has no demand column: the target *is* the row count.
+  const counting = mapping.aggregation === 'count';
+  const mapped = Boolean(mapping.timestamp && (mapping.target || counting));
   const step = !profile ? 1 : !mapped ? 2 : !validation ? 3 : 4;
 
   return (
@@ -423,14 +489,44 @@ export default function DataLabPage() {
                 : 'ابتدا دیتاستی را بارگذاری کنید'
             }
             action={
-              profile?.frequency ? (
-                <Badge tone={profile.frequency.regular ? 'success' : 'warning'}>
-                  فراوانی: {profile.frequency.frequency}
-                </Badge>
+              profile ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  {profile.calendar?.calendar === 'jalali' ? (
+                    <Badge tone="brand">تقویم شمسی</Badge>
+                  ) : null}
+                  {profile.transactional?.transactional ? (
+                    <Badge tone="brand">جدول خام رزرو</Badge>
+                  ) : null}
+                  {profile.frequency ? (
+                    <Badge tone={profile.frequency.regular ? 'success' : 'warning'}>
+                      فراوانی: {profile.frequency.frequency}
+                    </Badge>
+                  ) : null}
+                </div>
               ) : null
             }
           />
           <CardBody>
+            {/* Two detections change what the numbers mean, so neither may be
+                applied silently: the user has to be able to see and undo them. */}
+            {profile?.calendar?.calendar === 'jalali' ||
+            profile?.transactional?.transactional ? (
+              <ul className="mb-4 space-y-1.5 rounded-xl border border-brand-200 bg-brand-50/60 p-3 text-xs leading-6 text-brand-900">
+                {profile?.calendar?.calendar === 'jalali' ? (
+                  <li>
+                    تاریخ‌ها شمسی تشخیص داده شد و برای مدل‌سازی به میلادی تبدیل می‌شود (
+                    {profile.calendar.sample.slice(0, 2).join('، ')}). اگر اشتباه است، تقویم را در
+                    بخش نگاشت ستون‌ها دستی انتخاب کنید.
+                  </li>
+                ) : null}
+                {profile?.transactional?.transactional ? (
+                  <li>
+                    این فایل یک سطر به ازای هر رزرو دارد؛ تقاضا از «شمارش سطرها» ساخته می‌شود، نه از
+                    جمع یک ستون ({profile.transactional.reason}).
+                  </li>
+                ) : null}
+              </ul>
+            ) : null}
             {!profile ? (
               <EmptyState
                 icon={<Database className="h-6 w-6" />}
@@ -488,7 +584,11 @@ export default function DataLabPage() {
             title="۲. نگاشت ستون‌ها"
             subtitle="پیشنهاد خودکار اعمال شده است — در صورت نیاز اصلاح کنید"
             action={
-              <Button variant="secondary" size="sm" onClick={() => applySuggestion(profile)}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => applySuggestion(profile, mapping.joins)}
+              >
                 <Wand2 className="h-3.5 w-3.5" />
                 بازگشت به پیشنهاد خودکار
               </Button>
@@ -509,11 +609,14 @@ export default function DataLabPage() {
                 ))}
               </Select>
               <Select
-                label="متغیر هدف *"
+                label={counting ? 'متغیر هدف (لازم نیست)' : 'متغیر هدف *'}
                 value={mapping.target}
                 onChange={(event) => setMapping({ ...mapping, target: event.target.value })}
+                disabled={counting}
               >
-                <option value="">— انتخاب کنید —</option>
+                <option value="">
+                  {counting ? '— شمارش سطرها —' : '— انتخاب کنید —'}
+                </option>
                 {numeric.map((column) => (
                   <option key={column.name} value={column.name}>
                     {column.name}
@@ -581,15 +684,54 @@ export default function DataLabPage() {
               <Select
                 label="تجمیع سطرهای تکراری"
                 value={mapping.aggregation}
-                onChange={(event) => setMapping({ ...mapping, aggregation: event.target.value })}
+                onChange={(event) =>
+                  setMapping({
+                    ...mapping,
+                    aggregation: event.target.value,
+                    // Counting rows *is* the target; any column chosen before
+                    // would silently be measuring something else.
+                    target: event.target.value === 'count' ? '' : mapping.target,
+                  })
+                }
               >
+                <option value="count">شمارش سطرها (count) — جدول خام رزرو</option>
                 <option value="sum">جمع (sum)</option>
                 <option value="mean">میانگین (mean)</option>
                 <option value="max">بیشینه (max)</option>
                 <option value="min">کمینه (min)</option>
                 <option value="first">اولین (first)</option>
               </Select>
+              <Select
+                label="تقویم ستون تاریخ"
+                value={mapping.calendar}
+                onChange={(event) => setMapping({ ...mapping, calendar: event.target.value })}
+              >
+                <option value="auto">تشخیص خودکار</option>
+                <option value="jalali">شمسی (جلالی)</option>
+                <option value="gregorian">میلادی</option>
+              </Select>
             </div>
+
+            <JoinEditor
+              joins={mapping.joins}
+              mainColumns={columns.map((column) => column.name)}
+              pending={addJoin.isPending}
+              onAdd={(file) => addJoin.mutate(file)}
+              onChangeKey={(index, key) =>
+                setMapping({
+                  ...mapping,
+                  joins: mapping.joins.map((join, position) =>
+                    position === index ? { ...join, on: [key] } : join,
+                  ),
+                })
+              }
+              onRemove={(index) =>
+                setMapping({
+                  ...mapping,
+                  joins: mapping.joins.filter((_, position) => position !== index),
+                })
+              }
+            />
 
             <div className="grid gap-4 lg:grid-cols-3">
               <MultiSelect
@@ -748,6 +890,109 @@ export default function DataLabPage() {
             ) : null}
           </CardBody>
         </Card>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * Side tables. The hackathon supplies demand, accommodation/destination and
+ * booking data as separate files; this merges them on a shared key before the
+ * panel is built, so nothing has to be pre-joined outside the product.
+ */
+function JoinEditor({
+  joins,
+  mainColumns,
+  pending,
+  onAdd,
+  onChangeKey,
+  onRemove,
+}: {
+  joins: JoinRow[];
+  mainColumns: string[];
+  pending: boolean;
+  onAdd: (file: File) => void;
+  onChangeKey: (index: number, key: string) => void;
+  onRemove: (index: number) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  return (
+    <div className="rounded-xl border border-line bg-slate-50/60 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-ink">
+            فایل‌های جانبی
+            <InfoHint>
+              اگر دیتاست مسابقه چند فایل جداست — رزروها، اطلاعات اقامتگاه و مقصد، تقویم و
+              تعطیلات — همه را اینجا اضافه کنید تا روی یک ستون کلید مشترک به فایل اصلی متصل
+              شوند.
+            </InfoHint>
+          </p>
+          <p className="mt-0.5 text-xs text-muted">
+            {joins.length === 0
+              ? 'فایل اصلی به‌تنهایی کافی است؛ در صورت وجود فایل‌های جداگانه آن‌ها را اضافه کنید.'
+              : `${joins.length} فایل جانبی به فایل اصلی متصل می‌شود.`}
+          </p>
+        </div>
+        <input
+          ref={inputRef}
+          type="file"
+          className="hidden"
+          accept=".csv,.tsv,.parquet,.pq,.xlsx,.xls,.json"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) onAdd(file);
+            event.target.value = '';
+          }}
+        />
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => inputRef.current?.click()}
+          disabled={pending}
+        >
+          {pending ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Upload className="h-3.5 w-3.5" />
+          )}
+          افزودن فایل جانبی
+        </Button>
+      </div>
+
+      {joins.length > 0 ? (
+        <div className="mt-3 space-y-2">
+          {joins.map((join, index) => {
+            const shared = join.columns.filter((name) => mainColumns.includes(name));
+            return (
+              <div
+                key={`${join.dataset_id}-${index}`}
+                className="flex flex-wrap items-end gap-3 rounded-lg border border-line bg-surface p-3"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-medium text-ink">{join.name}</p>
+                  <p className="nums text-[11px] text-muted">{join.columns.length} ستون</p>
+                </div>
+                <Select
+                  label="ستون کلید"
+                  className="h-9 w-52"
+                  value={join.on[0] ?? ''}
+                  onChange={(event) => onChangeKey(index, event.target.value)}
+                >
+                  {shared.map((name) => (
+                    <option key={name} value={name}>
+                      {name}
+                    </option>
+                  ))}
+                </Select>
+                <Button variant="ghost" size="sm" onClick={() => onRemove(index)}>
+                  حذف
+                </Button>
+              </div>
+            );
+          })}
+        </div>
       ) : null}
     </div>
   );

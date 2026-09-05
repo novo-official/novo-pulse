@@ -6,11 +6,17 @@ from __future__ import annotations
 
 import json
 
+import numpy as np
 import pandas as pd
 import pytest
 
-from ml.contract import DataContract
-from ml.pipelines.training import TrainingConfig, TrainingPipeline
+from ml.contract import ENTITY, DataContract
+from ml.pipelines.training import (
+    INTERVAL_SWITCH_MARGIN,
+    TrainingConfig,
+    TrainingPipeline,
+    _weighted_blend,
+)
 
 
 @pytest.fixture(scope="module")
@@ -213,3 +219,85 @@ def test_insights_are_grounded_in_the_forecast(trained):
         rel=1e-3,
     )
     assert "decision_opportunities" in insights
+
+
+# ---------------------------------------------------------- interval choice
+def test_the_reported_interval_is_the_one_that_gets_served(trained):
+    """Coverage must describe the bounds the product actually shows.
+
+    The champion's own quantiles and conformal residual bounds are different
+    intervals; reporting one while serving the other makes every coverage
+    number in the run a fiction.
+    """
+    choice = trained.metrics["interval_selection"]
+    assert choice["chosen"] in {"native", "conformal"}
+    assert choice["reason"]
+
+    served = trained.metrics["uncertainty_method"]
+    if choice["chosen"] == "native":
+        assert served == "native model quantiles"
+    else:
+        assert "conformal" in served
+
+
+def test_the_chosen_interval_is_the_better_calibrated_one(trained):
+    choice = trained.metrics["interval_selection"]
+    native, conformal = choice["native_coverage"], choice["conformal_coverage"]
+    if native is None or conformal is None:
+        pytest.skip("only one interval method was measurable on this run")
+
+    nominal = choice["nominal"]
+    picked = native if choice["chosen"] == "native" else conformal
+    other = conformal if choice["chosen"] == "native" else native
+    # Native wins ties, so it is allowed to be marginally worse by the margin.
+    assert abs(picked - nominal) <= abs(other - nominal) + INTERVAL_SWITCH_MARGIN
+
+
+def test_interval_metrics_are_never_silently_zero(trained):
+    """A missing interval must read as "not measured", not as 0% coverage."""
+    intervals = trained.metrics["intervals"]
+    if intervals["observed_coverage"] is None:
+        assert intervals["measured_share"] == 0.0
+        assert "note" in intervals
+    else:
+        assert intervals["measured_share"] > 0
+        assert intervals["mean_interval_width"] > 0
+
+
+def test_a_winning_ensemble_still_reports_an_interval():
+    """Regression: the scored ensemble used to hard-code its bounds to NaN.
+
+    Whenever the blend won - which it often does - every coverage number in the
+    run collapsed to zero.
+    """
+    predictions = pd.DataFrame(
+        {
+            ENTITY: ["a"] * 8,
+            "ds": pd.date_range("2024-01-01", periods=4).tolist() * 2,
+            "horizon": [1, 2, 3, 4] * 2,
+            "fold": [0] * 8,
+            "model": ["lightgbm"] * 4 + ["catboost"] * 4,
+            "actual": [10.0, 11.0, 12.0, 13.0] * 2,
+            "prediction": [9.0, 10.0, 11.0, 12.0, 11.0, 12.0, 13.0, 14.0],
+            "lower": [7.0, 8.0, 9.0, 10.0, 9.0, 10.0, 11.0, 12.0],
+            "upper": [11.0, 12.0, 13.0, 14.0, 13.0, 14.0, 15.0, 16.0],
+        }
+    )
+
+    pivot = predictions.pivot_table(
+        index=[ENTITY, "ds", "horizon", "fold"], columns="model", values="lower"
+    )
+    weights = {"lightgbm": 0.5, "catboost": 0.5}
+    blended = _weighted_blend(pivot, weights, ["lightgbm", "catboost"])
+
+    assert blended.notna().all(), "the blended bound must exist for every row"
+    assert blended.to_numpy().tolist() == [8.0, 9.0, 10.0, 11.0]
+
+
+def test_a_member_missing_from_a_fold_does_not_drag_the_blend_to_zero():
+    """A NaN from a failed member must renormalise, not count as a zero."""
+    pivot = pd.DataFrame({"lightgbm": [10.0, 10.0], "catboost": [20.0, np.nan]})
+    blended = _weighted_blend(pivot, {"lightgbm": 0.5, "catboost": 0.5}, ["lightgbm", "catboost"])
+
+    assert blended.iloc[0] == pytest.approx(15.0)
+    assert blended.iloc[1] == pytest.approx(10.0), "not 5.0 - the absent member is not a zero"

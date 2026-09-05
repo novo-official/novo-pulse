@@ -14,41 +14,60 @@ import numpy as np
 import pandas as pd
 
 from .adapter import read_tabular
+from .dates import detect_calendar, normalise_digit_series, parse_timestamps
 from .frequency import detect_frequency
 
 # Role keyword tables. Matched against normalised column names.
 TIMESTAMP_HINTS = (
     "date", "datetime", "timestamp", "time", "day", "ds", "created_at",
     "period", "dt", "month", "week", "checkin", "check_in", "stay_date",
+    # Persian
+    "تاریخ", "روز", "زمان", "تاریخ_رزرو", "تاریخ_ورود", "تاریخ_اقامت", "ماه", "هفته",
 )
 TARGET_HINTS = (
     "booking_count", "bookings", "booking", "demand", "demand_count", "target",
     "reservation_count", "reservations", "reserved_nights", "y", "sales",
     "quantity", "orders", "occupancy", "revenue", "search_count", "conversion_rate",
     "nights", "units",
+    # Persian
+    "تعداد_رزرو", "رزرو", "تقاضا", "فروش", "شب_اقامت", "شب_رزرو", "اقامت",
+    "درآمد", "تعداد_شب", "ضریب_اشغال", "اشغال",
 )
 ENTITY_HINTS = (
     "accommodation_id", "listing_id", "hotel_id", "property_id", "unit_id",
     "entity_id", "item_id", "product_id", "series_id", "host_id", "unit_code",
     "property_code", "listing_key", "sku", "id", "code", "key", "uid", "guid",
+    # Persian
+    "کد_اقامتگاه", "شناسه_اقامتگاه", "اقامتگاه", "کد_ملک", "شناسه", "کد",
+    "کد_واحد", "واحد", "ملک", "هتل", "کد_هتل",
 )
 DESTINATION_HINTS = (
     "destination_id", "destination", "city", "city_id", "region", "province",
     "location", "area", "market", "geo", "zone", "district", "country",
     "state", "site", "branch", "store", "cluster", "territory",
+    # Persian
+    "شهر", "مقصد", "استان", "منطقه", "ناحیه", "محل", "کشور", "کد_شهر", "شهرستان",
 )
 CATEGORY_HINTS = (
     "category", "accommodation_type", "property_type", "type", "segment",
     "class", "group", "room_type", "tier", "brand", "family", "kind",
+    # Persian
+    "دسته", "دسته_بندی", "نوع", "نوع_اقامتگاه", "گروه", "طبقه_بندی", "سطح",
 )
 FUTURE_HINTS = (
     "price", "is_holiday", "holiday", "is_weekend", "weekend", "capacity",
     "available", "availability", "promotion", "promo", "discount", "event",
     "season", "day_of_week", "planned",
+    # Persian
+    "قیمت", "نرخ", "تعرفه", "مبلغ", "تعطیل", "تعطیلات", "مناسبت", "رویداد",
+    "ظرفیت", "موجودی", "تخفیف", "کمپین", "فصل", "آخر_هفته",
 )
 HISTORICAL_HINTS = (
     "search", "view", "click", "impression", "visit", "cancel", "review",
     "rating_count", "actual", "conversion",
+    # Persian
+    "جستجو", "جست_وجو", "بازدید", "مشاهده", "کلیک", "لغو", "نظر", "امتیاز",
+    "نرخ_تبدیل", "بازدیدکننده",
 )
 
 # Several columns can legitimately be "the target". When more than one matches
@@ -61,11 +80,32 @@ TARGET_PRIORITY: dict[str, float] = {
     "reserved_nights": 0.90, "nights": 0.88, "quantity": 0.88,
     "occupancy": 0.86, "revenue": 0.84, "conversion_rate": 0.80,
     "search_count": 0.78,
+    # Persian
+    "تعداد_رزرو": 1.00, "رزرو": 0.99, "تقاضا": 0.98, "شب_رزرو": 0.92,
+    "شب_اقامت": 0.90, "اقامت": 0.88, "فروش": 0.88, "اشغال": 0.86,
+    "ضریب_اشغال": 0.86, "درآمد": 0.84, "تعداد_شب": 0.90,
 }
 
 
+# Arabic letter forms and the zero-width non-joiner both appear in real Persian
+# headers; unifying them is what makes "جست‌وجو" and "جستجو" the same word.
+_PERSIAN_NORMALISE = str.maketrans({
+    "ي": "ی", "ك": "ک", "ﻰ": "ی", "ة": "ه", "ۀ": "ه",
+    "\u200c": "_", "\u200f": "", "\u200e": "",
+    "أ": "ا", "إ": "ا", "آ": "ا",
+})
+
+
 def _normalise(name: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "_", str(name).strip().lower()).strip("_")
+    """Lowercase and tokenise a column name, preserving Persian/Arabic letters.
+
+    Stripping to `[a-z0-9]` would erase a Persian header entirely, so every
+    role lookup would fail on exactly the datasets this product targets.
+    """
+    text = str(name).strip().lower().translate(_PERSIAN_NORMALISE)
+    # Keep ASCII alphanumerics plus the Arabic/Persian letter block.
+    text = re.sub(r"[^a-z0-9\u0620-\u064a\u0670-\u06d3]+", "_", text)
+    return text.strip("_")
 
 
 # Below this length a substring match is meaningless: the bare hint "id"
@@ -111,6 +151,36 @@ def _score(name: str, hints: tuple[str, ...]) -> float:
     return best
 
 
+def detect_transactional(
+    frame: pd.DataFrame, timestamp: str | None, entity: str | None
+) -> dict[str, Any]:
+    """Is this one row per event rather than one row per period?
+
+    A booking export has many rows sharing the same (accommodation, day) and no
+    column holding a count - the demand *is* the number of rows. Loading it
+    without `aggregation="count"` produces a nonsense series, so this has to be
+    detected rather than left for the user to notice.
+    """
+    if not timestamp or timestamp not in frame.columns:
+        return {"transactional": False, "reason": "no timestamp column identified"}
+
+    keys = [timestamp] + ([entity] if entity and entity in frame.columns else [])
+    sample = frame.head(100_000)
+    duplicated_share = float(sample.duplicated(subset=keys).mean())
+    rows_per_key = len(sample) / max(sample.drop_duplicates(subset=keys).shape[0], 1)
+
+    return {
+        "transactional": bool(duplicated_share > 0.3 and rows_per_key > 1.5),
+        "duplicate_share": round(duplicated_share, 3),
+        "rows_per_period": round(rows_per_key, 2),
+        "keys": keys,
+        "reason": (
+            f"{duplicated_share:.0%} of rows repeat a ({', '.join(keys)}) pair "
+            f"({rows_per_key:.1f} rows per period)"
+        ),
+    }
+
+
 def profile_dataset(
     path: str | Path, sample_rows: int = 200_000, preview_rows: int = 20
 ) -> dict[str, Any]:
@@ -126,9 +196,27 @@ def profile_dataset(
     candidates = _candidates(columns)
     suggestion = suggest_schema(columns, candidates)
 
+    transactional = detect_transactional(
+        frame_sample, suggestion.get("timestamp"), suggestion.get("entity_id")
+    )
+    if transactional["transactional"]:
+        # Demand is the row count. Any "target" the keyword matcher picked
+        # (guests, amount, nights) would be the wrong quantity entirely.
+        suggestion["aggregation"] = "count"
+        suggestion["target"] = None
+        suggestion["non_negative"] = True
+        suggestion["integer"] = True
+    else:
+        suggestion.setdefault("aggregation", "sum")
+
     freq_info = None
+    calendar_info = None
     if suggestion.get("timestamp"):
-        freq_info = detect_frequency(frame[suggestion["timestamp"]])
+        column = frame[suggestion["timestamp"]]
+        calendar_info = detect_calendar(column).as_dict()
+        parsed, _ = parse_timestamps(column)
+        freq_info = detect_frequency(parsed)
+        suggestion["calendar"] = calendar_info["calendar"]
 
     preview = frame.head(preview_rows).copy()
     for column in preview.columns:
@@ -144,6 +232,8 @@ def profile_dataset(
         "candidates": candidates,
         "suggested_schema": suggestion,
         "frequency": freq_info,
+        "calendar": calendar_info,
+        "transactional": transactional,
         "sample_rows": preview.to_dict(orient="records"),
         "memory_mb": round(frame.memory_usage(deep=True).sum() / 1e6, 2),
     }
@@ -165,13 +255,17 @@ def _profile_column(frame: pd.DataFrame, name: str) -> dict[str, Any]:
         kind = "categorical"
 
     parsed_dates = None
+    calendar = None
     if kind == "categorical" and len(non_null) > 0:
         sample = non_null.astype(str).head(500)
-        parsed = pd.to_datetime(sample, errors="coerce", format="mixed")
+        # Calendar-aware: a Jalali column parses to NaT under plain pandas and
+        # would otherwise be classified as ordinary text.
+        parsed, detection = parse_timestamps(sample)
         ratio = float(parsed.notna().mean())
         if ratio > 0.9:
             kind = "datetime_like"
             parsed_dates = ratio
+            calendar = detection.calendar
 
     info: dict[str, Any] = {
         "name": str(name),
@@ -189,6 +283,8 @@ def _profile_column(frame: pd.DataFrame, name: str) -> dict[str, Any]:
     }
     if parsed_dates is not None:
         info["date_parse_ratio"] = round(parsed_dates, 3)
+    if calendar:
+        info["calendar"] = calendar
 
     if kind == "numeric" and len(non_null):
         info.update(
@@ -203,11 +299,12 @@ def _profile_column(frame: pd.DataFrame, name: str) -> dict[str, Any]:
             }
         )
     if kind in {"datetime", "datetime_like"} and len(non_null):
-        parsed = pd.to_datetime(non_null, errors="coerce", format="mixed")
+        parsed, detection = parse_timestamps(non_null)
         parsed = parsed.dropna()
         if len(parsed):
             info["min"] = str(parsed.min().date())
             info["max"] = str(parsed.max().date())
+        info.setdefault("calendar", detection.calendar)
     return info
 
 
@@ -318,4 +415,5 @@ def suggest_schema(
         "static_features": [],
         "non_negative": bool(target_info.get("negative_pct", 0) == 0),
         "integer": bool(target_info.get("integer_like", False)),
+        "calendar": "auto",
     }

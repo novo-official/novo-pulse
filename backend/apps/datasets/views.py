@@ -116,6 +116,28 @@ def dataset_profile(request):
     return ok({"profile": profile, "dataset_id": dataset.id if dataset else None})
 
 
+def _resolve_joins(joins) -> list[dict]:
+    """Turn the UI's join rows into `{path, on}` the contract understands.
+
+    A side table is normally another uploaded dataset, referenced by id; a
+    literal path is accepted too, but only inside the project.
+    """
+    resolved = []
+    for join in joins or []:
+        path = join.get("path")
+        if join.get("dataset_id"):
+            side = Dataset.objects.filter(id=join["dataset_id"]).first()
+            if side is None:
+                raise ValueError(f"Join dataset {join['dataset_id']} not found")
+            path = side.path
+        elif path:
+            path = str(services.register_local_file(path))
+        if not path:
+            continue
+        resolved.append({"path": path, "on": list(join.get("on") or [])})
+    return resolved
+
+
 @api_view(["POST"])
 def dataset_map(request):
     """Persist a column mapping as a data contract."""
@@ -131,6 +153,11 @@ def dataset_map(request):
             404,
             detail_fa="دیتاست پیدا نشد؛ ابتدا آن را بارگذاری کنید.",
         )
+
+    try:
+        mapping["joins"] = _resolve_joins(mapping.get("joins"))
+    except ValueError as exc:
+        return error(str(exc), 400, detail_fa=f"فایل جانبی پیدا نشد: {exc}")
 
     contract = services.contract_from_mapping(mapping, dataset.path, dataset.name)
     dataset.mapping = {k: v for k, v in mapping.items() if k != "dataset_id"}
@@ -169,9 +196,12 @@ def dataset_validate(request):
         serializer = ColumnMappingSerializer(data=request.data["mapping"])
         if not serializer.is_valid():
             return Response({"available": False, "errors": serializer.errors}, status=400)
-        contract = services.contract_from_mapping(
-            serializer.validated_data, dataset.path, dataset.name
-        )
+        side_mapping = dict(serializer.validated_data)
+        try:
+            side_mapping["joins"] = _resolve_joins(side_mapping.get("joins"))
+        except ValueError as exc:
+            return error(str(exc), 400, detail_fa=f"فایل جانبی پیدا نشد: {exc}")
+        contract = services.contract_from_mapping(side_mapping, dataset.path, dataset.name)
     elif dataset is not None and dataset.mapping:
         contract = services.contract_from_mapping(dataset.mapping, dataset.path, dataset.name)
     else:

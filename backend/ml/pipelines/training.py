@@ -70,6 +70,11 @@ def set_global_seed(seed: int = 42) -> None:
         pass
 
 
+# Conformal only displaces the model's own quantiles when it is clearly better,
+# so a small measurement wobble does not flip the served interval each run.
+INTERVAL_SWITCH_MARGIN = 0.02
+
+
 @dataclass
 class TrainingConfig:
     contract: DataContract
@@ -244,7 +249,24 @@ class TrainingPipeline:
             self.contract.evaluation.quantiles
         )
         horizons = inference_frame.meta["horizon"].to_numpy()
-        if lower_q in quantiles and upper_q in quantiles:
+        nominal = round(upper_q - lower_q, 4)
+
+        # ---- champion backtest slice ---------------------------------------
+        champion_backtest = backtest_result.predictions[
+            backtest_result.predictions["model"] == champion_name
+        ].copy()
+        if champion_backtest.empty:
+            champion_backtest = backtest_result.predictions.copy()
+
+        # Having native quantiles does not mean they are *calibrated*. Measure
+        # both candidates out of sample and serve whichever actually lands
+        # closer to the nominal coverage, then report that same interval.
+        interval_choice = self._choose_interval_method(
+            champion_backtest,
+            nominal,
+            has_native=(lower_q in quantiles and upper_q in quantiles),
+        )
+        if interval_choice["chosen"] == "native":
             lower, upper = quantiles[lower_q], quantiles[upper_q]
             uncertainty_method = "native model quantiles"
         else:
@@ -254,6 +276,15 @@ class TrainingPipeline:
             lower = conformal.get(lower_q, point * 0.8)
             upper = conformal.get(upper_q, point * 1.2)
             uncertainty_method = calibrator.describe()["method"]
+            # Report the coverage of the bounds we actually serve. Only the
+            # held-out folds are measurable: the rest calibrated it.
+            champion_backtest = _rewrite_bounds_with_conformal(
+                champion_backtest,
+                interval_choice["calibrator"],
+                interval_choice["eval_folds"],
+                self.contract.target_options.non_negative,
+                (lower_q, upper_q),
+            )
 
         forecast = inference_frame.meta[[ENTITY, "ds", "horizon"]].copy()
         forecast["forecast"] = point
@@ -266,13 +297,6 @@ class TrainingPipeline:
             forecast["forecast"] = np.round(forecast["forecast"])
             forecast["lower"] = np.floor(forecast["lower"])
             forecast["upper"] = np.ceil(forecast["upper"])
-
-        # ---- champion backtest slice ---------------------------------------
-        champion_backtest = backtest_result.predictions[
-            backtest_result.predictions["model"] == champion_name
-        ].copy()
-        if champion_backtest.empty:
-            champion_backtest = backtest_result.predictions.copy()
 
         self._progress("explaining drivers", 0.82)
         explanation, dependence = self._explain(engine, champion_model, fitted, inference_frame)
@@ -326,13 +350,35 @@ class TrainingPipeline:
             history.rename(columns={"y": "y"}), mapping, panel.available_levels()
         )
 
-        interval_metrics = evaluate_intervals(
-            champion_backtest["actual"],
-            champion_backtest["lower"].fillna(champion_backtest["prediction"]),
-            champion_backtest["upper"].fillna(champion_backtest["prediction"]),
-            nominal=round(upper_q - lower_q, 4),
-            y_median=champion_backtest["prediction"],
+        has_interval = (
+            champion_backtest["lower"].notna() & champion_backtest["upper"].notna()
         )
+        if has_interval.any():
+            measurable = champion_backtest[has_interval]
+            interval_metrics = evaluate_intervals(
+                measurable["actual"],
+                measurable["lower"],
+                measurable["upper"],
+                nominal=round(upper_q - lower_q, 4),
+                y_median=measurable["prediction"],
+            )
+            interval_metrics["measured_share"] = round(float(has_interval.mean()), 4)
+        else:
+            # Filling the bounds with the point forecast would report a
+            # zero-width interval at 0% coverage, which reads as a catastrophic
+            # model rather than as "this model has no interval". Say so instead.
+            interval_metrics = {
+                "nominal_coverage": round(upper_q - lower_q, 4),
+                "observed_coverage": None,
+                "coverage_gap": None,
+                "mean_interval_width": None,
+                "relative_interval_width": None,
+                "measured_share": 0.0,
+                "note": (
+                    f"{champion_name} produced no prediction interval during "
+                    "cross-validation; the served forecast uses conformal bounds."
+                ),
+            }
 
         metrics = {
             "run_id": self.run_id,
@@ -351,6 +397,9 @@ class TrainingPipeline:
             ),
             "ensemble_weights": weights,
             "uncertainty_method": uncertainty_method,
+            "interval_selection": {
+                k: v for k, v in interval_choice.items() if k != "calibrator"
+            },
             "tuning": self.tuning_results,
             "censoring": censoring.as_dict(),
             "segment_scores": _segment_scores(champion_backtest, mapping, metric),
@@ -538,8 +587,7 @@ class TrainingPipeline:
         available = [m for m in weights if m in pivot.columns]
         if len(available) < 2:
             return leaderboard
-        normaliser = sum(weights[m] for m in available)
-        blended = sum(pivot[m].fillna(0) * weights[m] for m in available) / normaliser
+        blended = _weighted_blend(pivot, weights, available)
         actual = predictions.pivot_table(
             index=[ENTITY, "ds", "horizon", "fold"], columns="model", values="actual"
         ).mean(axis=1)
@@ -548,8 +596,33 @@ class TrainingPipeline:
             {"actual": actual, "prediction": blended}
         ).reset_index().dropna(subset=["actual", "prediction"])
         frame["model"] = "ensemble"
-        frame["lower"] = np.nan
-        frame["upper"] = np.nan
+
+        # The served EnsembleModel blends its members' quantiles, so the scored
+        # ensemble must do the same - otherwise a winning ensemble reports "no
+        # interval" and every coverage number in the run is meaningless.
+        for bound in ("lower", "upper"):
+            side = predictions.pivot_table(
+                index=[ENTITY, "ds", "horizon", "fold"], columns="model", values=bound
+            )
+            usable = [m for m in available if m in side.columns]
+            if not usable or side[usable].notna().to_numpy().sum() == 0:
+                frame[bound] = np.nan
+                continue
+            merged = pd.DataFrame({bound: _weighted_blend(side, weights, usable)})
+            frame = frame.merge(
+                merged.reset_index(), on=[ENTITY, "ds", "horizon", "fold"], how="left"
+            )
+        if "lower" not in frame.columns:
+            frame["lower"] = np.nan
+        if "upper" not in frame.columns:
+            frame["upper"] = np.nan
+        # A weighted blend of members whose quantiles cross can itself cross.
+        crossed = frame["lower"].notna() & frame["upper"].notna()
+        if crossed.any():
+            low = frame.loc[crossed, ["lower", "upper"]].min(axis=1)
+            high = frame.loc[crossed, ["lower", "upper"]].max(axis=1)
+            frame.loc[crossed, "lower"] = np.minimum(low, frame.loc[crossed, "prediction"])
+            frame.loc[crossed, "upper"] = np.maximum(high, frame.loc[crossed, "prediction"])
 
         combined = pd.concat([predictions, frame], ignore_index=True)
         backtest_result.predictions = combined
@@ -570,6 +643,89 @@ class TrainingPipeline:
         name = next(iter(serveable))
         self.warnings.append(f"no leaderboard entry was serveable; falling back to '{name}'")
         return name, serveable[name]
+
+    def _choose_interval_method(
+        self, champion_backtest: pd.DataFrame, nominal: float, has_native: bool
+    ) -> dict[str, Any]:
+        """Pick between the model's own quantiles and conformal residual bounds.
+
+        Both are scored out of sample. Native quantiles are already
+        out-of-sample everywhere in a rolling-origin backtest. Conformal is
+        fitted on the earlier folds and measured on the latest one, so its
+        coverage is not read off the data that produced it.
+        """
+        buckets = buckets_from_contract(self.contract.evaluation.horizon_buckets)
+        quantiles = (
+            min(self.contract.evaluation.quantiles),
+            max(self.contract.evaluation.quantiles),
+        )
+        result: dict[str, Any] = {
+            "chosen": "native" if has_native else "conformal",
+            "nominal": nominal,
+            "native_coverage": None,
+            "conformal_coverage": None,
+            "calibrator": None,
+            "eval_folds": [],
+            "reason": "",
+        }
+
+        native_gap = None
+        if has_native:
+            bounded = champion_backtest.dropna(subset=["lower", "upper", "actual"])
+            if not bounded.empty:
+                inside = (bounded["actual"] >= bounded["lower"]) & (
+                    bounded["actual"] <= bounded["upper"]
+                )
+                result["native_coverage"] = round(float(inside.mean()), 4)
+                native_gap = abs(result["native_coverage"] - nominal)
+
+        folds = sorted(champion_backtest["fold"].dropna().unique().tolist())
+        conformal_gap = None
+        if len(folds) >= 2:
+            eval_folds = [folds[-1]]
+            calib = champion_backtest[~champion_backtest["fold"].isin(eval_folds)]
+            held = champion_backtest[champion_backtest["fold"].isin(eval_folds)]
+            calibrator = ConformalCalibrator(quantiles=quantiles, buckets=buckets)
+            calibrator.fit(
+                calib["actual"].to_numpy(),
+                calib["prediction"].to_numpy(),
+                calib["horizon"].to_numpy(),
+            )
+            if calibrator.fitted and not held.empty:
+                bounds = calibrator.apply(
+                    held["prediction"].to_numpy(),
+                    held["horizon"].to_numpy(),
+                    self.contract.target_options.non_negative,
+                )
+                low = bounds.get(quantiles[0])
+                high = bounds.get(quantiles[1])
+                if low is not None and high is not None:
+                    actual = held["actual"].to_numpy()
+                    inside = (actual >= low) & (actual <= high)
+                    result["conformal_coverage"] = round(float(np.mean(inside)), 4)
+                    conformal_gap = abs(result["conformal_coverage"] - nominal)
+                    result["calibrator"] = calibrator
+                    result["eval_folds"] = eval_folds
+
+        if not has_native:
+            result["reason"] = "the champion exposes no quantiles"
+        elif conformal_gap is None:
+            result["reason"] = "not enough folds to score conformal bounds out of sample"
+        elif native_gap is None:
+            result["chosen"] = "conformal"
+            result["reason"] = "the champion produced no measurable interval"
+        elif conformal_gap + INTERVAL_SWITCH_MARGIN < native_gap:
+            result["chosen"] = "conformal"
+            result["reason"] = (
+                f"native coverage {result['native_coverage']:.0%} is further from the "
+                f"{nominal:.0%} target than conformal {result['conformal_coverage']:.0%}"
+            )
+        else:
+            result["reason"] = (
+                f"native coverage {result['native_coverage']:.0%} is at least as close "
+                f"to the {nominal:.0%} target as conformal"
+            )
+        return result
 
     def _calibrate(self, backtest_result, champion_name, native_quantiles) -> ConformalCalibrator:
         buckets = buckets_from_contract(self.contract.evaluation.horizon_buckets)
@@ -772,6 +928,59 @@ def _collapse_folds(backtest: pd.DataFrame) -> pd.DataFrame:
     if "model" in backtest.columns:
         collapsed["model"] = backtest["model"].iloc[0]
     return collapsed
+
+
+def _rewrite_bounds_with_conformal(
+    backtest: pd.DataFrame,
+    calibrator,
+    eval_folds: list,
+    non_negative: bool,
+    quantiles: tuple[float, float],
+) -> pd.DataFrame:
+    """Replace the backtest bounds with the conformal ones we actually serve.
+
+    Only rows the calibrator never saw keep a bound; everything else is blanked
+    so the reported coverage stays an out-of-sample number.
+    """
+    frame = backtest.copy()
+    frame["lower"] = np.nan
+    frame["upper"] = np.nan
+    if calibrator is None or not eval_folds:
+        return frame
+    mask = frame["fold"].isin(eval_folds)
+    if not mask.any():
+        return frame
+    bounds = calibrator.apply(
+        frame.loc[mask, "prediction"].to_numpy(),
+        frame.loc[mask, "horizon"].to_numpy(),
+        non_negative,
+    )
+    low, high = bounds.get(quantiles[0]), bounds.get(quantiles[1])
+    if low is None or high is None:
+        return frame
+    point = frame.loc[mask, "prediction"].to_numpy()
+    frame.loc[mask, "lower"] = np.minimum(low, point)
+    frame.loc[mask, "upper"] = np.maximum(high, point)
+    return frame
+
+
+def _weighted_blend(pivot: pd.DataFrame, weights: dict[str, float], members: list[str]):
+    """Weighted mean across `members`, renormalised per row over what is present.
+
+    A member that failed on one fold leaves a NaN there. Treating that as a
+    zero would silently drag the blend toward zero, so the weights are
+    renormalised row by row instead.
+    """
+    total = None
+    used = None
+    for name in members:
+        column = pivot[name]
+        present = column.notna()
+        contribution = column.fillna(0.0) * weights[name]
+        share = present.astype(float) * weights[name]
+        total = contribution if total is None else total + contribution
+        used = share if used is None else used + share
+    return (total / used.replace(0.0, np.nan)).astype(float)
 
 
 def _ensemble_candidates(model_scores: dict[str, dict], metric: str) -> dict[str, float]:

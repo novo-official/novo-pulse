@@ -395,8 +395,26 @@ export interface DatasetProfile {
   candidates: Record<string, { column: string; score: number }[]>;
   suggested_schema: SuggestedSchema;
   frequency: FrequencyInfo | null;
+  calendar: CalendarInfo | null;
+  transactional: TransactionalInfo | null;
   sample_rows: Record<string, unknown>[];
   memory_mb: number;
+}
+
+export interface CalendarInfo {
+  calendar: 'gregorian' | 'jalali' | 'unknown';
+  confidence: number;
+  parsed_ratio: number;
+  sample: string[];
+  reason: string;
+}
+
+export interface TransactionalInfo {
+  transactional: boolean;
+  duplicate_share: number;
+  rows_per_period: number;
+  keys: string[];
+  reason: string;
 }
 
 export interface SuggestedSchema {
@@ -410,6 +428,8 @@ export interface SuggestedSchema {
   static_features: string[];
   non_negative: boolean;
   integer: boolean;
+  aggregation?: string;
+  calendar?: string;
 }
 
 export interface FrequencyInfo {

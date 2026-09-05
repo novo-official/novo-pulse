@@ -91,6 +91,9 @@ class DataContract:
     entity_id: str | None = None
     frequency: str | None = "D"
     aggregation: str = "sum"
+    # "auto" detects Jalali vs Gregorian from the values; force it when a
+    # dataset mixes calendars or the year range is ambiguous.
+    calendar: str = "auto"
 
     destination: str | None = None
     category: str | None = None
@@ -127,6 +130,7 @@ class DataContract:
             entity_id=schema.get("entity_id"),
             frequency=schema.get("frequency"),
             aggregation=schema.get("aggregation", "sum"),
+            calendar=schema.get("calendar", "auto"),
             destination=hierarchy.get("destination"),
             category=hierarchy.get("category"),
             labels=dict(raw.get("labels") or {}),
@@ -186,6 +190,7 @@ class DataContract:
                 "entity_id": self.entity_id,
                 "frequency": self.frequency,
                 "aggregation": self.aggregation,
+                "calendar": self.calendar,
             },
             "hierarchy": {"destination": self.destination, "category": self.category},
             "labels": self.labels,
