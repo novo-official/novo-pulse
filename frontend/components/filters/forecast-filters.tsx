@@ -1,6 +1,7 @@
 'use client';
 
 import { Filter, Layers3, MapPin, Sparkles } from 'lucide-react';
+import { useEffect } from 'react';
 import type { CSSProperties } from 'react';
 
 import { Select } from '@/components/ui/select';

@@ -6,6 +6,7 @@ import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/states';
 import { ScrollList } from '@/components/ui/scroll-list';
 import { TypePill } from '@/components/ui/type-pill';
+import { useCalendar } from '@/hooks/useCalendar';
 import type { PeakPeriod } from '@/lib/types/api';
 import { CONFIDENCE_FA, cn } from '@/lib/utils';
 

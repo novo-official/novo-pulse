@@ -24,6 +24,7 @@ import {
 import { CHART, axisProps } from '@/components/charts/palette';
 import { GlassTooltip } from '@/components/charts/glass-tooltip';
 import { LegendChips } from '@/components/charts/legend-chips';
+import { useCalendar } from '@/hooks/useCalendar';
 import type { SeriesPoint } from '@/lib/types/api';
 
 interface Row extends SeriesPoint {
