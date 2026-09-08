@@ -34,6 +34,7 @@ function Kpi({
   tone = 'neutral',
   badge,
   footnote,
+  valueClassName,
 }: {
   label: string;
   value: ReactNode;
@@ -42,14 +43,20 @@ function Kpi({
   tone?: BadgeTone;
   badge?: ReactNode;
   footnote?: ReactNode;
+  valueClassName?: string;
 }) {
   return (
-    <Card className="animate-fade-up p-5">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2 text-sm font-medium text-muted">
+    <Card
+      className={cn(
+        'group kpi-card relative flex min-h-[202px] flex-col p-5 sm:p-5.5',
+        `kpi-card--${tone}`,
+      )}
+    >
+      <div className="relative flex min-h-9 items-start">
+        <div className="flex min-w-0 items-center gap-2.5 text-[13px] font-semibold leading-5 text-muted">
           <span
             className={cn(
-              'flex h-8 w-8 items-center justify-center rounded-lg',
+              'kpi-icon flex h-9 w-9 shrink-0 items-center justify-center rounded-[11px]',
               tone === 'success' && 'bg-emerald-50 text-emerald-600',
               tone === 'danger' && 'bg-rose-50 text-rose-600',
               tone === 'warning' && 'bg-amber-50 text-amber-600',
@@ -60,15 +67,21 @@ function Kpi({
           >
             {icon}
           </span>
-          <span className="flex items-center gap-1">
+          <span className="flex min-w-0 items-center gap-1">
             {label}
             {hint ? <InfoHint>{hint}</InfoHint> : null}
           </span>
         </div>
-        {badge}
       </div>
-      <p className="kpi-value mt-4 nums">{value}</p>
-      {footnote ? <p className="mt-2 text-xs leading-5 text-muted">{footnote}</p> : null}
+      <div className="relative mt-6 flex flex-1 flex-col justify-end">
+        <p className={cn('kpi-value max-w-full break-words nums', valueClassName)}>{value}</p>
+        {footnote || badge ? (
+          <div className="kpi-meta mt-4 flex flex-col gap-2.5">
+            {footnote ? <p className="line-clamp-2 text-[12px] leading-5 text-muted">{footnote}</p> : null}
+            {badge ? <span className="kpi-status w-fit max-w-full">{badge}</span> : null}
+          </div>
+        ) : null}
+      </div>
     </Card>
   );
 }
@@ -99,6 +112,10 @@ export function KpiCards({ summary }: { summary: DashboardSummary }) {
         icon={<Activity className="h-4 w-4" />}
         tone={toneForChange(summary.change_pct)}
         value={formatPercent(summary.change_pct)}
+        valueClassName={cn(
+          'kpi-value--change',
+          summary.change_pct !== null && summary.change_pct < -3 && 'kpi-value--change-negative',
+        )}
         badge={
           <Badge tone={toneForChange(summary.change_pct)}>
             <ChangeIcon change={summary.change_pct} />
@@ -116,7 +133,7 @@ export function KpiCards({ summary }: { summary: DashboardSummary }) {
         value={growth ? growth.label : '—'}
         badge={
           growth ? (
-            <Badge tone={toneForChange(growth.change_pct)}>{formatPercent(growth.change_pct)}</Badge>
+            <Badge className="kpi-percent" tone={toneForChange(growth.change_pct)}>{formatPercent(growth.change_pct)}</Badge>
           ) : null
         }
         footnote={
@@ -128,7 +145,7 @@ export function KpiCards({ summary }: { summary: DashboardSummary }) {
         label="بازه اطمینان ۸۰٪"
         icon={<Gauge className="h-4 w-4" />}
         value={
-          <span className="text-xl lg:text-2xl">
+          <span className="text-[29px] tracking-tight sm:text-[31px]">
             {formatCompact(summary.forecast_lower)} – {formatCompact(summary.forecast_upper)}
           </span>
         }
@@ -141,9 +158,10 @@ export function KpiCards({ summary }: { summary: DashboardSummary }) {
         icon={<Target className="h-4 w-4" />}
         tone={summary.model.improvement_pct && summary.model.improvement_pct > 0 ? 'success' : 'neutral'}
         value={formatMetric(summary.model.primary_value, metric)}
+        valueClassName="kpi-value--metric"
         badge={
           summary.model.improvement_pct !== null ? (
-            <Badge tone="success" title={`نسبت به ${summary.model.baseline_model}`}>
+            <Badge className="kpi-percent" tone="success" title={`نسبت به ${summary.model.baseline_model}`}>
               <ArrowUpRight className="h-3 w-3" />
               {summary.model.improvement_pct.toFixed(1)}٪ بهتر از پایه
             </Badge>

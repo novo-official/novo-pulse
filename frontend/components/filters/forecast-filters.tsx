@@ -1,7 +1,7 @@
 'use client';
 
-import { Filter } from 'lucide-react';
-import { useEffect } from 'react';
+import { Filter, Layers3, MapPin, Sparkles } from 'lucide-react';
+import type { CSSProperties } from 'react';
 
 import { Select } from '@/components/ui/select';
 import { useForecastFilters } from '@/hooks/useForecastFilters';
@@ -17,6 +17,12 @@ export function HorizonSelector({
 }) {
   const horizon = useForecastFilters((state) => state.horizon);
   const setHorizon = useForecastFilters((state) => state.setHorizon);
+  const activeIndex = Math.max(0, options.indexOf(horizon));
+
+  const move = (direction: 1 | -1) => {
+    const current = Math.max(0, options.indexOf(horizon));
+    setHorizon(options[(current + direction + options.length) % options.length]);
+  };
 
   // A run trained to 30 days cannot answer a 90-day question, so a horizon the
   // current run does not cover snaps down to the longest one it does.
@@ -28,20 +34,31 @@ export function HorizonSelector({
 
   return (
     <div
-      className={cn('inline-flex rounded-xl border border-line bg-surface p-1', className)}
-      role="group"
+      className={cn('forecast-segment inline-flex rounded-full', className)}
+      role="radiogroup"
       aria-label="افق پیش‌بینی"
+      onKeyDown={(event) => {
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') { event.preventDefault(); move(1); }
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') { event.preventDefault(); move(-1); }
+        if (event.key === 'Home') { event.preventDefault(); setHorizon(options[0]); }
+        if (event.key === 'End') { event.preventDefault(); setHorizon(options[options.length - 1]); }
+      }}
+      style={{ '--segment-index': activeIndex } as CSSProperties}
     >
+      <span className="forecast-segment__thumb" aria-hidden="true" />
       {options.map((option) => (
         <button
           key={option}
           type="button"
           onClick={() => setHorizon(option)}
+          role="radio"
+          aria-checked={horizon === option}
+          tabIndex={horizon === option ? 0 : -1}
           className={cn(
-            'nums rounded-lg px-3 py-1.5 text-xs font-semibold transition',
+            'forecast-segment__option nums rounded-[9px] px-3 py-1.5 text-xs font-semibold transition duration-200',
             horizon === option
-              ? 'bg-brand-600 text-white shadow-sm'
-              : 'text-muted hover:bg-slate-50 hover:text-ink',
+              ? 'forecast-segment__option--active bg-brand-600 text-white'
+              : 'text-muted hover:text-ink',
           )}
         >
           {option}D
@@ -55,10 +72,12 @@ export function LevelEntityFilter({
   levels,
   members,
   className,
+  memberLabel,
 }: {
   levels: Level[];
   members: Member[];
   className?: string;
+  memberLabel?: string;
 }) {
   const { level, entityId, setLevel, setEntityId } = useForecastFilters();
 
@@ -66,6 +85,9 @@ export function LevelEntityFilter({
     <div className={cn('grid gap-3 sm:grid-cols-2', className)}>
       <Select
         label="سطح تحلیل"
+        icon={<Layers3 className="h-3.5 w-3.5" aria-hidden="true" />}
+        containerClassName="filter-bar__field"
+        className="filter-bar__select"
         value={level}
         onChange={(event) => setLevel(event.target.value as Level)}
       >
@@ -76,7 +98,10 @@ export function LevelEntityFilter({
         ))}
       </Select>
       <Select
-        label={LEVEL_FA[level] ?? 'انتخاب'}
+        label={memberLabel ?? LEVEL_FA[level] ?? 'انتخاب'}
+        icon={<MapPin className="h-3.5 w-3.5" aria-hidden="true" />}
+        containerClassName="filter-bar__field"
+        className="filter-bar__select"
         value={entityId ?? ''}
         onChange={(event) => setEntityId(event.target.value || null)}
         disabled={members.length === 0}
@@ -96,22 +121,29 @@ export function FilterBar({
   levels,
   members,
   horizons,
+  label = 'فیلترهای تحلیل',
+  memberLabel,
 }: {
   levels: Level[];
   members: Member[];
   horizons: number[];
+  label?: string;
+  memberLabel?: string;
 }) {
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-line bg-surface p-4 shadow-card lg:flex-row lg:items-end lg:justify-between">
-      <div className="flex items-center gap-2 lg:hidden">
-        <Filter className="h-4 w-4 text-muted" />
-        <span className="text-sm font-medium text-ink">فیلترها</span>
+    <section aria-label="فیلترهای پیش‌بینی" className="filter-bar relative flex flex-col gap-5 overflow-visible rounded-[20px] border border-slate-900/[0.07] bg-surface p-5 shadow-[0_1px_2px_rgb(15_23_42_/_0.02),0_14px_30px_-24px_rgb(15_23_42_/_0.24)] lg:flex-row lg:items-end lg:justify-between lg:px-6 lg:py-5">
+      <div className="filter-bar__analysis min-w-0">
+        <div className="filter-bar__context">
+          <Filter className="h-3.5 w-3.5" aria-hidden="true" />
+          <span>{label}</span>
+
+        </div>
+        <LevelEntityFilter levels={levels} members={members} memberLabel={memberLabel} className="mt-2.5 lg:w-[500px]" />
       </div>
-      <LevelEntityFilter levels={levels} members={members} className="lg:w-[420px]" />
-      <div className="flex flex-col gap-1.5">
-        <span className="text-xs font-medium text-muted">افق پیش‌بینی</span>
+      <div className="filter-bar__horizon flex flex-col gap-2">
+        <span className="flex items-center gap-1.5 px-0.5 text-xs font-semibold text-muted"><Sparkles className="h-3.5 w-3.5 text-brand-500/80" aria-hidden="true" />افق پیش‌بینی</span>
         <HorizonSelector options={horizons} />
       </div>
-    </div>
+    </section>
   );
 }

@@ -13,9 +13,9 @@ export function TableWrap({
   minWidth?: number;
 }) {
   return (
-    <div className={cn('-mx-1 overflow-x-auto px-1', className)}>
+    <div className={cn('-mx-1 overflow-x-auto rounded-xl px-1', className)}>
       <table
-        className="w-full border-collapse text-sm"
+        className="w-full border-separate border-spacing-0 text-sm [&_tbody_tr]:transition-colors [&_tbody_tr:hover]:bg-brand-50/35"
         style={{ minWidth: `${minWidth}px` }}
       >
         {children}
@@ -29,17 +29,20 @@ export function Th({
   align = 'right',
   className,
   title,
+  scope = 'col',
 }: {
   children: ReactNode;
   align?: 'right' | 'left' | 'center';
   className?: string;
   title?: string;
+  scope?: 'col' | 'row' | 'colgroup' | 'rowgroup';
 }) {
   return (
     <th
+      scope={scope}
       title={title}
       className={cn(
-        'whitespace-nowrap border-b border-line px-3 pb-2.5 pt-1 text-xs font-semibold text-muted',
+        'whitespace-nowrap border-b border-line bg-slate-50/80 px-3 py-3 text-[11px] font-bold text-muted',
         align === 'right' && 'text-right',
         align === 'left' && 'text-left',
         align === 'center' && 'text-center',
@@ -63,7 +66,7 @@ export function Td({
   return (
     <td
       className={cn(
-        'whitespace-nowrap border-b border-line/70 px-3 py-2.5 text-sm text-ink',
+        'whitespace-nowrap border-b border-line/60 px-3 py-3 text-sm text-ink',
         align === 'right' && 'text-right',
         align === 'left' && 'text-left',
         align === 'center' && 'text-center',

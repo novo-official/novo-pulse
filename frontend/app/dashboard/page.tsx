@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { LineChart } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 import { DemandHeatmap } from '@/components/charts/heatmap';
 import { ForecastChart } from '@/components/charts/forecast-chart';
@@ -13,7 +13,9 @@ import { OpportunitiesCard } from '@/components/dashboard/opportunities-card';
 import { OverviewTable } from '@/components/dashboard/overview-table';
 import { PeaksCard } from '@/components/dashboard/peaks-card';
 import { FilterBar } from '@/components/filters/forecast-filters';
-import { Card, CardBody, CardHeader } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
+import { TrendCard } from '@/components/dashboard/trend-card';
+import { PageHeader } from '@/components/ui/page-header';
 import {
   AsyncBoundary,
   CardSkeleton,
@@ -28,6 +30,15 @@ import { LEVEL_FA } from '@/lib/utils';
 export default function DashboardPage() {
   const { level, entityId, horizon, setEntityId } = useForecastFilters();
   const filters = { level, id: entityId, horizon };
+  const [loadDetails, setLoadDetails] = useState(false);
+
+  // Keep the first paint focused on KPIs, filters and the primary chart. The
+  // lower dashboard sections fetch just after that frame, avoiding a burst of
+  // simultaneous API work while the user is interacting with the filters.
+  useEffect(() => {
+    const timer = window.setTimeout(() => setLoadDetails(true), 250);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const summaryQuery = useQuery({
     queryKey: ['dashboard-summary', level, horizon],
@@ -37,23 +48,31 @@ export default function DashboardPage() {
     queryKey: ['timeseries', level, entityId, horizon],
     queryFn: () => api.timeseries(filters),
   });
-  const driversQuery = useQuery({ queryKey: ['drivers'], queryFn: () => api.drivers() });
+  const driversQuery = useQuery({
+    queryKey: ['drivers'],
+    queryFn: () => api.drivers(),
+    enabled: loadDetails,
+  });
   const overviewQuery = useQuery({
     queryKey: ['overview', level, horizon],
     queryFn: () => api.overview({ level, horizon }),
+    enabled: loadDetails,
   });
-  const peaksQuery = useQuery({ queryKey: ['peaks'], queryFn: () => api.peaks(6) });
+  const peaksQuery = useQuery({ queryKey: ['peaks'], queryFn: () => api.peaks(6), enabled: loadDetails });
   const anomalyQuery = useQuery({
     queryKey: ['anomalies', entityId],
     queryFn: () => api.anomalies({ id: entityId, limit: 12 }),
+    enabled: loadDetails,
   });
   const narrativeQuery = useQuery({
     queryKey: ['narrative', level, entityId, horizon],
     queryFn: () => api.narrative(filters),
+    enabled: loadDetails,
   });
   const heatmapQuery = useQuery({
     queryKey: ['heatmap', level, horizon],
     queryFn: () => api.heatmap({ level, horizon, top_n: 12 }),
+    enabled: loadDetails,
   });
 
   const summary = summaryQuery.data;
@@ -68,7 +87,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="page-stack">
+      <PageHeader eyebrow="نمای کلان بازار" title="داشبورد هوش تقاضا" description="تصویری یکپارچه از روند بازار، سیگنال‌های مهم و فرصت‌هایی که به تصمیم شما جهت می‌دهند." />
       {/* --------------------------------------------------------- KPIs */}
       <AsyncBoundary
         isLoading={summaryQuery.isLoading}
@@ -99,12 +119,7 @@ export default function DashboardPage() {
       )}
 
       {/* ------------------------------------------------- forecast chart */}
-      <Card>
-        <CardHeader
-          icon={<LineChart className="h-4.5 w-4.5" />}
-          title={`روند تقاضا — ${timeseries?.label ?? LEVEL_FA[level]}`}
-          subtitle="تاریخچه واقعی، پیش‌بینی گذشته‌نگر و پیش‌بینی آینده به همراه بازه اطمینان ۸۰٪"
-        />
+      <TrendCard title={`روند تقاضا — ${timeseries?.label ?? LEVEL_FA[level]}`}>
         <AsyncBoundary
           isLoading={timeseriesQuery.isLoading}
           error={timeseriesQuery.error}
@@ -112,7 +127,7 @@ export default function DashboardPage() {
           onRetry={() => timeseriesQuery.refetch()}
           skeleton={<ChartSkeleton height={340} />}
         >
-          <CardBody>
+          <>
             {timeseries ? (
               <ForecastChart
                 series={timeseries.series}
@@ -120,18 +135,18 @@ export default function DashboardPage() {
                 height={380}
               />
             ) : null}
-          </CardBody>
+          </>
         </AsyncBoundary>
-      </Card>
+      </TrendCard>
 
       {/* ------------------------------------- narrative + drivers + opps */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="insights-section">
         <NarrativeCard
           narrative={narrativeQuery.data?.data ?? null}
-          isLoading={narrativeQuery.isLoading}
+          isLoading={!loadDetails || narrativeQuery.isLoading}
         />
         <AsyncBoundary
-          isLoading={driversQuery.isLoading}
+          isLoading={!loadDetails || driversQuery.isLoading}
           error={driversQuery.error}
           onRetry={() => driversQuery.refetch()}
           skeleton={
@@ -160,7 +175,7 @@ export default function DashboardPage() {
       {/* ------------------------------------------- peaks + anomalies */}
       <div className="grid gap-6 lg:grid-cols-2">
         <AsyncBoundary
-          isLoading={peaksQuery.isLoading}
+          isLoading={!loadDetails || peaksQuery.isLoading}
           error={peaksQuery.error}
           onRetry={() => peaksQuery.refetch()}
           skeleton={
@@ -175,7 +190,7 @@ export default function DashboardPage() {
           />
         </AsyncBoundary>
         <AsyncBoundary
-          isLoading={anomalyQuery.isLoading}
+          isLoading={!loadDetails || anomalyQuery.isLoading}
           error={anomalyQuery.error}
           onRetry={() => anomalyQuery.refetch()}
           skeleton={
@@ -190,7 +205,7 @@ export default function DashboardPage() {
 
       {/* -------------------------------------------------- overview table */}
       <AsyncBoundary
-        isLoading={overviewQuery.isLoading}
+        isLoading={!loadDetails || overviewQuery.isLoading}
         error={overviewQuery.error}
         onRetry={() => overviewQuery.refetch()}
         skeleton={
@@ -208,7 +223,7 @@ export default function DashboardPage() {
 
       {/* ------------------------------------------------------- heatmap */}
       <AsyncBoundary
-        isLoading={heatmapQuery.isLoading}
+        isLoading={!loadDetails || heatmapQuery.isLoading}
         error={heatmapQuery.error}
         onRetry={() => heatmapQuery.refetch()}
         skeleton={

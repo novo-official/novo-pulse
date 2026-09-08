@@ -9,7 +9,7 @@ export function Card({
   return (
     <div
       className={cn(
-        'rounded-2xl border border-line bg-surface shadow-card transition-shadow',
+        'rounded-2xl border border-line/90 bg-surface shadow-card ring-1 ring-white/70 transition duration-200',
         className,
       )}
       {...props}
@@ -33,10 +33,10 @@ export function CardHeader({
   className?: string;
 }) {
   return (
-    <div className={cn('flex items-start justify-between gap-4 px-5 pt-5', className)}>
+    <div className={cn('flex flex-col items-start justify-between gap-3 px-4 pt-4 sm:flex-row sm:px-5 sm:pt-5', className)}>
       <div className="flex items-start gap-3">
         {icon ? (
-          <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+          <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-brand-100 bg-brand-50 text-brand-600">
             {icon}
           </span>
         ) : null}
@@ -45,7 +45,7 @@ export function CardHeader({
           {subtitle ? <p className="mt-1 text-sm leading-6 text-muted">{subtitle}</p> : null}
         </div>
       </div>
-      {action ? <div className="shrink-0">{action}</div> : null}
+      {action ? <div className="max-w-full shrink-0">{action}</div> : null}
     </div>
   );
 }
@@ -57,5 +57,5 @@ export function CardBody({
   className?: string;
   children: ReactNode;
 }) {
-  return <div className={cn('px-5 pb-5 pt-4', className)}>{children}</div>;
+  return <div className={cn('px-4 pb-4 pt-4 sm:px-5 sm:pb-5', className)}>{children}</div>;
 }
