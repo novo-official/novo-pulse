@@ -33,6 +33,42 @@ So the cleanup is **not** "delete the admin panel". It is:
 
 ---
 
+## 0. Executed (Phase 3, 2026-09-09)
+
+The plan below was written during the audit. This is what was actually done.
+
+**Routes: 7 → 5** (4 in navigation, plus the `/` redirect).
+
+| Was | Action taken | Now |
+|---|---|---|
+| `/dashboard` | REBUILT | `/overview` — KPIs, national forecast, heatmap, top cities, provinces, emerging demand |
+| `/forecasts` | MERGED | `/city` — per-city forecast, pickup curve, peaks, history |
+| `/backtesting` | MERGED | `/reports` — model performance section |
+| `/models` | MERGED | `/reports` — leaderboard, folds, feature importance |
+| `/scenarios` | **REMOVED** | deleted, backend app included |
+| `/data-lab` | **REMOVED** | deleted |
+| — | BUILT | `/stability` — D-30 → D-1 snapshot ladder |
+
+**Deleted, frontend:** `app/dashboard`, `app/forecasts`, `app/backtesting`,
+`app/models`, `app/data-lab`, `app/scenarios`, `components/charts/*` (6 files),
+`components/dashboard/*` (9 files), `components/filters/*`, `components/ui/*`
+(7 unused primitives), `hooks/useCalendar.ts`, `hooks/useForecastFilters.ts`,
+`lib/calendar.ts`, `lib/api/endpoints.ts`, `lib/types/api.ts`,
+`tests/calendar.test.mts`.
+
+**Deleted, backend:** `apps/scenarios/` in full, and its three API tests.
+
+**Built:** `components/pol4/` (chart frame, KPI, tooltip, city picker, theme),
+`lib/pol4/` (typed client and types), `apps/pol4/` (services, reports, views),
+`ml/pol4/analytics.py` (four new artefacts).
+
+**Nav:** a four-item top bar. The collapsible sidebar is gone.
+
+**Every metric is traceable** — see `docs/POL4_TRACEABILITY.md`, which names the
+artefact and the computation behind each figure on each screen.
+
+---
+
 ## 1. Current routes
 
 | # | Route | File | LOC | In nav? |

@@ -1,25 +1,30 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Cpu, WifiOff } from 'lucide-react';
+import { CircleCheck, TriangleAlert, WifiOff } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
-import { api } from '@/lib/api/endpoints';
-import { METRIC_FA } from '@/lib/utils';
+import { pol4 } from '@/lib/pol4/api';
 
-/** Live backend status: demo mode, champion model, connectivity. */
+/**
+ * Whether the dashboard is showing a real forecast.
+ *
+ * There is no demo mode to report. Either the pipeline has produced artefacts -
+ * in which case the cutoff and the grid size are shown - or it has not, and the
+ * strip says so rather than letting an empty page look like a working one.
+ */
 export function StatusStrip() {
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['health'],
-    queryFn: api.health,
-    refetchInterval: 30_000,
+    queryKey: ['pol4-overview'],
+    queryFn: pol4.overview,
+    refetchInterval: 60_000,
   });
 
   if (isLoading) {
-    return <span className="hidden h-6 w-40 animate-pulse rounded-full bg-slate-200 dark:bg-slate-700 sm:block" />;
+    return <span className="hidden h-6 w-44 animate-pulse rounded-full bg-slate-200 dark:bg-slate-700 sm:block" />;
   }
 
-  if (isError || !data) {
+  if (isError) {
     return (
       <Badge tone="danger">
         <WifiOff className="h-3 w-3" />
@@ -28,16 +33,22 @@ export function StatusStrip() {
     );
   }
 
-  return (
-    <div className="flex items-center gap-2">
-      <Badge
-        tone={data.has_trained_model ? 'success' : 'warning'}
-        title={data.latest_run ?? undefined}
-        className="hidden sm:inline-flex"
-      >
-        <Cpu className="h-3 w-3" />
-        {data.has_trained_model ? `مدل آماده · ${METRIC_FA[data.primary_metric] ?? 'معیار ارزیابی'}` : 'مدل آموزش‌ندیده'}
+  if (!data?.available || !data.data) {
+    return (
+      <Badge tone="warning">
+        <TriangleAlert className="h-3 w-3" />
+        خروجی ساخته نشده
       </Badge>
-    </div>
+    );
+  }
+
+  const { kpis, cutoff } = data.data;
+  return (
+    <Badge tone="success" title={`داده تا ${cutoff}`} className="hidden sm:inline-flex">
+      <CircleCheck className="h-3 w-3" />
+      <span dir="ltr">
+        {kpis.cities}×{kpis.dates} · {cutoff}
+      </span>
+    </Badge>
   );
 }

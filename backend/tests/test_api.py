@@ -252,46 +252,6 @@ def test_models_endpoint_reports_registry_and_training_metadata(client, trained_
     assert data["trained"]["n_features"] > 0
 
 
-# --------------------------------------------------------------- scenarios
-def test_scenario_options_list_only_usable_covariates(client, trained_run):
-    body = client.get(reverse("scenario-options")).json()
-    if not body["available"]:
-        pytest.skip("no persisted model for scenarios in this run")
-
-    columns = {item["column"] for item in body["data"]["adjustable"]}
-    assert "price" in columns
-    assert "is_weekend" not in columns, "a calendar fact is not an actionable lever"
-
-
-def test_scenario_price_cut_moves_demand_the_right_way(client, trained_run):
-    response = client.post(
-        reverse("scenario-simulate"),
-        {"level": "destination", "adjustments": [{"column": "price", "change_pct": -20}]},
-        format="json",
-    )
-    assert response.status_code == 200
-    body = response.json()
-    if not body["available"]:
-        pytest.skip("scenario engine unavailable in this run")
-
-    data = body["data"]
-    assert data["baseline_total"] > 0
-    assert data["applied"], "the price adjustment should have been applied"
-    assert data["impact_pct"] is not None
-
-
-def test_scenario_rejects_an_unused_covariate(client, trained_run):
-    response = client.post(
-        reverse("scenario-simulate"),
-        {"adjustments": [{"column": "not_a_column", "change_pct": 10}]},
-        format="json",
-    )
-    body = response.json()
-    if not body["available"]:
-        pytest.skip("scenario engine unavailable in this run")
-    assert body["data"]["rejected"], "an unknown column must be reported, not ignored"
-
-
 # ---------------------------------------------------------------- data lab
 def test_upload_profiles_the_dataset(client, tmp_path, raw_frame):
     csv = tmp_path / "upload.csv"

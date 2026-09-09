@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     "apps.experiments",
     "apps.forecasting",
     "apps.insights",
-    "apps.scenarios",
+    "apps.pol4",
 ]
 
 MIDDLEWARE = [

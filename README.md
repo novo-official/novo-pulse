@@ -9,19 +9,31 @@ built on the competition data and nothing else.
 
 ---
 
-## The five questions
+## The dashboard
 
-Everything in this repository exists to answer five questions, in order:
+Four screens, and each answers one question a judge actually asks:
 
-| Question | Answer | Where |
+| Screen | Question | What it shows |
 |---|---|---|
-| What will happen? | Multi-horizon forecast (7 / 14 / 30 / 60 / 90 days) | `/dashboard` |
-| How confident are we? | P10–P90 prediction interval with **measured** coverage | `/dashboard`, `/backtesting` |
-| Why will it happen? | SHAP driver attribution, grouped and signed | `/dashboard` |
-| What if conditions change? | What-if simulation on the fitted model | `/scenarios` |
-| How do we know it is good? | Rolling-origin backtest vs. statistical baselines | `/backtesting`, `/models` |
+| `/overview` | What will happen, where and when? | KPI row, national 30-night forecast, city × date heatmap, top cities, province split, emerging demand |
+| `/city` | What about *this* city? | 30-night forecast, pickup curve against the city's own history, peak nights, recent history |
+| `/stability` | Can I trust it? | the same (city, night) predicted at D-30 → D-1, against the realised actual |
+| `/reports` | How do we know it works? | champion vs baseline per fold, error by horizon, feature importance, CSV exports |
 
-**Predict → Explain → Detect → Simulate → Decide.**
+Every figure on every screen traces to a generated artefact -
+**[docs/POL4_TRACEABILITY.md](docs/POL4_TRACEABILITY.md)** names the file and the
+computation behind each one. There is no mock data, no demo mode and no
+placeholder metric anywhere in the product.
+
+The dashboard never opens `search_data.csv`. Its 3.3 million rows are read once,
+offline, by `python -m ml.pol4.pipeline`; every page load reads a pre-aggregated
+artefact through `/api/v1/pol4/*`.
+
+**What it does not claim.** Demand is latent and unobservable. The product says
+*search-based demand as an observable proxy for travel intent* - never that it
+predicts intent directly. Feature importance is labelled as what the model
+splits on, not what causes demand. There is nothing about bookable demand,
+capacity, price or properties, because this dataset contains none of it.
 
 ---
 
@@ -615,45 +627,30 @@ See `config/data_contract.example.yaml` and **[docs/COMPETITION_DAY.md](docs/COM
 
 ## API
 
-```
-GET  /api/v1/health/                     liveness + model availability
-GET  /api/v1/system/                     hardware, model registry, profiles
-
-GET  /api/v1/dashboard/summary/          KPI block
-GET  /api/v1/forecasts/                  raw forecast rows
-GET  /api/v1/forecasts/timeseries/       history + backtest + forecast + band
-GET  /api/v1/forecasts/drivers/          SHAP driver groups
-GET  /api/v1/forecasts/peaks/            upcoming peaks and troughs
-GET  /api/v1/forecasts/overview/         per-entity table
-GET  /api/v1/forecasts/heatmap/          entity × date matrix
-GET  /api/v1/forecasts/narrative/        grounded natural-language summary
-
-GET  /api/v1/anomalies/
-GET  /api/v1/models/                     registry + trained metadata
-GET  /api/v1/models/leaderboard/
-GET  /api/v1/backtests/
-GET  /api/v1/backtests/metrics/
-GET  /api/v1/insights/
-
-POST /api/v1/scenarios/simulate/
-GET  /api/v1/scenarios/options/
-
-POST /api/v1/datasets/upload/
-POST /api/v1/datasets/profile/
-POST /api/v1/datasets/map/
-POST /api/v1/datasets/validate/
-
-POST /api/v1/training/run/
-GET  /api/v1/training/{run_id}/
-```
-
-Filtering:
+The dashboard reads these, and nothing else. All read-only, all served from
+generated artefacts - no endpoint fits a model or opens a source CSV.
 
 ```
-/api/v1/forecasts/timeseries/?level=destination&id=kish&horizon=30
+GET  /api/v1/pol4/overview/                 KPIs, national series, top cities, provinces, momentum
+GET  /api/v1/pol4/forecast/                 the national daily series alone
+GET  /api/v1/pol4/heatmap/?top_n=           city × date matrix
+GET  /api/v1/pol4/cities/                   every city with totals and names
+GET  /api/v1/pol4/cities/{code}/            one city: forecast, peaks, history, momentum
+GET  /api/v1/pol4/cities/{code}/pickup/     observed accumulation vs the historical curve
+GET  /api/v1/pol4/stability/                D-30 → D-1 snapshots plus the aggregate
+GET  /api/v1/pol4/model-performance/        champion vs baseline, folds, breakdowns, importance
+GET  /api/v1/pol4/reports/                  the seven report kinds
+GET  /api/v1/pol4/reports/{kind}/           a preview of one
+GET  /api/v1/pol4/reports/{kind}.csv        the download
 ```
 
-`level` ∈ `listing | destination | category | market`.
+`{code}` accepts either the numeric `city_code` or the city name, so the UI
+never has to know which it is holding. The competition identifier is never
+replaced - names are a display layer.
+
+The generic-platform endpoints (`/dashboard/`, `/forecasts/`, `/models/`,
+`/datasets/`, `/training/`, `/insights/`) still exist and are still tested, but
+the Pol 4 product no longer calls them.
 
 ---
 

@@ -15,12 +15,16 @@ NO_DATA_MESSAGE_FA = "داده‌ای در دسترس نیست. ابتدا یک 
 NO_DATA_MESSAGE_EN = "No data available. Train a model first."
 
 
-def no_data(detail: str | None = None, http_status: int = status.HTTP_200_OK) -> Response:
+def no_data(
+    detail: str | None = None,
+    http_status: int = status.HTTP_200_OK,
+    detail_fa: str | None = None,
+) -> Response:
     return Response(
         {
             "available": False,
             "detail": detail or NO_DATA_MESSAGE_EN,
-            "detail_fa": NO_DATA_MESSAGE_FA,
+            "detail_fa": detail_fa or NO_DATA_MESSAGE_FA,
             "data": None,
         },
         status=http_status,

@@ -61,3 +61,40 @@
   --heat-down-2: #f43f5e;
   --heat-down-3: #fda4af;
 }
+
+/* ---------------------------------------------------------------------------
+   Pol 4 chart palette.
+
+   Three categorical slots bound to meaning, not to series order, plus a
+   single-hue sequential ramp for the heatmap. Validated with the data-viz
+   validator in both modes: worst adjacent CVD ΔE 9.2 light / 9.4 dark, worst
+   normal-vision ΔE 27.6 light / 26.5 dark. Aqua is below 3:1 on the light
+   surface, so every chart using it also ships a legend and direct labels.
+   --------------------------------------------------------------------------- */
+:root {
+  --pol4-forecast: #2a78d6;
+  --pol4-observed: #eb6834;
+  --pol4-expected: #1baf7a;
+  --pol4-grid: #e7eaf1;
+  --pol4-axis: #64748b;
+  --pol4-ink: #0b0b0b;
+  --pol4-heat-0: #f4f7fc;
+  --pol4-heat-1: #cddff5;
+  --pol4-heat-2: #8fb9e8;
+  --pol4-heat-3: #4a8dd8;
+  --pol4-heat-4: #1d5aa8;
+}
+
+:root[data-theme='dark'] {
+  --pol4-forecast: #3987e5;
+  --pol4-observed: #d95926;
+  --pol4-expected: #199e70;
+  --pol4-grid: #2a2a2e;
+  --pol4-axis: #8b93a7;
+  --pol4-ink: #f4f4f5;
+  --pol4-heat-0: #1b1e24;
+  --pol4-heat-1: #1f3a56;
+  --pol4-heat-2: #24557f;
+  --pol4-heat-3: #2f77b8;
+  --pol4-heat-4: #4f9ce4;
+}

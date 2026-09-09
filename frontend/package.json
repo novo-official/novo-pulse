@@ -8,7 +8,7 @@
     "start": "next start -p 3000",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test 'tests/*.test.mts'"
+    "test": "tsc --noEmit"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.62.0",

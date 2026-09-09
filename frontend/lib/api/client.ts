@@ -5,10 +5,24 @@
  * explicit `available` flag, and turns HTTP failures into typed errors the
  * error boundaries can render.
  */
-import type { ApiEnvelope } from '@/lib/types/api';
 
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, '') ?? 'http://localhost:8000/api/v1';
+
+/**
+ * Every Pol 4 endpoint answers in this envelope.
+ *
+ * `available: false` means the pipeline has not produced artefacts yet - which
+ * is a different thing from a failed request, and the UI shows a different
+ * empty state for each.
+ */
+export interface ApiEnvelope<T> {
+  available: boolean;
+  detail?: string;
+  detail_fa?: string;
+  data: T | null;
+  [key: string]: unknown;
+}
 
 export class ApiError extends Error {
   status: number;
