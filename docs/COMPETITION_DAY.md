@@ -3,8 +3,8 @@
 The real dataset lands and the clock starts. This file exists so that nobody
 has to think about architecture at that moment — only about the data.
 
-**The core promise:** moving from synthetic to real data is a *configuration*
-change, not a code change. Nothing in `backend/ml/` hard-codes a synthetic
+**The core promise:** moving to a new dataset is a *configuration*
+change, not a code change. Nothing in `backend/ml/` hard-codes a
 column name, a target, a metric, or a hierarchy level.
 
 ---
@@ -329,7 +329,7 @@ nominal. If those pass, the dashboard will behave.
 | Ollama is not running | Expected. The template narrator takes over automatically. |
 | Redis is not running | Expected. `SYNC_TASKS=true` runs training inline. |
 | Dashboard says "no data" | No successful run yet. Check `/api/v1/training/` for the failure reason. |
-| Everything is broken 10 minutes before the demo | `DEMO_MODE=true` serves the committed artefacts in `data/demo_artifacts/`. Every page works with zero training, including the scenario simulator - the run ships its own model and panel. |
+| Everything is broken 10 minutes before the demo | `make pol4-baseline` - fifteen seconds, no model fitting, and it still produces a validated `results.csv` at WAPE 0.220. |
 
 ## Metric cheat-sheet
 

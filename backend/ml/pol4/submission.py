@@ -105,6 +105,24 @@ def build_submission(predictions: pd.DataFrame, integer: bool = True) -> pd.Data
     return out.sort_values(["cluster_code", "checkin"], ignore_index=True)
 
 
+def build_named_submission(predictions: pd.DataFrame, data: Pol4Data) -> pd.DataFrame:
+    """A readable companion to results.csv, for humans rather than the scorer.
+
+    `results.csv` must carry the numeric `cluster_code` the brief specifies, so
+    the names live here instead: same rows, same numbers, plus the city and
+    province they belong to and the split between what is already observed and
+    what the model expects still to arrive.
+    """
+    out = data.label(predictions[[CITY, CHECKIN]].copy())
+    out["checkin"] = pd.to_datetime(predictions[CHECKIN]).dt.strftime(DATE_FORMAT).to_numpy()
+    out["observed_so_far"] = np.rint(predictions["observed"].to_numpy()).astype(np.int64)
+    out["predicted_demand"] = np.rint(
+        np.maximum(predictions["predicted_demand"].to_numpy(), 0.0)
+    ).astype(np.int64)
+    out["predicted_remaining"] = out["predicted_demand"] - out["observed_so_far"]
+    return out.sort_values(["city", "checkin"], ignore_index=True)
+
+
 def write_submission(frame: pd.DataFrame, path: Path) -> Path:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)

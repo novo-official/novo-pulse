@@ -13,7 +13,7 @@ from typing import Any, Iterable
 
 import yaml
 
-from .paths import ACTIVE_CONTRACT_FILE, DEFAULT_CONTRACT_FILE, PROFILES_FILE, REPO_ROOT
+from .paths import ACTIVE_CONTRACT_FILE, PROFILES_FILE, REPO_ROOT
 
 # Canonical internal column names. The pipeline renames the user's columns to
 # these once, at load time, and never looks at the original names again.
@@ -167,10 +167,19 @@ class DataContract:
 
     @classmethod
     def load(cls, path: str | Path | None = None) -> "DataContract":
-        """Load a contract. Prefers the active contract written by the Data Lab."""
+        """Load a contract - the active one written by the Data Lab by default.
+
+        There is no shipped example contract: it described a synthetic dataset
+        that no longer exists, and defaulting to it would have meant loading
+        fabricated data whenever nothing real was configured.
+        """
         if path is None:
-            path = ACTIVE_CONTRACT_FILE if ACTIVE_CONTRACT_FILE.exists() else DEFAULT_CONTRACT_FILE
+            path = ACTIVE_CONTRACT_FILE
         path = Path(path)
+        if not path.exists():
+            raise FileNotFoundError(
+                f"No data contract at {path}. Map a dataset first, or pass a path."
+            )
         if not path.is_absolute():
             path = REPO_ROOT / path
         with path.open("r", encoding="utf-8") as handle:

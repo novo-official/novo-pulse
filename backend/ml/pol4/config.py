@@ -132,3 +132,8 @@ class Pol4Config:
     @property
     def cities_path(self) -> Path:
         return self.raw_dir / "cities.csv"
+
+    @property
+    def city_names_path(self) -> Path:
+        """Optional city_code -> name mapping. Reports fall back to codes."""
+        return self.raw_dir / "city_code_mapping.csv"

@@ -1,13 +1,13 @@
 """Shared response helpers.
 
-`DEMO_MODE=false` is a hard promise: if there is no trained run, the API says
-so instead of inventing a number.
+The promise is unconditional: if there is no trained run, the API says so
+instead of inventing a number. There is no demo mode and no synthetic
+fallback - every figure the product shows came from the competition data.
 """
 from __future__ import annotations
 
 from typing import Any
 
-from django.conf import settings
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -19,7 +19,6 @@ def no_data(detail: str | None = None, http_status: int = status.HTTP_200_OK) ->
     return Response(
         {
             "available": False,
-            "demo_mode": settings.DEMO_MODE,
             "detail": detail or NO_DATA_MESSAGE_EN,
             "detail_fa": NO_DATA_MESSAGE_FA,
             "data": None,
@@ -29,7 +28,7 @@ def no_data(detail: str | None = None, http_status: int = status.HTTP_200_OK) ->
 
 
 def ok(data: Any, **extra: Any) -> Response:
-    payload = {"available": True, "demo_mode": settings.DEMO_MODE, "data": data}
+    payload = {"available": True, "data": data}
     payload.update(extra)
     return Response(payload)
 

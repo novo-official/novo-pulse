@@ -21,7 +21,6 @@ export class ApiError extends Error {
 
 export interface ApiResult<T> {
   available: boolean;
-  demoMode: boolean;
   data: T | null;
   detail?: string;
   detailFa?: string;
@@ -79,10 +78,9 @@ async function request<T>(path: string, init?: RequestInit, query?: Query): Prom
 /** GET an envelope-wrapped endpoint. */
 export async function getEnvelope<T>(path: string, query?: Query): Promise<ApiResult<T>> {
   const payload = await request<ApiEnvelope<T>>(path, { method: 'GET' }, query);
-  const { available, demo_mode, data, detail, detail_fa, ...extra } = payload;
+  const { available, data, detail, detail_fa, ...extra } = payload;
   return {
     available: Boolean(available),
-    demoMode: Boolean(demo_mode),
     data: (data ?? null) as T | null,
     detail,
     detailFa: detail_fa,
@@ -100,10 +98,9 @@ export async function postEnvelope<T>(path: string, body: unknown): Promise<ApiR
     method: 'POST',
     body: JSON.stringify(body),
   });
-  const { available, demo_mode, data, detail, detail_fa, ...extra } = payload;
+  const { available, data, detail, detail_fa, ...extra } = payload;
   return {
     available: Boolean(available),
-    demoMode: Boolean(demo_mode),
     data: (data ?? null) as T | null,
     detail,
     detailFa: detail_fa,
@@ -113,10 +110,9 @@ export async function postEnvelope<T>(path: string, body: unknown): Promise<ApiR
 
 export async function postForm<T>(path: string, form: FormData): Promise<ApiResult<T>> {
   const payload = await request<ApiEnvelope<T>>(path, { method: 'POST', body: form });
-  const { available, demo_mode, data, detail, detail_fa, ...extra } = payload;
+  const { available, data, detail, detail_fa, ...extra } = payload;
   return {
     available: Boolean(available),
-    demoMode: Boolean(demo_mode),
     data: (data ?? null) as T | null,
     detail,
     detailFa: detail_fa,

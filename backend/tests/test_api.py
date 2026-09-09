@@ -6,7 +6,6 @@ run whose artefacts are on disk.
 from __future__ import annotations
 
 import json
-import shutil
 from pathlib import Path
 
 import pandas as pd
@@ -116,35 +115,6 @@ def test_no_data_mode_never_fabricates_numbers(client, settings):
     body = client.get(reverse("dashboard-summary")).json()
     assert body["data"] is None
     assert json.dumps(body).count("forecast_total") == 0
-
-
-def test_demo_mode_falls_back_to_precomputed_artefacts(client, settings, artefacts, monkeypatch):
-    """A fresh clone with an empty database must still render a dashboard.
-
-    This is the presentation safety net: `DEMO_MODE=true` serves the committed
-    artefacts in `data/demo_artifacts/` when no training run exists.
-    """
-    from apps.forecasting import store as store_module
-
-    settings.DEMO_MODE = True
-    assert not TrainingRun.objects.exists(), "this test needs an empty run table"
-
-    monkeypatch.setattr(store_module, "DEMO_ARTIFACTS_DIR", artefacts.run_dir)
-    body = client.get(reverse("dashboard-summary")).json()
-
-    assert body["available"] is True
-    assert body["data"]["run_id"] == "precomputed-demo"
-    assert body["data"]["forecast_total"] > 0
-
-
-def test_demo_fallback_is_ignored_when_demo_mode_is_off(client, settings, artefacts, monkeypatch):
-    from apps.forecasting import store as store_module
-
-    settings.DEMO_MODE = False
-    monkeypatch.setattr(store_module, "DEMO_ARTIFACTS_DIR", artefacts.run_dir)
-
-    body = client.get(reverse("dashboard-summary")).json()
-    assert body["available"] is False
 
 
 # ---------------------------------------------------------------- with data
@@ -412,7 +382,6 @@ def test_local_path_registration_rejects_traversal(tmp_path):
 def test_local_path_registration_rejects_a_sibling_prefix_directory(tmp_path, monkeypatch):
     """A directory whose name merely starts with the repo path is still outside it."""
     from apps.datasets import services
-    from ml.paths import REPO_ROOT
 
     sibling = tmp_path / "novo-pulse-backup"
     sibling.mkdir()
@@ -465,7 +434,6 @@ def test_validate_rejects_an_unknown_dataset_instead_of_answering_about_another(
 
 def test_upload_accepts_a_json_local_path(client, tmp_path, raw_frame, monkeypatch):
     """Registering a file already on disk should not require a multipart body."""
-    from apps.datasets import services
     from ml.paths import REPO_ROOT
 
     target = REPO_ROOT / "data" / "raw" / "json_path_test.csv"
@@ -563,78 +531,6 @@ def test_training_rejects_an_invalid_inline_mapping(client, tmp_path, raw_frame)
     )
     assert response.status_code == 400
     assert "target" in response.json()["errors"]
-
-
-# ------------------------------------------------- the fresh-clone guarantee
-def test_scenarios_work_from_the_demo_artefacts_alone(
-    client, settings, artefacts, monkeypatch, tmp_path
-):
-    """The what-if page must work on a clone with no database and no source data.
-
-    Scenario simulation re-predicts with the fitted model, so the run has to be
-    self-contained: the model binary and the canonical panel both travel with
-    it. Re-reading the original CSV is not an option once the run is copied to
-    another machine, or when the source was never committed.
-    """
-    import shutil
-
-    from apps.forecasting import store as store_module
-    from apps.scenarios import services as scenario_services
-
-    settings.DEMO_MODE = True
-    assert not TrainingRun.objects.exists(), "this test needs an empty run table"
-
-    # Copy the run somewhere else entirely, as `seed_demo --publish` does.
-    published = tmp_path / "demo_artifacts"
-    shutil.copytree(artefacts.run_dir, published)
-    monkeypatch.setattr(store_module, "DEMO_ARTIFACTS_DIR", published)
-    scenario_services.clear_cache()
-
-    assert (published / "panel.parquet").exists(), "the panel must travel with the run"
-    assert list((published / "models").glob("*.joblib")), "a model binary must travel with the run"
-
-    options = client.get(reverse("scenario-options")).json()
-    assert options["available"] is True, options.get("detail")
-    assert options["data"]["adjustable"], "no covariate could be simulated"
-
-    result = client.post(
-        reverse("scenario-simulate"),
-        {"level": "destination", "adjustments": [{"column": "price", "change_pct": -20}]},
-        format="json",
-    )
-    assert result.status_code == 200, result.content
-    data = result.json()["data"]
-    assert data["baseline_total"] > 0
-    assert data["applied"], "the adjustment was not applied"
-    assert data["series"], "no scenario series was produced"
-
-
-def test_a_published_run_does_not_need_its_source_file(
-    client, settings, artefacts, monkeypatch, tmp_path
-):
-    """Deleting the source dataset must not break scenario simulation."""
-    import shutil
-
-    from apps.forecasting import store as store_module
-    from apps.scenarios import services as scenario_services
-
-    settings.DEMO_MODE = True
-    published = tmp_path / "artifacts"
-    shutil.copytree(artefacts.run_dir, published)
-
-    # Point the run's contract at a file that does not exist.
-    from ml.contract import DataContract
-
-    contract = DataContract.load(published / "config.yaml")
-    contract.path = str(tmp_path / "deleted-source.csv")
-    contract.save(published / "config.yaml")
-
-    monkeypatch.setattr(store_module, "DEMO_ARTIFACTS_DIR", published)
-    scenario_services.clear_cache()
-
-    options = client.get(reverse("scenario-options")).json()
-    assert options["available"] is True, "the run must be self-contained"
-    assert options["data"]["adjustable"]
 
 
 # ------------------------------------------------- competition-day mapping

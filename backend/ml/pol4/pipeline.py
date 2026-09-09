@@ -52,6 +52,7 @@ from .experiments import (
 from .loader import CITY, load_pol4
 from .submission import (
     build_grid,
+    build_named_submission,
     build_submission,
     validate_submission,
     write_submission,
@@ -122,9 +123,19 @@ def run(
 
     # -- 2. pickup curves at the competition cutoff -------------------------
     baseline = PickupBaseline.fit(data, config.cutoff, config)
-    baseline.curves.to_frame().to_parquet(
-        config.artifacts_dir / "pickup_curves.parquet", index=False
+    curves = baseline.curves.to_frame()
+    city_names = data.city_name_of
+    province_names = data.cities.drop_duplicates("province_code").set_index("province_code")
+    province_names = (
+        province_names["province"] if "province" in province_names.columns else None
     )
+    curves["name"] = [
+        city_names.get(key, str(key))
+        if level == "city"
+        else (province_names.get(key, str(key)) if level == "province" and province_names is not None else level)
+        for level, key in zip(curves["level"], curves["key"])
+    ]
+    curves.to_parquet(config.artifacts_dir / "pickup_curves.parquet", index=False)
     summary["baseline"] = baseline.summary()
 
     # -- 3. backtest --------------------------------------------------------
@@ -133,6 +144,8 @@ def run(
     elif model == "baseline":
         log.info("running the pickup-baseline backtest")
         backtest = run_backtest(data, config)
+        # Only the baseline path writes this; the champion path's equivalent is
+        # backtest_metrics_phase2.json, which carries the baseline inside it.
         (config.artifacts_dir / "backtest_metrics.json").write_text(
             json.dumps(_json_ready(backtest), indent=2, ensure_ascii=False), encoding="utf-8"
         )
@@ -150,7 +163,7 @@ def run(
         )
         results = run_suite(data, config, specs)
         experiments = _write_experiments(results, config)
-        payload = _write_phase2_backtest(results, config)
+        payload = _write_phase2_backtest(results, config, data)
 
         champion_scores = payload["champion"]
         summary["backtest"] = {
@@ -194,8 +207,15 @@ def run(
     results_path = write_submission(submission, config.artifacts_dir / "results.csv")
     report = validate_submission(submission, data.city_codes, config, raise_on_error=True)
 
+    # The scored file keeps the numeric cluster_code the brief asks for; the
+    # readable companion carries the same rows with city and province names.
+    named_path = write_submission(
+        build_named_submission(predictions, data), config.artifacts_dir / "results_named.csv"
+    )
+
     summary["submission"] = report.as_dict()
     summary["submission"]["path"] = str(results_path)
+    summary["submission"]["named_path"] = str(named_path)
 
     city_totals = submission.groupby("cluster_code")["predicted_demand"].sum()
     silent = city_totals.index[city_totals == 0]
@@ -211,8 +231,17 @@ def run(
         # Some cities round to zero across the whole window. That is a measured
         # result, not an assumption: each still receives a positive prediction,
         # but its historical demand is below half a search per night.
+        "top_cities": [
+            {"city": name, "city_code": int(code), "predicted_demand": int(total)}
+            for code, name, total in zip(
+                city_totals.sort_values(ascending=False).head(10).index,
+                data.name(city_totals.sort_values(ascending=False).head(10).index),
+                city_totals.sort_values(ascending=False).head(10).to_numpy(),
+            )
+        ],
         "cities_rounding_to_zero": {
             "count": int(len(silent)),
+            "cities": sorted(data.name(silent).tolist())[:20],
             "median_historical_demand": float(historical.reindex(silent).fillna(0.0).median())
             if len(silent)
             else None,
@@ -316,8 +345,21 @@ def _write_experiments(results: list[ExperimentResult], config: Pol4Config) -> d
     return summary
 
 
+def _name_segments(detail: dict[str, Any], data) -> dict[str, Any]:
+    """Swap province codes for province names in a breakdown block."""
+    named = dict(detail)
+    provinces = data.cities.drop_duplicates("province_code").set_index("province_code")
+    if "province" in provinces.columns:
+        lookup = provinces["province"]
+        named["by_province"] = [
+            {**row, "key": lookup.get(row["key"], row["key"])}
+            for row in detail.get("by_province", [])
+        ]
+    return named
+
+
 def _write_phase2_backtest(
-    results: list[ExperimentResult], config: Pol4Config
+    results: list[ExperimentResult], config: Pol4Config, data
 ) -> dict[str, Any]:
     champion = next(r for r in results if r.stage == "champion")
     baseline = next(r for r in results if r.name.startswith("E0"))
@@ -333,13 +375,13 @@ def _write_phase2_backtest(
             "name": champion.name,
             "pooled": champion.pooled,
             "folds": champion.folds,
-            **champion.detail,
+            **_name_segments(champion.detail, data),
         },
         "baseline": {
             "name": baseline.name,
             "pooled": baseline.pooled,
             "folds": baseline.folds,
-            **baseline.detail,
+            **_name_segments(baseline.detail, data),
         },
     }
     (config.artifacts_dir / "backtest_metrics_phase2.json").write_text(

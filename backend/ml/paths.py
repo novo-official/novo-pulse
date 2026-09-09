@@ -20,15 +20,13 @@ def _resolve(env_var: str, default: str) -> Path:
 
 DATA_DIR = _resolve("DATA_DIR", "data")
 RAW_DATA_DIR = DATA_DIR / "raw"
-SYNTHETIC_DATA_DIR = DATA_DIR / "synthetic"
 UPLOAD_DIR = DATA_DIR / "uploads"
 RUNS_DIR = _resolve("RUNS_DIR", "runs")
 REPORTS_DIR = _resolve("REPORTS_DIR", "reports")
 CONFIG_DIR = REPO_ROOT / "config"
-DEMO_ARTIFACTS_DIR = _resolve("DEMO_ARTIFACTS_DIR", "data/demo_artifacts")
+ARTIFACTS_DIR = _resolve("ARTIFACTS_DIR", "artifacts")
 
 PROFILES_FILE = CONFIG_DIR / "profiles.yaml"
-DEFAULT_CONTRACT_FILE = CONFIG_DIR / "data_contract.example.yaml"
 ACTIVE_CONTRACT_FILE = CONFIG_DIR / "data_contract.active.yaml"
 
 
@@ -37,10 +35,9 @@ def ensure_dirs() -> None:
     for directory in (
         DATA_DIR,
         RAW_DATA_DIR,
-        SYNTHETIC_DATA_DIR,
         UPLOAD_DIR,
         RUNS_DIR,
         REPORTS_DIR,
-        DEMO_ARTIFACTS_DIR,
+        ARTIFACTS_DIR,
     ):
         directory.mkdir(parents=True, exist_ok=True)

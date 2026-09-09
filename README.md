@@ -3,9 +3,9 @@
 **پل چهارم | هوش پیش‌بینی تقاضا**
 پیش‌بینی، تحلیل و شبیه‌سازی تقاضای بازار اقامت و گردشگری
 
-A production-shaped demand-forecasting platform for the hospitality market:
-multi-model, multi-horizon, probabilistic, explainable, and built so the real
-competition dataset can replace the synthetic one through configuration alone.
+A demand-forecasting platform for the Pol 4 competition: two-clock pickup
+modelling, leakage-safe walk-forward evaluation, and a validated submission -
+built on the competition data and nothing else.
 
 ---
 
@@ -30,7 +30,7 @@ Everything in this repository exists to answer five questions, in order:
 ```bash
 git clone <repo> && cd novo-pulse
 
-make demo        # venv + deps + synthetic data + trained demo model (~4 min)
+make demo        # venv + deps + the Pol 4 pipeline (~12 min)
 make dev         # backend :8000, frontend :3000
 ```
 
@@ -40,7 +40,7 @@ With Docker:
 
 ```bash
 docker compose up --build
-docker compose exec backend python backend/manage.py seed_demo --publish
+docker compose exec backend make pol4
 ```
 
 Manual setup:
@@ -48,7 +48,7 @@ Manual setup:
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python backend/manage.py migrate
-.venv/bin/python backend/manage.py seed_demo --publish
+PYTHONPATH=backend .venv/bin/python -m ml.pol4.pipeline
 .venv/bin/python backend/manage.py runserver          # :8000
 
 cd frontend && npm install && npm run dev             # :3000
@@ -99,7 +99,7 @@ cd frontend && npm install && npm run dev             # :3000
 backend/
   config/            Django project + API routes
   apps/
-    core/            health, system info, seed_demo
+    core/            health, system info
     datasets/        Data Lab: upload, profile, map, validate
     forecasting/     dashboard, forecasts, anomalies, backtests, models
     experiments/     training runs, leaderboard, model report
@@ -107,7 +107,7 @@ backend/
     scenarios/       what-if simulation
   ml/
     contract.py      the data contract - the seam to any dataset
-    data/            adapter, profiler, validator, frequency, synthetic
+    data/            adapter, profiler, validator, frequency
     features/        tensor, engineering, rolling, calendar
     models/          base, registry, baselines, gbdt, chronos, neural, ensemble
     evaluation/      metrics, splitters, backtest, uncertainty
@@ -176,22 +176,26 @@ Together. Everything runs locally and free.
 
 ---
 
-## Demo mode
+## No synthetic data
 
-`DEMO_MODE=true` (the default) serves the precomputed artefacts in
-`data/demo_artifacts/` (4.6 MB, committed), so a **fresh clone renders the full
-product with no database, no source data and no training** — the dashboard,
-drivers, backtesting, leaderboard *and* the scenario simulator.
+There is none. The repository contains exactly four data files, all of them the
+competition's:
 
-That last one is why each run is self-contained: the fitted model binary and
-the canonical panel are written alongside the metrics, so "change the price,
-watch the forecast move" works on a laptop that has never seen the dataset.
+```
+data/raw/pol4/search_data.csv        3,298,564 search events
+data/raw/pol4/evaluation.csv            65,411 partial Azar observations
+data/raw/pol4/cities.csv                   321 cities with coordinates
+data/raw/pol4/city_code_mapping.csv        321 city and province names
+```
 
-`DEMO_MODE=false` makes a hard promise: **no fabricated numbers**. With no
-trained model, every endpoint returns `available: false` and the UI shows an
-explicit empty state instead of a plausible-looking figure.
+The synthetic dataset, its generator, the precomputed demo run, the `seed_demo`
+command and `DEMO_MODE` have all been removed. Every number this product shows
+is computed from the four files above; when no model has been trained, each
+endpoint reports that plainly rather than serving a fabricated run.
 
----
+Those files are gitignored, so a fresh clone has no data until you place them.
+`city_code_mapping.csv` is optional - without it every report falls back to
+numeric city codes.
 
 ## ML pipeline
 
@@ -249,36 +253,34 @@ Metrics: `mae`, `rmse`, `wape`, `mape`, `smape`, `rmsle`, `r2`, `bias`,
 `mase`, `poisson_deviance`. Selecting one re-orients the leaderboard, champion
 selection, ensemble weighting and all reported scores.
 
-Example run - **synthetic dataset, not Pol 4** (`demo` profile, 90-day horizon,
-listing level). For measured competition results see
-[POL 4 Competition Mode](#pol-4-competition-mode):
+The generic platform, measured on the Pol 4 panel it can express - demand
+aggregated by check-in date, one time axis, `evaluation.csv` unused (`demo`
+profile, 30-day horizon, two rolling-origin folds):
 
-| Model | WAPE | vs. baseline |
-|---|---:|---:|
-| **LightGBM (champion)** | **25.5%** | **+19.7%** |
-| Ensemble | 25.6% | +19.5% |
-| CatBoost | 26.2% | +17.6% |
-| Moving average *(best baseline)* | 31.8% | — |
-| Seasonal naive (7) | 39.4% | −23.8% |
+| Model | WAPE |
+|---|---:|
+| **LightGBM (champion)** | **26.2%** |
+| Ensemble | 27.1% |
+| CatBoost | 30.1% |
+| Seasonal naive (7) *(best baseline)* | 33.5% |
+| Historical mean | 42.1% |
+| Moving average | 59.8% |
+| Seasonal naive (30) | 68.3% |
+
+These are the honest numbers for the single-axis approach, and they are the
+reason `backend/ml/pol4/` exists: the two-clock champion scores **15.8%** on the
+same data. See [POL 4 Competition Mode](#pol-4-competition-mode).
 
 ### Long horizons
 
-The brief names long forecast horizons as the central difficulty, so the
-product defaults to 90 days and the accuracy is reported per horizon bucket
-rather than as a single headline number:
-
-| Days ahead | 1–7 | 8–14 | 15–30 | 31–60 | 61–90 |
-|---|---:|---:|---:|---:|---:|
-| WAPE | 25.5% | 24.9% | 24.8% | 25.7% | 26.0% |
-| 80% interval coverage | 78.7% | 78.8% | 79.9% | 79.2% | 78.7% |
-
-Accuracy is nearly flat from a week out to a quarter out because each horizon
-is predicted **directly** — one sample is `(entity, forecast origin, horizon)`
-and the horizon is an explicit feature — so a 90-day forecast is a single
-prediction rather than 90 chained ones, and there is no error to compound.
-Coverage is measured, not assumed: the served interval is whichever of the
-model's own quantiles or conformal residual bounds lands closer to nominal on
-held-out folds, and the run records which one it picked and why.
+Each horizon is predicted **directly** — one sample is
+`(entity, forecast origin, horizon)` with the horizon as an explicit feature —
+so a 90-day forecast is a single prediction rather than 90 chained ones and
+there is no error to compound. Accuracy is reported per horizon bucket rather
+than as one headline number, and interval coverage is measured on held-out
+folds rather than assumed: the served interval is whichever of the model's own
+quantiles or the conformal residual bounds lands closer to nominal, and the run
+records which it picked and why.
 
 `reports/model_report.md` is regenerated automatically after each run.
 
@@ -286,10 +288,7 @@ held-out folds, and the run records which one it picked and why.
 
 ## POL 4 Competition Mode
 
-**Everything in this section is measured on the real Pol 4 datasets.** It is
-kept separate from the synthetic demo numbers elsewhere in this README, which
-come from `data/synthetic/` and describe the generic platform, not this
-competition.
+**Everything in this section is measured on the real Pol 4 datasets.**
 
 ### The problem has two clocks
 
@@ -345,13 +344,13 @@ Artefacts land in `artifacts/pol4/`:
 | File | What it is |
 |---|---|
 | `results.csv` | the submission: 9,630 rows of `cluster_code, checkin, predicted_demand` |
+| `results_named.csv` | the same rows for humans: city and province names, observed-so-far, predicted remaining |
 | `backtest_metrics_phase2.json` | champion vs baseline: every fold, WAPE by horizon / province / weekday / demand bucket / observation state / high-demand slice |
 | `experiments.csv` | every experiment run, one row each, sorted by WAPE |
 | `experiment_summary.json` | the same with per-fold detail and the rejections |
 | `feature_importance.json` | the champion's gain importance, all 66 features |
 | `stability.parquet` | D-30 → D-1 forecast snapshots for a historical window |
 | `pickup_curves.parquet` | the fitted completion curves (global, province, city) |
-| `backtest_metrics.json` | pickup-baseline backtest (written by `make pol4-baseline`) |
 | `run_summary.json` | data validation, model config, submission report |
 
 ### Results — walk-forward, five simulated competitions
@@ -608,10 +607,7 @@ is detected, converted, and *reported* — never applied behind your back.
 | **Several separate files** — demand, accommodation/destination, bookings | `dataset.joins`, or **فایل‌های جانبی** in the Data Lab. Match rates are reported per join; date keys are parsed on both sides, so a Jalali booking file joins a Gregorian holiday calendar correctly. |
 | **Persian column headers** — `تاریخ_رزرو`, `کد_اقامتگاه`, `شهر` | Recognised alongside the English names, including `ی`/`ي`, `ک`/`ك` and zero-width non-joiner variants. |
 
-Verified end to end through the browser: `frontend/e2e/ui_competition.mjs`
-uploads a 10k-row Jalali booking log with Persian headers, joins an
-accommodation table and a holiday calendar to it, trains, and checks the
-Persian destinations reach the dashboard.
+These shapes are exercised by the data-adapter test suite.
 
 See `config/data_contract.example.yaml` and **[docs/COMPETITION_DAY.md](docs/COMPETITION_DAY.md)**.
 
@@ -700,7 +696,6 @@ Every optional component fails soft. None of them can take the demo down.
 | Redis not running | `SYNC_TASKS=true` runs training inline |
 | A column is missing | Pipeline continues with the features that exist |
 | SHAP unavailable | Falls back to split-gain importance |
-| Training never ran | `DEMO_MODE` serves precomputed artefacts |
 
 ---
 
@@ -727,7 +722,7 @@ Three further layers run against a live system rather than fixtures:
 |---|---|---|
 | API audit | 63 calls across every endpoint, including malformed input and edge cases | `make audit` |
 | Semantic audit | 45 checks that the *numbers* are right - hierarchy coherence, KPI/series agreement, scenario direction, coverage vs. nominal | `make audit` |
-| Browser E2E | 46 real interactions: filters, entity selection, horizon switching, running a scenario, uploading a CSV and training from the UI | `make e2e` |
+| Browser E2E | real interactions: filters, entity selection, horizon switching | `make e2e` |
 
 All three were run against a bare clone (no DB, no data, no runs) as well as a
 seeded one.
@@ -743,7 +738,6 @@ any environment. Accuracy is not asserted there - the integration is.
 See `.env.example`. The most important settings:
 
 ```env
-DEMO_MODE=true          # false ⇒ never show a number we did not compute
 DEFAULT_HORIZON=30
 PRIMARY_METRIC=wape
 TRAINING_PROFILE=demo
@@ -759,14 +753,14 @@ ENABLE_LOCAL_LLM=false
 
 | Symptom | Fix |
 |---|---|
-| Dashboard shows "no model trained" | `make seed` |
+| Dashboard shows "no model trained" | `make pol4` |
 | `ModuleNotFoundError: ml` | Run through `backend/manage.py`, or set `PYTHONPATH=backend` |
 | Frontend cannot reach the API | Set `NEXT_PUBLIC_API_BASE_URL` and restart `next dev` |
 | CORS error | Add the origin to `CORS_ALLOWED_ORIGINS` |
 | Training is slow | `PROFILE=demo`, or lower `max_train_rows` in `config/profiles.yaml` |
 | `No trainable samples` | History is shorter than horizon + context; reduce `--horizon` |
 | LightGBM import error on macOS | `brew install libomp` |
-| Everything broken before the demo | `DEMO_MODE=true` serves `data/demo_artifacts/` |
+| Everything broken before the demo | `make pol4-baseline` - 15 seconds, no model fitting |
 
 ---
 

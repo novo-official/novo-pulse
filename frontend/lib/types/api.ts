@@ -8,7 +8,6 @@
 
 export interface ApiEnvelope<T> {
   available: boolean;
-  demo_mode: boolean;
   detail?: string;
   detail_fa?: string;
   data: T | null;
@@ -19,7 +18,6 @@ export type Level = 'listing' | 'destination' | 'category' | 'market';
 
 export interface HealthResponse {
   status: string;
-  demo_mode: boolean;
   sync_tasks: boolean;
   default_horizon: number;
   primary_metric: string;

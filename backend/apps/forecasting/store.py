@@ -13,15 +13,13 @@ from __future__ import annotations
 import json
 import logging
 import threading
-from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
-from django.conf import settings
 
 from ml.contract import ENTITY
-from ml.paths import DEMO_ARTIFACTS_DIR, REPO_ROOT
+from ml.paths import REPO_ROOT
 
 log = logging.getLogger(__name__)
 
@@ -150,11 +148,10 @@ def clear_cache() -> None:
 
 # --------------------------------------------------------------------------
 def active_run():
-    """The run the dashboard should show.
+    """The run the dashboard should show: the newest successful one, or nothing.
 
-    Priority: the newest successful DB run, then - only in DEMO_MODE - the
-    committed precomputed demo artefacts, so a presentation still works even if
-    training was never executed on this machine.
+    There is no synthetic fallback. If no model has been trained on real data,
+    every endpoint reports that plainly rather than serving a fabricated run.
     """
     from apps.experiments.models import TrainingRun
 
@@ -170,14 +167,7 @@ def active_run():
 
 def active_store() -> ArtifactStore | None:
     run = active_run()
-    if run is not None:
-        return ArtifactStore(run.run_dir, run.run_id)
-    if settings.DEMO_MODE:
-        fallback = ArtifactStore(DEMO_ARTIFACTS_DIR, "precomputed-demo")
-        if fallback.exists():
-            log.info("Serving precomputed demo artefacts from %s", fallback.directory)
-            return fallback
-    return None
+    return ArtifactStore(run.run_dir, run.run_id) if run is not None else None
 
 
 def store_for(run_id: str | None) -> ArtifactStore | None:

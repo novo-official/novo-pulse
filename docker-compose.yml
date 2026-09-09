@@ -17,7 +17,6 @@ services:
       - "8000:8000"
     environment:
       DEBUG: "${DEBUG:-true}"
-      DEMO_MODE: "${DEMO_MODE:-true}"
       SECRET_KEY: "${SECRET_KEY:-dev-only-change-me}"
       ALLOWED_HOSTS: "*"
       CORS_ALLOWED_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000"

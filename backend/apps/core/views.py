@@ -22,7 +22,6 @@ def health(_request):
     return Response(
         {
             "status": "ok",
-            "demo_mode": settings.DEMO_MODE,
             "sync_tasks": settings.SYNC_TASKS,
             "default_horizon": settings.DEFAULT_HORIZON,
             "primary_metric": settings.PRIMARY_METRIC,
@@ -41,6 +40,5 @@ def system_info(_request):
             "resources": detect_resources(),
             "models": describe_registry(),
             "profiles": list_profiles(),
-            "demo_mode": settings.DEMO_MODE,
         }
     )

@@ -98,7 +98,7 @@ def analyse(
                 prediction=predict(builder, horizon, observed),
             )
         )
-    snapshots = pd.concat(rows, ignore_index=True)
+    snapshots = data.label(pd.concat(rows, ignore_index=True))
     revisions = _revision_table(snapshots)
 
     by_step = (

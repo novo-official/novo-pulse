@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-09T11:46:32.605564+00:00",
+  "generated_at": "2026-09-09T12:08:17.496611+00:00",
   "python": "3.11.15",
   "seed": 42,
   "model": "champion",
@@ -10,6 +10,7 @@
   ],
   "data": {
     "search_rows": 3298564,
+    "city_names": true,
     "evaluation_rows": 65411,
     "cities": 321,
     "provinces": 7,
@@ -34,6 +35,12 @@
         "dataset": "evaluation.csv",
         "title": "validated",
         "detail": "65,411 rows, no duplicates, no impossible dates, lead time 0-59 days"
+      },
+      {
+        "severity": "info",
+        "dataset": "city_code_mapping.csv",
+        "title": "city names attached",
+        "detail": "321 of 321 cities named"
       }
     ]
   },
@@ -279,19 +286,94 @@
     "total_predicted_demand": 8010957.0,
     "rows_predicting_zero": 3040,
     "problems": [],
-    "path": "/home/user/novo-pulse/artifacts/pol4/results.csv"
+    "path": "/home/user/novo-pulse/artifacts/pol4/results.csv",
+    "named_path": "/home/user/novo-pulse/artifacts/pol4/results_named.csv"
   },
   "inference": {
     "observed_total": 2686508.0,
     "predicted_total": 8010986.791277152,
     "pairs_with_no_observation": 4282,
     "cities_with_no_observation": 82,
+    "top_cities": [
+      {
+        "city": "tehran",
+        "city_code": 1183,
+        "predicted_demand": 1113808
+      },
+      {
+        "city": "qeshm",
+        "city_code": 4995,
+        "predicted_demand": 975471
+      },
+      {
+        "city": "kish",
+        "city_code": 2099,
+        "predicted_demand": 726103
+      },
+      {
+        "city": "rasht",
+        "city_code": 7339,
+        "predicted_demand": 625073
+      },
+      {
+        "city": "mashhad",
+        "city_code": 9356,
+        "predicted_demand": 568054
+      },
+      {
+        "city": "ramsar",
+        "city_code": 8978,
+        "predicted_demand": 526056
+      },
+      {
+        "city": "kordan",
+        "city_code": 9547,
+        "predicted_demand": 370323
+      },
+      {
+        "city": "bandar_anzali",
+        "city_code": 9814,
+        "predicted_demand": 246470
+      },
+      {
+        "city": "isfahan",
+        "city_code": 7619,
+        "predicted_demand": 225492
+      },
+      {
+        "city": "chalus",
+        "city_code": 9770,
+        "predicted_demand": 204650
+      }
+    ],
     "cities_rounding_to_zero": {
       "count": 77,
+      "cities": [
+        "amirkola",
+        "baghershahr",
+        "baharanshahr",
+        "bakharz",
+        "bandarjask",
+        "bejestan",
+        "bika",
+        "buin_va_miandasht",
+        "chahardangeh",
+        "chali",
+        "chamgordan",
+        "darrood",
+        "dastjerd",
+        "davarzan",
+        "dolatabad",
+        "gazanak",
+        "gazbarkhar",
+        "ghadamgah",
+        "ghahderijan",
+        "gharchak"
+      ],
       "median_historical_demand": 2.0,
       "median_unrounded_prediction": 3.491472498866913e-05,
       "note": "these cities receive a positive prediction; it rounds to zero because their measured demand is below half a search per night"
     }
   },
-  "elapsed_seconds": 444.87
+  "elapsed_seconds": 985.06
 }

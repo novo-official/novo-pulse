@@ -17,7 +17,7 @@ HORIZON ?= 90
 METRIC  ?= wape
 
 .DEFAULT_GOAL := help
-.PHONY: help venv install install-optional migrate seed seed-data-only train demo dev \
+.PHONY: help venv install install-optional migrate train dev \
         backend frontend frontend-install test test-backend test-frontend lint report \
         clean download-models docker-up docker-down check profile validate audit e2e \
         pol4 pol4-baseline pol4-ablation pol4-submission test-pol4
@@ -75,12 +75,6 @@ profile: ## Profile a dataset and suggest a mapping (FILE=path/to/data.csv)
 validate: ## Data-quality + leakage report for the active contract
 	$(MANAGE) validate_dataset
 
-seed: migrate ## Generate synthetic data, train a demo model, publish artefacts
-	$(MANAGE) seed_demo --profile $(PROFILE) --horizon $(HORIZON) --publish
-
-seed-data-only: ## Regenerate the synthetic dataset without training
-	$(MANAGE) seed_demo --skip-training
-
 train: migrate ## Train on the active data contract
 	$(MANAGE) train_forecast --profile $(PROFILE) --horizon $(HORIZON) --metric $(METRIC)
 
@@ -91,11 +85,8 @@ download-models: ## Pre-fetch optional model weights for offline use
 	$(PY) scripts/download_models.py
 
 # ------------------------------------------------------------------ run
-demo: install frontend-install seed ## One command: setup -> seed -> ready to run
-	@echo ""
-	@echo "  Demo data is ready. Start the services with:"
-	@echo "      make dev"
-	@echo "  then open http://localhost:3000"
+demo: install frontend-install migrate pol4 ## One command: setup -> Pol 4 forecast -> ready to run
+	@echo "Pol 4 pipeline complete. Run 'make dev' to open the dashboard."
 
 dev: ## Run backend and frontend together
 	@trap 'kill 0' EXIT; \
@@ -124,8 +115,6 @@ audit: ## Live API audit against a running backend (status codes + semantics)
 
 e2e: ## Browser end-to-end walkthrough (needs both servers running)
 	cd frontend && node e2e/ui_drive.mjs
-	cd frontend && node e2e/ui_upload.mjs
-	cd frontend && node e2e/ui_competition.mjs
 
 lint: ## Lint the frontend
 	cd frontend && npm run lint

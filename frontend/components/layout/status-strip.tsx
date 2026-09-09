@@ -30,15 +30,6 @@ export function StatusStrip() {
 
   return (
     <div className="flex items-center gap-2">
-      {data.demo_mode ? (
-        <Badge tone="violet" title="داده‌های نمایشی مصنوعی فعال است">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-400 opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-500" />
-          </span>
-          حالت دمو
-        </Badge>
-      ) : null}
       <Badge
         tone={data.has_trained_model ? 'success' : 'warning'}
         title={data.latest_run ?? undefined}

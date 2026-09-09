@@ -38,6 +38,16 @@ def training_list(_request):
 @api_view(["POST"])
 def training_run(request):
     """Kick off a training run. Returns immediately with the run id."""
+    # Validate the request before resolving any state: a bad metric is a bad
+    # request whether or not a dataset happens to be mapped.
+    horizon = request.data.get("horizon")
+    metric = request.data.get("metric")
+    if metric and metric not in available_metrics():
+        return error(
+            f"Unknown metric '{metric}'. Available: {available_metrics()}",
+            detail_fa=f"معیار «{metric}» شناخته‌شده نیست.",
+        )
+
     dataset_id = request.data.get("dataset_id")
     contract = None
 
@@ -78,15 +88,17 @@ def training_run(request):
         except ValueError as exc:
             return error(str(exc), 400, detail_fa=f"فایل جانبی پیدا نشد: {exc}")
     else:
-        contract = DataContract.load()
-
-    horizon = request.data.get("horizon")
-    metric = request.data.get("metric")
-    if metric and metric not in available_metrics():
-        return error(
-            f"Unknown metric '{metric}'. Available: {available_metrics()}",
-            detail_fa=f"معیار «{metric}» شناخته‌شده نیست.",
-        )
+        # No dataset in the request, so fall back to the mapped one. There is no
+        # shipped example contract any more - the dataset it described was
+        # synthetic - so "nothing mapped yet" is a user-facing 400, not a 500.
+        try:
+            contract = DataContract.load()
+        except FileNotFoundError:
+            return error(
+                "No dataset has been mapped yet. Upload and map one first.",
+                400,
+                detail_fa="هنوز هیچ دیتاستی نگاشت نشده است. ابتدا یک دیتاست بارگذاری و نگاشت کنید.",
+            )
 
     try:
         run = services.start_training(
