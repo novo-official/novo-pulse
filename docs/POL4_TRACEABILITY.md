@@ -40,6 +40,8 @@ offline, by the pipeline; every page load reads a pre-aggregated artefact.
 | `city_momentum.parquet` | `analytics.city_momentum` | recent pickup vs each city's own expectation |
 | `city_history.parquet` | `analytics.city_history` | 180 days of completed demand per city |
 | `province_summary.json` | `analytics.province_summary` | forecast rolled up to the seven provinces |
+| `stability_summary.json` | `pipeline._write_stability` | the stability aggregate, in its own file so a partial run cannot clobber it |
+| `training_sample.csv` | `dataset.export_training_frame` | 5,500 of the rows the champion was fitted on, 500 per horizon |
 | `run_summary.json` | `pipeline.run` | data validation, champion config, stability summary |
 
 ---

@@ -414,7 +414,7 @@
           "normalised_bias": -0.215605
         }
       ],
-      "runtime_seconds": 306.7,
+      "runtime_seconds": 295.9,
       "meta": {
         "model": "lightgbm",
         "groups": [

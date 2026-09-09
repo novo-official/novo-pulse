@@ -181,7 +181,16 @@ def run(
 
     # -- 4. stability -------------------------------------------------------
     if skip_stability or model == "baseline":
-        summary["stability"] = {"skipped": True}
+        # Carry forward what a previous full run measured rather than dropping
+        # it. Labelled, so a stale number can never pass for a fresh one.
+        previous = config.artifacts_dir / "stability_summary.json"
+        if previous.exists():
+            summary["stability"] = {
+                **json.loads(previous.read_text(encoding="utf-8")),
+                "measured_in_this_run": False,
+            }
+        else:
+            summary["stability"] = {"skipped": True}
     else:
         log.info("measuring forecast stability across the D-30 -> D-1 ladder")
         summary["stability"] = _write_stability(data, spec, config)
@@ -418,7 +427,13 @@ def _write_phase2_backtest(
 def _write_stability(
     data, spec: ChampionSpec, config: Pol4Config
 ) -> dict[str, Any]:
-    """Snapshot the champion across the D-30 -> D-1 ladder on a historical window."""
+    """Snapshot the champion across the D-30 -> D-1 ladder on a historical window.
+
+    The summary is written to its own artefact, not only into run_summary.json:
+    a partial run (`--skip-stability`) rewrites run_summary and would otherwise
+    silently delete a full run's stability numbers, leaving the dashboard to
+    report a score of "—" with nothing to say it had ever been measured.
+    """
     target_start = config.cutoff - pd.Timedelta(days=config.stability_window_days - 1)
     anchor = target_start - pd.Timedelta(days=max(stability_module.SNAPSHOT_HORIZONS))
     model, baseline = stability_module.fit_snapshot_model(
@@ -432,6 +447,9 @@ def _write_stability(
         config,
     )
     report.snapshots.to_parquet(config.artifacts_dir / "stability.parquet", index=False)
+    (config.artifacts_dir / "stability_summary.json").write_text(
+        json.dumps(_json_ready(report.summary), indent=2, ensure_ascii=False), encoding="utf-8"
+    )
     return report.summary
 
 def build_parser() -> argparse.ArgumentParser:

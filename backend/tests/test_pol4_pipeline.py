@@ -132,3 +132,27 @@ def test_cli_exposes_the_baseline_fallback():
     args = build_parser().parse_args(["--model", "baseline", "--skip-stability"])
     assert args.model == "baseline"
     assert args.skip_stability is True
+
+
+# ------------------------------------------------- partial runs must not lose data
+def test_skipping_stability_does_not_erase_a_previous_measurement(tmp_path_factory):
+    """A partial run rewrites run_summary.json; it must not delete what a full
+    run measured, and it must not pass the carried-forward number off as fresh."""
+    directory = tmp_path_factory.mktemp("pol4_partial")
+    config = replace(write_dataset(directory), calibration_windows=1)
+
+    full = run(config, model="champion", spec=SMALL)
+    assert full["stability"]["stability_score"] is not None
+    assert (config.artifacts_dir / "stability_summary.json").exists()
+
+    partial = run(config, model="champion", spec=SMALL, skip_backtest=True, skip_stability=True)
+    assert partial["stability"]["stability_score"] == full["stability"]["stability_score"]
+    # Labelled, so a stale number can never read as a fresh one.
+    assert partial["stability"]["measured_in_this_run"] is False
+
+
+def test_stability_summary_is_absent_before_any_full_run(tmp_path_factory):
+    directory = tmp_path_factory.mktemp("pol4_nostab")
+    config = replace(write_dataset(directory), calibration_windows=1)
+    summary = run(config, model="champion", spec=SMALL, skip_backtest=True, skip_stability=True)
+    assert summary["stability"] == {"skipped": True}

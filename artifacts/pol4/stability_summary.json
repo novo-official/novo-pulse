@@ -1,0 +1,87 @@
+{
+  "target_start": "2025-10-23",
+  "target_days": 30,
+  "anchor_cutoff": "2025-09-23",
+  "snapshot_horizons": [
+    30,
+    21,
+    14,
+    7,
+    3,
+    1
+  ],
+  "pairs": 9630,
+  "stability_score": 0.8443,
+  "mean_absolute_revision": 63.347,
+  "mean_relative_revision": 0.1557,
+  "convergence_rate": 0.7221,
+  "by_step": [
+    {
+      "step": "30->21",
+      "mean_absolute_revision": 75.4772,
+      "mean_relative_revision": 0.151,
+      "convergence_rate": 0.6634,
+      "n": 9630
+    },
+    {
+      "step": "21->14",
+      "mean_absolute_revision": 66.9177,
+      "mean_relative_revision": 0.1483,
+      "convergence_rate": 0.6804,
+      "n": 9630
+    },
+    {
+      "step": "14->7",
+      "mean_absolute_revision": 77.8212,
+      "mean_relative_revision": 0.1842,
+      "convergence_rate": 0.7202,
+      "n": 9630
+    },
+    {
+      "step": "7->3",
+      "mean_absolute_revision": 61.7227,
+      "mean_relative_revision": 0.156,
+      "convergence_rate": 0.7474,
+      "n": 9630
+    },
+    {
+      "step": "3->1",
+      "mean_absolute_revision": 34.7955,
+      "mean_relative_revision": 0.1389,
+      "convergence_rate": 0.7993,
+      "n": 9630
+    }
+  ],
+  "by_horizon": [
+    {
+      "horizon": 1,
+      "wape": 0.02,
+      "mean_prediction": 996.66
+    },
+    {
+      "horizon": 3,
+      "wape": 0.04,
+      "mean_prediction": 988.25
+    },
+    {
+      "horizon": 7,
+      "wape": 0.08,
+      "mean_prediction": 962.87
+    },
+    {
+      "horizon": 14,
+      "wape": 0.12,
+      "mean_prediction": 918.57
+    },
+    {
+      "horizon": 21,
+      "wape": 0.14,
+      "mean_prediction": 891.88
+    },
+    {
+      "horizon": 30,
+      "wape": 0.17,
+      "mean_prediction": 864.91
+    }
+  ]
+}
