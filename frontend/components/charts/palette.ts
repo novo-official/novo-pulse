@@ -1,16 +1,16 @@
-/** One colour system across every chart, tuned for light backgrounds. */
+/** Theme-aware CSS values allow Recharts SVGs to update without a rerender. */
 export const CHART = {
-  actual: '#0f172a',
-  forecast: '#4f46e5',
-  backtest: '#7c3aed',
-  band: '#6366f1',
+  actual: 'rgb(var(--chart-actual))',
+  forecast: 'rgb(var(--indigo-deep))',
+  backtest: 'rgb(var(--violet-deep))',
+  band: 'rgb(var(--indigo))',
   bandOpacity: 0.14,
   scenario: '#0d9488',
   positive: '#059669',
   negative: '#e11d48',
   neutral: '#94a3b8',
-  grid: '#e7eaf1',
-  axis: '#64748b',
+  grid: 'rgb(var(--chart-grid))',
+  axis: 'rgb(var(--chart-axis))',
 };
 
 export const SERIES_COLORS = [

@@ -7,7 +7,7 @@ import { GlassTooltip } from '@/components/charts/glass-tooltip';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/states';
 import type { OverviewRow } from '@/lib/types/api';
-import { cn, CONFIDENCE_FA } from '@/lib/utils';
+import { cn, CONFIDENCE_FA, displayNameFa } from '@/lib/utils';
 
 const STATUS_TONE: Record<string, 'success' | 'danger' | 'warning' | 'neutral'> = { growing: 'success', declining: 'danger', spike_risk: 'warning', stable: 'neutral', unknown: 'neutral' };
 const faNumber = new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 0 });
@@ -15,7 +15,7 @@ const faPercent = new Intl.NumberFormat('fa-IR', { minimumFractionDigits: 1, max
 const showNumber = (value: number | null | undefined) => value === null || value === undefined || !Number.isFinite(value) ? '—' : faNumber.format(value);
 const showPercent = (value: number | null | undefined) => value === null || value === undefined || !Number.isFinite(value) ? '—' : `${faPercent.format(value)}٪`;
 
-function DestinationAvatar({ label }: { label: string }) { return <span aria-hidden="true" className="destination-table__avatar">{label.trim().slice(0, 1)}</span>; }
+function DestinationAvatar({ label }: { label: string }) { return <span aria-hidden="true" className="destination-table__avatar">{displayNameFa(label).trim().slice(0, 1)}</span>; }
 function DeltaPill({ value }: { value: number | null | undefined }) { const tone = toneForChange(value); return <bdi dir="ltr" className={cn('destination-table__delta', `destination-table__delta--${tone}`)}>{showPercent(value)}</bdi>; }
 function LevelPill({ confidence }: { confidence: string | null | undefined }) { const tone = toneForConfidence(confidence); return <span className={cn('destination-table__level', `destination-table__level--${tone}`, confidence && `destination-table__level--${confidence}`)}><i />{CONFIDENCE_FA[confidence ?? ''] ?? confidence}</span>; }
 function StatusPill({ status, label }: { status: string; label: string }) { return <span className={cn('destination-table__status', `destination-table__status--${STATUS_TONE[status] ?? 'neutral'}`, status === 'stable' && 'destination-table__status--stable')}><i />{label}</span>; }

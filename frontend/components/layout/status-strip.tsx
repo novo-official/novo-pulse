@@ -5,6 +5,7 @@ import { Cpu, WifiOff } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { api } from '@/lib/api/endpoints';
+import { METRIC_FA } from '@/lib/utils';
 
 /** Live backend status: demo mode, champion model, connectivity. */
 export function StatusStrip() {
@@ -15,7 +16,7 @@ export function StatusStrip() {
   });
 
   if (isLoading) {
-    return <span className="hidden h-6 w-40 animate-pulse rounded-full bg-slate-200 sm:block" />;
+    return <span className="hidden h-6 w-40 animate-pulse rounded-full bg-slate-200 dark:bg-slate-700 sm:block" />;
   }
 
   if (isError || !data) {
@@ -44,7 +45,7 @@ export function StatusStrip() {
         className="hidden sm:inline-flex"
       >
         <Cpu className="h-3 w-3" />
-        {data.has_trained_model ? `مدل آماده · ${data.primary_metric.toUpperCase()}` : 'مدل آموزش‌ندیده'}
+        {data.has_trained_model ? `مدل آماده · ${METRIC_FA[data.primary_metric] ?? 'معیار ارزیابی'}` : 'مدل آموزش‌ندیده'}
       </Badge>
     </div>
   );

@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/states';
 import { useForecastFilters } from '@/hooks/useForecastFilters';
 import { api } from '@/lib/api/endpoints';
-import { LEVEL_FA } from '@/lib/utils';
+import { LEVEL_FA, displayNameFa } from '@/lib/utils';
 
 export default function DashboardPage() {
   const { level, entityId, horizon, setEntityId } = useForecastFilters();
@@ -119,7 +119,7 @@ export default function DashboardPage() {
       )}
 
       {/* ------------------------------------------------- forecast chart */}
-      <TrendCard title={`روند تقاضا — ${timeseries?.label ?? LEVEL_FA[level]}`}>
+      <TrendCard title={`روند تقاضا — ${timeseries?.label ? displayNameFa(timeseries.label) : LEVEL_FA[level]}`}>
         <AsyncBoundary
           isLoading={timeseriesQuery.isLoading}
           error={timeseriesQuery.error}

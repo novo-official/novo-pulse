@@ -1,5 +1,16 @@
 :root {
   --font: "Vazirmatn", ui-sans-serif;
+  /* Semantic colour roles. Component code should prefer these over a fixed
+     slate/white utility whenever the colour is part of the UI chrome. */
+  --surface-raised: 255 255 255;
+  --surface-subtle: 248 250 252;
+  --surface-hover: 241 245 249;
+  --overlay: 15 23 42;
+  --placeholder: 148 163 184;
+  --focus: 99 102 241;
+  --chart-grid: 231 234 241;
+  --chart-axis: 100 116 139;
+  --chart-actual: 15 23 42;
   --ok: 16 185 129;
   --bad: 244 63 94;
   --warn: 245 158 11;
@@ -27,6 +38,15 @@
 }
 
 [data-theme='dark'], .dark {
+  --surface-raised: 27 34 50;
+  --surface-subtle: 18 24 38;
+  --surface-hover: 37 47 66;
+  --overlay: 2 6 23;
+  --placeholder: 148 163 184;
+  --focus: 129 140 248;
+  --chart-grid: 61 72 94;
+  --chart-axis: 167 181 205;
+  --chart-actual: 226 232 240;
   --indigo: 129 140 248;
   --violet: 139 92 246;
   --ok: 52 211 153;

@@ -8,7 +8,7 @@ import { ScrollList } from '@/components/ui/scroll-list';
 import { TypePill } from '@/components/ui/type-pill';
 import { useCalendar } from '@/hooks/useCalendar';
 import type { PeakPeriod } from '@/lib/types/api';
-import { CONFIDENCE_FA, cn } from '@/lib/utils';
+import { CONFIDENCE_FA, cn, displayNameFa } from '@/lib/utils';
 
 const faDate = new Intl.DateTimeFormat('fa-IR-u-ca-gregory', { day: 'numeric', month: 'long', year: 'numeric' });
 const faPercent = new Intl.NumberFormat('fa-IR', { style: 'percent', signDisplay: 'always', maximumFractionDigits: 0 });
@@ -27,7 +27,7 @@ function PeakRow({ period }: { period: PeakPeriod }) {
         {up ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
       </span>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[13.5px] font-bold text-ink">{period.label}</p>
+        <p className="truncate text-[13.5px] font-bold text-ink">{displayNameFa(period.label)}</p>
         <p className="mt-0.5 text-xs text-muted">
           {faDate.format(new Date(period.start))} تا {faDate.format(new Date(period.end))} · {new Intl.NumberFormat('fa-IR').format(period.days)} روز
         </p>

@@ -102,9 +102,9 @@ export function Select({
             }
           }}
           className={cn(
-            'flex h-11 w-full min-w-0 items-center justify-between gap-3 rounded-xl border border-line bg-gradient-to-l from-surface to-slate-50/80 px-3 text-right text-sm font-medium text-ink shadow-sm',
+            'flex h-11 w-full min-w-0 items-center justify-between gap-3 rounded-xl border border-line bg-gradient-to-l from-surface to-slate-50/80 px-3 text-right text-sm font-medium text-ink shadow-sm dark:to-slate-800/60',
             'transition duration-200 hover:border-brand-200 hover:shadow-card focus:border-brand-400 focus:outline-none focus:ring-4 focus:ring-brand-100/70',
-            'disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 disabled:hover:border-line disabled:hover:shadow-sm',
+            'disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 disabled:hover:border-line disabled:hover:shadow-sm dark:disabled:bg-slate-800',
             open && 'border-brand-400 bg-surface ring-4 ring-brand-100/70',
             className,
           )}
@@ -150,7 +150,7 @@ export function TextInput({
       <input
         className={cn(
           'h-10 w-full rounded-xl border border-line bg-surface px-3 text-sm text-ink shadow-sm',
-          'transition placeholder:text-slate-400 focus:border-brand-400 focus:outline-none focus:ring-4 focus:ring-brand-100/70',
+          'transition placeholder:text-slate-400 focus:border-brand-400 focus:outline-none focus:ring-4 focus:ring-brand-100/70 dark:placeholder:text-slate-400',
           className,
         )}
         {...props}

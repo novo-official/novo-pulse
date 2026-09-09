@@ -25,9 +25,9 @@ export function formatNumber(value: number | null | undefined, digits = 0): stri
 export function formatCompact(value: number | null | undefined): string {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—';
   const abs = Math.abs(value);
-  if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
-  if (abs >= 10_000) return `${(value / 1000).toFixed(0)}K`;
-  if (abs >= 1000) return `${(value / 1000).toFixed(1)}K`;
+  if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1)} میلیون`;
+  if (abs >= 10_000) return `${(value / 1000).toFixed(0)} هزار`;
+  if (abs >= 1000) return `${(value / 1000).toFixed(1)} هزار`;
   return formatNumber(value, abs < 10 && abs % 1 !== 0 ? 1 : 0);
 }
 
@@ -139,3 +139,43 @@ export const MODEL_KIND_FA: Record<string, string> = {
   foundation: 'مدل بنیادین',
   meta: 'ترکیبی',
 };
+
+/** User-facing names stay Persian even when the API exposes technical IDs. */
+export const METRIC_FA: Record<string, string> = {
+  wape: 'خطای مطلق وزنی',
+  mape: 'خطای درصدی مطلق',
+  smape: 'خطای درصدی متقارن',
+  rmsle: 'خطای لگاریتمی مربعات',
+  r2: 'ضریب تعیین',
+};
+
+const DISPLAY_NAME_FA: Record<string, string> = {
+  kish: 'کیش',
+  tehran: 'تهران',
+  isfahan: 'اصفهان',
+  mashhad: 'مشهد',
+  shiraz: 'شیراز',
+  tabriz: 'تبریز',
+  rasht: 'رشت',
+  qeshm: 'قشم',
+  chabahar: 'چابهار',
+  bandarabbas: 'بندرعباس',
+  ramser: 'رامسر',
+  yazd: 'یزد',
+  lightgbm: 'لایت جی‌بی‌ام',
+  catboost: 'کت‌بوست',
+  ensemble: 'مدل ترکیبی',
+  moving_average: 'میانگین متحرک',
+  historical_mean: 'میانگین تاریخی',
+  seasonal_naive_7: 'مدل فصلی ۷ روزه',
+  seasonal_naive_30: 'مدل فصلی ۳۰ روزه',
+  chronos: 'کرونوس',
+  nhits: 'ان‌هیتس',
+};
+
+export function displayNameFa(value: string | null | undefined): string {
+  if (!value) return '—';
+  return DISPLAY_NAME_FA[value.trim().toLowerCase().replace(/[\s-]/g, '_').replace('_', '')]
+    ?? DISPLAY_NAME_FA[value.trim().toLowerCase()]
+    ?? value;
+}

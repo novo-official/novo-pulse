@@ -7,7 +7,7 @@ import type { CSSProperties } from 'react';
 import { Select } from '@/components/ui/select';
 import { useForecastFilters } from '@/hooks/useForecastFilters';
 import type { Level, Member } from '@/lib/types/api';
-import { LEVEL_FA, cn } from '@/lib/utils';
+import { LEVEL_FA, cn, displayNameFa } from '@/lib/utils';
 
 export function HorizonSelector({
   options = [7, 14, 30, 60, 90],
@@ -62,7 +62,7 @@ export function HorizonSelector({
               : 'text-muted hover:text-ink',
           )}
         >
-          {option}D
+          {option} روز
         </button>
       ))}
     </div>
@@ -110,7 +110,7 @@ export function LevelEntityFilter({
         <option value="">همه ({members.length})</option>
         {members.map((member) => (
           <option key={member.id} value={member.id}>
-            {member.label}
+            {displayNameFa(member.label)}
           </option>
         ))}
       </Select>

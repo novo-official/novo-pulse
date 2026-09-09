@@ -79,17 +79,17 @@ export function ForecastChart({
         <ComposedChart data={rows} margin={{ top: 10, right: 12, bottom: 4, left: 4 }}>
           <defs>
             <linearGradient id="bandFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#6366f1" stopOpacity={0.16} />
-              <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.03} />
+              <stop offset="0%" stopColor="rgb(var(--indigo))" stopOpacity={0.22} />
+              <stop offset="100%" stopColor="rgb(var(--violet))" stopOpacity={0.05} />
             </linearGradient>
-            <linearGradient id="forecastStroke" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#6366f1" /><stop offset="100%" stopColor="#8b5cf6" /></linearGradient>
-            <filter id="forecastGlow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#6366f1" floodOpacity="0.55" /></filter>
+            <linearGradient id="forecastStroke" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="rgb(var(--indigo))" /><stop offset="100%" stopColor="rgb(var(--violet))" /></linearGradient>
+            <filter id="forecastGlow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="rgb(var(--indigo))" floodOpacity="0.55" /></filter>
           </defs>
 
-          <CartesianGrid stroke="rgb(15 23 42 / 0.08)" strokeDasharray="2 4" vertical={false} />
+          <CartesianGrid stroke="rgb(var(--chart-grid))" strokeDasharray="2 4" vertical={false} />
           <XAxis dataKey="ds" {...axisProps} tickFormatter={(value) => faDate.format(new Date(value))} minTickGap={36} />
           <YAxis {...axisProps} tickFormatter={(value: number) => faCompact.format(value)} width={52} />
-          <Tooltip content={<GlassTooltip />} cursor={{ stroke: 'rgb(15 23 42 / 0.15)', strokeWidth: 1 }} />
+          <Tooltip content={<GlassTooltip />} cursor={{ stroke: 'rgb(var(--ink) / 0.20)', strokeWidth: 1 }} />
           <Legend
             verticalAlign="top"
             height={42}
@@ -173,7 +173,7 @@ export function ForecastChart({
                 value: 'شروع پیش‌بینی',
                 position: 'insideTopLeft',
                 fontSize: 11,
-                fill: '#64748b',
+                fill: 'rgb(var(--chart-axis))',
               }}
             />
           ) : null}

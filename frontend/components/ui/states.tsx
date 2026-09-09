@@ -22,9 +22,9 @@ export function Skeleton({
     <div
       style={style}
       className={cn(
-        'relative overflow-hidden rounded-lg bg-slate-100',
+        'relative overflow-hidden rounded-lg bg-slate-100 dark:bg-slate-800',
         'after:absolute after:inset-0 after:-translate-x-full after:animate-shimmer',
-        'after:bg-gradient-to-l after:from-transparent after:via-white/70 after:to-transparent',
+        'after:bg-gradient-to-l after:from-transparent after:via-white/70 after:to-transparent dark:after:via-white/10',
         className,
       )}
     />
@@ -64,7 +64,7 @@ export function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 px-6 py-12 text-center">
-      <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-line bg-gradient-to-br from-slate-50 to-brand-50 text-brand-500 shadow-sm">
+      <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-line bg-gradient-to-br from-slate-50 to-brand-50 text-brand-500 shadow-sm dark:from-slate-800 dark:to-indigo-950">
         {icon ?? <Inbox className="h-6 w-6" />}
       </span>
       <div className="max-w-lg">
@@ -111,7 +111,7 @@ export function ErrorState({
           <button
             type="button"
             onClick={onRetry}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm font-medium text-ink transition hover:bg-slate-50"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm font-medium text-ink transition hover:bg-slate-50 dark:hover:bg-slate-800"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             تلاش دوباره

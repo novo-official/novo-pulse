@@ -27,7 +27,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fa" dir="rtl" className={vazir.variable}>
+    <html lang="fa" dir="rtl" className={vazir.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('novo-pulse-theme');if(t!=='dark')t='light';var e=document.documentElement;e.dataset.theme=t;e.classList.toggle('dark',t==='dark');e.style.colorScheme=t}catch(e){}})()` }} />
+      </head>
       <body className="min-h-screen">
         <Providers>
           <AppShell>{children}</AppShell>

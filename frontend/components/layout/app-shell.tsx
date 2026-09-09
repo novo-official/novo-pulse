@@ -19,6 +19,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
 import { StatusStrip } from '@/components/layout/status-strip';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { useCalendar } from '@/hooks/useCalendar';
 import { storedCalendar, useForecastFilters } from '@/hooks/useForecastFilters';
 import { cn } from '@/lib/utils';
@@ -80,7 +81,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* ------------------------------------------------------- sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 right-0 z-40 w-[276px] shrink-0 border-l border-white/10 bg-slate-950 text-white shadow-2xl transition-all duration-200 lg:h-screen lg:translate-x-0',
+          'app-sidebar fixed inset-y-0 right-0 z-40 w-[276px] shrink-0 text-ink transition-all duration-300 lg:h-screen lg:translate-x-0',
           compact ? 'lg:w-[88px]' : 'lg:w-[248px]',
           open ? 'translate-x-0' : 'translate-x-full',
         )}
@@ -93,16 +94,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <span className="absolute inset-x-0 top-1/2 h-px bg-white/30" />
               </span>
               <span className={cn(compact && 'lg:hidden')}>
-                <span className="block text-base font-bold leading-tight text-white">نووُ پالس</span>
-                <span className="mt-1 block text-[10px] font-medium tracking-wide text-slate-400" dir="ltr">
-                  MARKET INTELLIGENCE
+                <span className="block text-base font-bold leading-tight text-ink">نووُ پالس</span>
+                <span className="mt-1 block text-[10px] font-medium tracking-wide text-slate-500">
+                  هوش بازار
                 </span>
               </span>
             </Link>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="rounded-lg p-1.5 text-slate-400 hover:bg-white/10 hover:text-white lg:hidden"
+              className="rounded-lg p-1.5 text-muted hover:bg-black/5 hover:text-ink lg:hidden"
               aria-label="بستن منو"
             >
               <X className="h-5 w-5" />
@@ -112,16 +113,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             onClick={() => setCompact((value) => !value)}
-            className="absolute -left-3 top-20 z-10 hidden h-7 w-7 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-slate-300 shadow-lg transition hover:border-slate-500 hover:text-white lg:flex"
+            className="absolute -left-3 top-[125px] z-10 hidden h-7 w-7 items-center justify-center rounded-full border border-line bg-surface text-muted shadow-md transition hover:border-brand-300 hover:text-brand-600 lg:flex"
             aria-label={compact ? 'باز کردن سایدبار' : 'جمع کردن سایدبار'}
           >
             {compact ? <ChevronLeft className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
           </button>
 
-          <div className={cn('mx-4 mb-4 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5', compact && 'lg:hidden')}>
-            <p className="flex items-center gap-2 text-xs text-slate-300"><Sparkles className="h-3.5 w-3.5 text-cyan-400" />نبض بازار را در دست بگیر</p>
+          <div className={cn('mx-4 mb-4 rounded-xl border border-brand-100 bg-brand-50/55 px-3 py-2.5', compact && 'lg:hidden')}>
+            <p className="flex items-center gap-2 text-xs text-slate-600"><Sparkles className="h-3.5 w-3.5 text-cyan-500" />نبض بازار را در دست بگیر</p>
           </div>
-          <p className={cn('px-5 pb-2 text-[10px] font-bold tracking-wider text-slate-500', compact && 'lg:hidden')}>فضای تحلیل</p>
+          <p className={cn('px-5 pb-2 text-[10px] font-bold tracking-wider text-slate-400', compact && 'lg:hidden')}>فضای تحلیل</p>
           <nav className={cn('flex-1 space-y-1 overflow-y-auto px-3 pb-4', compact && 'lg:px-2')}>
             {NAV.map((item) => {
               const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -135,11 +136,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     'group relative flex items-start gap-3 rounded-xl px-3 py-2.5 transition duration-200',
                     compact && 'lg:justify-center lg:px-2 lg:py-3',
                     active
-                      ? 'bg-white/[0.09] text-white shadow-inner shadow-white/5'
-                      : 'text-slate-400 hover:bg-white/[0.05] hover:text-white',
+                      ? 'bg-brand-50 text-ink shadow-sm ring-1 ring-brand-100'
+                      : 'text-muted hover:bg-black/5 hover:text-ink',
                   )}
                 >
-                  {active ? <span className="absolute inset-y-2 -right-3 w-0.5 rounded-full bg-cyan-400" /> : null}
+                  {active ? <span className="absolute inset-y-3 right-1 w-0.5 rounded-full bg-cyan-400" /> : null}
                   <Icon className={cn('mt-0.5 h-4.5 w-4.5 shrink-0', active && 'text-cyan-400')} />
                   <span className={cn('min-w-0', compact && 'lg:hidden')}>
                     <span className="block text-sm font-medium">{item.label}</span>
@@ -153,6 +154,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </nav>
 
           <div className={cn('border-t border-white/10 px-3 py-3', compact && 'lg:px-2')}>
+            <ThemeToggle className="mb-2 hidden w-full justify-center lg:flex" compact={compact} />
             <button
               type="button"
               onClick={togglePresentation}
@@ -161,8 +163,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 'flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition',
                 compact && 'lg:justify-center lg:px-2',
                 presentation
-                  ? 'bg-violet-500/15 text-violet-300'
-                  : 'text-slate-400 hover:bg-white/[0.05] hover:text-white',
+                  ? 'bg-violet-50 text-violet-700'
+                  : 'text-muted hover:bg-black/5 hover:text-ink',
               )}
             >
               <Presentation className="h-4 w-4" />
@@ -172,10 +174,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {/* Shamsi is the calendar the audience plans in; Gregorian stays a
                 click away for anyone reading the raw dates alongside. */}
             <div
-              className="mt-2 flex rounded-xl border border-line bg-surface p-1"
+              className={cn('calendar-switch mt-3', compact && 'lg:hidden')}
               role="group"
               aria-label="تقویم نمایش تاریخ‌ها"
             >
+              <span
+                aria-hidden="true"
+                className={cn(
+                  'calendar-switch__indicator right-1',
+                  calendar.calendar === 'jalali' ? 'translate-x-0' : '-translate-x-full',
+                )}
+              />
               {(
                 [
                   ['jalali', 'شمسی'],
@@ -188,10 +197,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   onClick={() => calendar.setCalendar(value)}
                   aria-pressed={calendar.calendar === value}
                   className={cn(
-                    'flex-1 rounded-lg px-2 py-1.5 text-xs font-semibold transition',
+                    'calendar-switch__option',
                     calendar.calendar === value
-                      ? 'bg-brand-600 text-white shadow-sm'
-                      : 'text-muted hover:bg-slate-50 hover:text-ink',
+                      ? 'text-white'
+                      : 'text-slate-500 hover:text-brand-700',
                   )}
                 >
                   {label}
@@ -230,6 +239,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Suspense fallback={null}>
               <StatusStrip />
             </Suspense>
+            <ThemeToggle compact className="lg:hidden" />
           </div>
         </header>
 

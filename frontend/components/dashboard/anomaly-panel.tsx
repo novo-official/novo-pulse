@@ -9,7 +9,7 @@ import { ScrollList } from '@/components/ui/scroll-list';
 import { TypePill } from '@/components/ui/type-pill';
 import { useCalendar } from '@/hooks/useCalendar';
 import type { Anomaly } from '@/lib/types/api';
-import { SEVERITY_FA, cn } from '@/lib/utils';
+import { SEVERITY_FA, cn, displayNameFa } from '@/lib/utils';
 
 const faNumber = new Intl.NumberFormat('fa-IR');
 const faDate = new Intl.DateTimeFormat('fa-IR-u-ca-gregory', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -55,7 +55,7 @@ export function AnomalyPanel({ anomalies }: { anomalies: Anomaly[] }) {
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="flex items-center gap-2 text-[13.5px] font-bold text-ink">
-                      <span className="truncate">{anomaly.label}</span>
+                      <span className="truncate">{displayNameFa(anomaly.label)}</span>
                       <span className="scroll-card-row__delta shrink-0 text-xs font-extrabold text-muted">
                         {anomaly.deviation !== null
                           ? <bdi dir="ltr">{faPercent.format(anomaly.deviation)}</bdi>

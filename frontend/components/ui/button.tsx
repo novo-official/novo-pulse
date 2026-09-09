@@ -5,7 +5,7 @@ const VARIANTS = {
   primary: 'bg-brand-600 text-white shadow-sm shadow-brand-900/15 hover:-translate-y-px hover:bg-brand-700 hover:shadow-md disabled:bg-brand-300 disabled:shadow-none',
   secondary: 'border border-line bg-surface text-ink shadow-sm hover:border-brand-200 hover:bg-brand-50/40 disabled:text-slate-400',
   outline: 'border border-brand-200 bg-transparent text-brand-700 hover:bg-brand-50',
-  ghost: 'text-muted hover:bg-slate-100 hover:text-ink',
+  ghost: 'text-muted hover:bg-black/5 hover:text-ink',
   danger: 'bg-rose-600 text-white hover:bg-rose-700',
   link: 'h-auto rounded-none px-0 text-brand-700 underline-offset-4 hover:underline',
 } as const;

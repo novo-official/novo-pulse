@@ -48,7 +48,7 @@ export function DataQualityCard({ report }: { report: ValidationReport }) {
         <div className="mb-5 flex items-center gap-4 rounded-2xl border border-line/70 bg-surface p-4 shadow-sm">
           <div className="relative h-20 w-20 shrink-0">
             <svg viewBox="0 0 36 36" className="h-20 w-20 -rotate-90">
-              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e2e8f0" strokeWidth="3" />
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgb(var(--line))" strokeWidth="3" />
               <circle
                 cx="18"
                 cy="18"

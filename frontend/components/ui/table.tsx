@@ -42,7 +42,7 @@ export function Th({
       scope={scope}
       title={title}
       className={cn(
-        'whitespace-nowrap border-b border-line bg-slate-50/80 px-3 py-3 text-[11px] font-bold text-muted',
+        'whitespace-nowrap border-b border-line bg-slate-50/80 px-3 py-3 text-[11px] font-bold text-muted dark:bg-slate-800/80',
         align === 'right' && 'text-right',
         align === 'left' && 'text-left',
         align === 'center' && 'text-center',

@@ -19,11 +19,13 @@ import type { DashboardSummary } from '@/lib/types/api';
 import {
   CONFIDENCE_FA,
   cn,
+  displayNameFa,
   formatCompact,
   formatMetric,
   formatNumber,
   formatPercent,
   formatRatioAsPercent,
+  METRIC_FA,
 } from '@/lib/utils';
 
 function Kpi({
@@ -93,9 +95,18 @@ function ChangeIcon({ change }: { change: number | null }) {
   return <Minus className="h-3 w-3" />;
 }
 
+function forecastRangeParts(lower: number | null | undefined, upper: number | null | undefined) {
+  if (lower === null || lower === undefined || upper === null || upper === undefined) return null;
+  const scale = Math.max(Math.abs(lower), Math.abs(upper));
+  if (scale >= 1_000_000) return { lower: (lower / 1_000_000).toFixed(1), upper: (upper / 1_000_000).toFixed(1), unit: 'میلیون' };
+  if (scale >= 1_000) return { lower: (lower / 1_000).toFixed(scale >= 10_000 ? 0 : 1), upper: (upper / 1_000).toFixed(scale >= 10_000 ? 0 : 1), unit: 'هزار' };
+  return { lower: formatNumber(lower), upper: formatNumber(upper), unit: '' };
+}
+
 export function KpiCards({ summary }: { summary: DashboardSummary }) {
   const metric = summary.model.primary_metric ?? 'wape';
   const growth = summary.insights.fastest_growing ?? summary.top_growth;
+  const interval = forecastRangeParts(summary.forecast_lower, summary.forecast_upper);
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
@@ -130,7 +141,7 @@ export function KpiCards({ summary }: { summary: DashboardSummary }) {
         label="مقصد با بیشترین رشد"
         icon={<Sparkles className="h-4 w-4" />}
         tone="violet"
-        value={growth ? growth.label : '—'}
+        value={growth ? displayNameFa(growth.label) : '—'}
         badge={
           growth ? (
             <Badge className="kpi-percent" tone={toneForChange(growth.change_pct)}>{formatPercent(growth.change_pct)}</Badge>
@@ -145,29 +156,30 @@ export function KpiCards({ summary }: { summary: DashboardSummary }) {
         label="بازه اطمینان ۸۰٪"
         icon={<Gauge className="h-4 w-4" />}
         value={
-          <span className="text-[29px] tracking-tight sm:text-[31px]">
-            {formatCompact(summary.forecast_lower)} – {formatCompact(summary.forecast_upper)}
+          <span className="kpi-range-value">
+            {interval ? <><bdi dir="ltr">{interval.lower} – {interval.upper}</bdi>{interval.unit ? <span> {interval.unit}</span> : null}</> : '—'}
           </span>
         }
+        valueClassName="kpi-value--range"
         footnote={`پهنای نسبی: ${formatRatioAsPercent(summary.relative_interval_width)} از سطح پیش‌بینی`}
         hint="کران‌های P10 و P90. پهنای نسبی، پهنای بازه تقسیم بر مقدار پیش‌بینی است."
       />
 
       <Kpi
-        label={`دقت مدل (${metric.toUpperCase()})`}
+        label={`دقت مدل (${METRIC_FA[metric] ?? 'معیار ارزیابی'})`}
         icon={<Target className="h-4 w-4" />}
         tone={summary.model.improvement_pct && summary.model.improvement_pct > 0 ? 'success' : 'neutral'}
         value={formatMetric(summary.model.primary_value, metric)}
         valueClassName="kpi-value--metric"
         badge={
           summary.model.improvement_pct !== null ? (
-            <Badge className="kpi-percent" tone="success" title={`نسبت به ${summary.model.baseline_model}`}>
+            <Badge className="kpi-percent" tone="success" title={`نسبت به ${displayNameFa(summary.model.baseline_model)} `}>
               <ArrowUpRight className="h-3 w-3" />
               {summary.model.improvement_pct.toFixed(1)}٪ بهتر از پایه
             </Badge>
           ) : null
         }
-        footnote={`مدل منتخب: ${summary.model.champion ?? '—'}`}
+        footnote={`مدل منتخب: ${displayNameFa(summary.model.champion)}`}
         hint="خطای مدل روی اعتبارسنجی متحرک زمانی، در مقایسه با بهترین مدل پایه."
       />
 

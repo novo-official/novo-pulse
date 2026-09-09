@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/states';
 import { useForecastFilters } from '@/hooks/useForecastFilters';
 import { api } from '@/lib/api/endpoints';
-import { LEVEL_FA, formatCompact, formatNumber } from '@/lib/utils';
+import { LEVEL_FA, displayNameFa, formatCompact, formatNumber } from '@/lib/utils';
 
 export default function ForecastsPage() {
   const { level, entityId, horizon, setEntityId } = useForecastFilters();
@@ -72,7 +72,7 @@ export default function ForecastsPage() {
       <Card className="overflow-hidden border-brand-100/80 shadow-lift">
         <CardHeader
           icon={<LineChart className="h-4.5 w-4.5" />}
-          title={timeseries?.label ?? LEVEL_FA[level]}
+          title={timeseries?.label ? displayNameFa(timeseries.label) : LEVEL_FA[level]}
           subtitle={`افق ${horizon} روزه · سطح ${LEVEL_FA[level]}`}
           action={
             timeseries ? (
