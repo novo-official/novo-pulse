@@ -6,6 +6,7 @@ leaves open is a parameter. No number in this package is written twice.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Any
 from pathlib import Path
 
 import pandas as pd
@@ -82,6 +83,32 @@ class Pol4Config:
         ]
     )
     horizon_buckets: tuple[tuple[int, int], ...] = ((1, 3), (4, 7), (8, 14), (15, 21), (22, 30))
+
+    # -- calibration ---------------------------------------------------------
+    #: How many earlier 30-day windows a fold's calibration is fitted on. Each
+    #: one closes before the fold's own cutoff, so none of them can see it.
+    calibration_windows: int = 4
+    #: Shrinkage weight, in units of demand: a horizon bucket supported by this
+    #: much demand gets half its own factor and half the global one. Keeps a thin
+    #: bucket from swinging the forecast on noise.
+    calibration_shrinkage: float = 500_000.0
+    calibration_method: str = "horizon_shrunk"
+
+    # -- features / models ---------------------------------------------------
+    #: Trailing window for the per-city demand statistics.
+    city_history_days: int = 365
+    #: Horizons sampled when building training rows. Stratified rather than
+    #: exhaustive: 30 horizons per pair is 7M rows for no extra signal.
+    train_horizons: tuple[int, ...] = (1, 2, 3, 5, 7, 10, 14, 18, 21, 25, 30)
+    #: Check-ins before the cutoff used for training. Longer is not always
+    #: better - the regime drifts - so this is an experiment knob.
+    train_window_days: int = 540
+    max_train_rows: int = 900_000
+    #: Trees for the ablation ladder. Fewer than the champion uses: the ladder
+    #: compares feature sets, and nine full-size fits per fold buys nothing.
+    ablation_params: dict[str, Any] = field(default_factory=lambda: {"n_estimators": 300})
+    #: Check-in days in the historical window used for the stability snapshots.
+    stability_window_days: int = 30
     #: Quantile edges for the demand-bucket error breakdown.
     demand_bucket_quantiles: tuple[float, ...] = (0.0, 0.5, 0.75, 0.9, 0.99, 1.0)
 

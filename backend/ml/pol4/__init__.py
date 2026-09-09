@@ -15,23 +15,43 @@ check-in. At any cutoff C the pair is therefore only *partially* observed:
     final_demand   = observed_demand(C) + remaining_pickup(C)
 
 This package owns that formulation end to end - loading, cutoff-safe pickup
-curves, the baseline, the backtest, and the submission file. It deliberately
-does not go through `ml/contract.py`, because a `DataContract` has exactly one
-timestamp field and no way to express a forecast that is already half-observed.
+curves, the baseline, features, the remaining-demand model, the backtest,
+forecast stability and the submission file. It deliberately does not go through
+`ml/contract.py`, because a `DataContract` has exactly one timestamp field and
+no way to express a forecast that is already half-observed.
+
+    loader      the three CSVs, validated, events intact
+    pickup      completion curves, city -> province -> global, cutoff-safe
+    baseline    observed / expected_completion_fraction  (the Phase 1 champion)
+    features    (pair x days_to_checkin) matrices; a feature at horizon h can
+                only read columns >= h, which makes cutoff safety structural
+    dataset     supervised frames: target is remaining = final - observed
+    models      LightGBM / CatBoost on remaining demand
+    champion    the selected configuration, fitted and applied
+    calibration bias correction - built, measured, and rejected on WAPE
+    backtest    pseudo-competition folds
+    experiments the ablation harness that decided all of the above
+    stability   D-30 -> D-1 forecast snapshots
+    submission  the 9,630-row grid, results.csv, and a loud validator
 """
+from .baseline import PickupBaseline
+from .calibration import Calibrator
+from .champion import ChampionSpec, FittedChampion
 from .config import Pol4Config
 from .loader import Pol4Data, load_pol4
 from .pickup import PickupCurves
-from .baseline import PickupBaseline
-from .submission import build_submission, validate_submission, SubmissionError
+from .submission import SubmissionError, build_submission, validate_submission
 
 __all__ = [
+    "Calibrator",
+    "ChampionSpec",
+    "FittedChampion",
     "Pol4Config",
     "Pol4Data",
-    "load_pol4",
-    "PickupCurves",
     "PickupBaseline",
-    "build_submission",
-    "validate_submission",
+    "PickupCurves",
     "SubmissionError",
+    "build_submission",
+    "load_pol4",
+    "validate_submission",
 ]

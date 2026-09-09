@@ -1,7 +1,8 @@
 {
-  "generated_at": "2026-09-09T10:12:49.251094+00:00",
+  "generated_at": "2026-09-09T11:46:32.605564+00:00",
   "python": "3.11.15",
   "seed": 42,
+  "model": "champion",
   "cutoff": "2025-11-21",
   "target_window": [
     "2025-11-22",
@@ -36,7 +37,7 @@
       }
     ]
   },
-  "model": {
+  "baseline": {
     "cutoff": "2025-11-21",
     "zero_observation_policy": "prior",
     "min_city_support": 20000,
@@ -60,16 +61,213 @@
     }
   },
   "backtest": {
-    "pooled_wape": 0.219991,
-    "pooled_normalised_bias": -0.149974,
+    "pooled_wape": 0.158148,
+    "pooled_normalised_bias": -0.098586,
     "folds": {
-      "2024-11-21": 0.206532,
-      "2025-05-21": 0.299927,
-      "2025-08-21": 0.197624,
-      "2025-09-22": 0.159896,
-      "2025-10-22": 0.21665
+      "2024-11-21": 0.12219,
+      "2025-05-21": 0.271148,
+      "2025-08-21": 0.127601,
+      "2025-09-22": 0.108677,
+      "2025-10-22": 0.118212
     },
-    "artefact": "artifacts/pol4/backtest_metrics.json"
+    "baseline_wape": 0.219991,
+    "relative_improvement": 0.2811,
+    "experiments": 4
+  },
+  "stability": {
+    "target_start": "2025-10-23",
+    "target_days": 30,
+    "anchor_cutoff": "2025-09-23",
+    "snapshot_horizons": [
+      30,
+      21,
+      14,
+      7,
+      3,
+      1
+    ],
+    "pairs": 9630,
+    "stability_score": 0.8443,
+    "mean_absolute_revision": 63.347,
+    "mean_relative_revision": 0.1557,
+    "convergence_rate": 0.7221,
+    "by_step": [
+      {
+        "step": "30->21",
+        "mean_absolute_revision": 75.4772,
+        "mean_relative_revision": 0.151,
+        "convergence_rate": 0.6634,
+        "n": 9630
+      },
+      {
+        "step": "21->14",
+        "mean_absolute_revision": 66.9177,
+        "mean_relative_revision": 0.1483,
+        "convergence_rate": 0.6804,
+        "n": 9630
+      },
+      {
+        "step": "14->7",
+        "mean_absolute_revision": 77.8212,
+        "mean_relative_revision": 0.1842,
+        "convergence_rate": 0.7202,
+        "n": 9630
+      },
+      {
+        "step": "7->3",
+        "mean_absolute_revision": 61.7227,
+        "mean_relative_revision": 0.156,
+        "convergence_rate": 0.7474,
+        "n": 9630
+      },
+      {
+        "step": "3->1",
+        "mean_absolute_revision": 34.7955,
+        "mean_relative_revision": 0.1389,
+        "convergence_rate": 0.7993,
+        "n": 9630
+      }
+    ],
+    "by_horizon": [
+      {
+        "horizon": 1,
+        "wape": 0.02,
+        "mean_prediction": 996.66
+      },
+      {
+        "horizon": 3,
+        "wape": 0.04,
+        "mean_prediction": 988.25
+      },
+      {
+        "horizon": 7,
+        "wape": 0.08,
+        "mean_prediction": 962.87
+      },
+      {
+        "horizon": 14,
+        "wape": 0.12,
+        "mean_prediction": 918.57
+      },
+      {
+        "horizon": 21,
+        "wape": 0.14,
+        "mean_prediction": 891.88
+      },
+      {
+        "horizon": 30,
+        "wape": 0.17,
+        "mean_prediction": 864.91
+      }
+    ]
+  },
+  "champion": {
+    "model": "lightgbm",
+    "horizon_bands": [
+      [
+        1,
+        14
+      ],
+      [
+        15,
+        30
+      ]
+    ],
+    "feature_groups": [
+      "base",
+      "pickup",
+      "velocity",
+      "activity",
+      "curve",
+      "calendar",
+      "city",
+      "market",
+      "province"
+    ],
+    "n_features": 66,
+    "log1p_target": true,
+    "params": {
+      "n_estimators": 600
+    },
+    "blend_weight_on_model": 1.0,
+    "training_rows": 900000,
+    "top_features": [
+      {
+        "feature": "city_hist_mean",
+        "importance": 0.25928669778733265,
+        "share": 0.2592866977873327
+      },
+      {
+        "feature": "city_weekday_mean",
+        "importance": 0.2294362904107911,
+        "share": 0.22943629041079114
+      },
+      {
+        "feature": "city_hist_p75",
+        "importance": 0.2198152763639077,
+        "share": 0.21981527636390774
+      },
+      {
+        "feature": "city_hist_p90",
+        "importance": 0.10739788877757946,
+        "share": 0.10739788877757947
+      },
+      {
+        "feature": "pickup_baseline_remaining",
+        "importance": 0.06712196043593163,
+        "share": 0.06712196043593165
+      },
+      {
+        "feature": "city_hist_median",
+        "importance": 0.022856585895685202,
+        "share": 0.022856585895685205
+      },
+      {
+        "feature": "city_code",
+        "importance": 0.021523264187862098,
+        "share": 0.0215232641878621
+      },
+      {
+        "feature": "city_volatility",
+        "importance": 0.015272079896062375,
+        "share": 0.015272079896062376
+      },
+      {
+        "feature": "pickup_baseline_prediction",
+        "importance": 0.007991790197274957,
+        "share": 0.007991790197274959
+      },
+      {
+        "feature": "city_hist_std",
+        "importance": 0.006811282525188458,
+        "share": 0.006811282525188459
+      },
+      {
+        "feature": "jalali_month",
+        "importance": 0.0056471162385828355,
+        "share": 0.005647116238582836
+      },
+      {
+        "feature": "expected_completion_fraction",
+        "importance": 0.0033127821688090377,
+        "share": 0.003312782168809038
+      },
+      {
+        "feature": "days_to_checkin",
+        "importance": 0.002777050136379744,
+        "share": 0.0027770501363797444
+      },
+      {
+        "feature": "is_weekend",
+        "importance": 0.002006308119719049,
+        "share": 0.0020063081197190494
+      },
+      {
+        "feature": "jalali_day",
+        "importance": 0.0019464370672506188,
+        "share": 0.001946437067250619
+      }
+    ]
   },
   "submission": {
     "valid": true,
@@ -78,27 +276,22 @@
     "dates": 30,
     "checkin_min": "2025-11-22",
     "checkin_max": "2025-12-21",
-    "total_predicted_demand": 7493215.0,
-    "rows_predicting_zero": 2537,
+    "total_predicted_demand": 8010957.0,
+    "rows_predicting_zero": 3040,
     "problems": [],
     "path": "/home/user/novo-pulse/artifacts/pol4/results.csv"
   },
   "inference": {
     "observed_total": 2686508.0,
-    "predicted_total": 7493322.894080576,
+    "predicted_total": 8010986.791277152,
     "pairs_with_no_observation": 4282,
     "cities_with_no_observation": 82,
-    "curve_source_counts": {
-      "province": 5130,
-      "city": 4500
-    },
     "cities_rounding_to_zero": {
-      "count": 74,
+      "count": 77,
       "median_historical_demand": 2.0,
-      "max_historical_demand": 391.0,
-      "median_unrounded_prediction": 0.07712765957446809,
-      "note": "these cities receive a positive prior; it rounds to zero because their measured demand is below half a search per night"
+      "median_unrounded_prediction": 3.491472498866913e-05,
+      "note": "these cities receive a positive prediction; it rounds to zero because their measured demand is below half a search per night"
     }
   },
-  "elapsed_seconds": 15.53
+  "elapsed_seconds": 444.87
 }

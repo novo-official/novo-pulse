@@ -20,7 +20,7 @@ METRIC  ?= wape
 .PHONY: help venv install install-optional migrate seed seed-data-only train demo dev \
         backend frontend frontend-install test test-backend test-frontend lint report \
         clean download-models docker-up docker-down check profile validate audit e2e \
-        pol4 pol4-submission test-pol4
+        pol4 pol4-baseline pol4-ablation pol4-submission test-pol4
 
 help: ## Show this help
 	@grep -hE '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -45,15 +45,20 @@ frontend-install: ## Install frontend dependencies
 # The competition pipeline. Separate from `train` on purpose: it models the
 # two-clock (log_date / checkin) problem and writes the submission file, while
 # `train` runs the generic single-axis platform on whatever the contract says.
-pol4: ## Pol 4: pickup curves + backtest + results.csv (needs data/raw/pol4/)
+pol4: ## Pol 4: champion backtest + stability + results.csv (needs data/raw/pol4/)
 	PYTHONPATH=backend $(PY) -m ml.pol4.pipeline
 
+pol4-baseline: ## Pol 4: the pickup baseline alone - fast, and the fallback
+	PYTHONPATH=backend $(PY) -m ml.pol4.pipeline --model baseline
+
+pol4-ablation: ## Pol 4: rerun the full feature ladder and rewrite experiments.csv
+	PYTHONPATH=backend $(PY) -m ml.pol4.pipeline --ablation
+
 pol4-submission: ## Pol 4: skip the backtest, just regenerate results.csv
-	PYTHONPATH=backend $(PY) -m ml.pol4.pipeline --skip-backtest
+	PYTHONPATH=backend $(PY) -m ml.pol4.pipeline --skip-backtest --skip-stability
 
 test-pol4: ## Run only the Pol 4 test suite
-	$(PY) -m pytest backend/tests/test_pol4.py backend/tests/test_pol4_leakage.py \
-	 backend/tests/test_pol4_competition.py -q
+	$(PY) -m pytest backend/tests -q -k pol4
 
 # ------------------------------------------------------------- database
 migrate: ## Apply database migrations

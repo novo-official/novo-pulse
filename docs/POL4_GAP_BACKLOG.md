@@ -47,6 +47,54 @@ the delta.
 
 ---
 
+## 0b. Phase 2 status (accuracy optimisation, 2026-09-09)
+
+Champion: **LightGBM on remaining demand, log1p target, 66 features, two
+horizon bands (1-14, 15-30)** — pooled walk-forward WAPE **0.1581**, against the
+Phase 1 baseline's 0.2200 (**28.1% relative improvement**). Wins all five folds
+against the baseline.
+
+| ID | Item | Was | Now | Evidence |
+|---|---|---|---|---|
+| M-03 / E5 | log1p target tested, not assumed | 🔴 auto-applied | ✅ A/B'd and **accepted** | 0.1692 → 0.1618; top-1% WAPE 0.1681 → 0.1544; peak bias -0.119 → -0.100 |
+| P1-1 | GBDT on remaining demand | ❌ | ✅ | `ml/pol4/models.py`, `ml/pol4/champion.py` |
+| P1-2 | Bias calibration | ❌ | ✅ built, **rejected** | every variant neutral-to-worse on WAPE; see below |
+| E-04 | WAPE by demand bucket / high-demand slice | ❌ | ✅ | `backtest_metrics_phase2.json` → `high_demand`, `by_demand_bucket` |
+| ST-01 | Forecast stability D-30 → D-1 | ❌ | ✅ | `ml/pol4/stability.py`, `artifacts/pol4/stability.parquet` |
+| T-01 | `pickup_surprise` / velocity / acceleration | ❌ | ✅ | `ml/pol4/features.py` |
+| E7 | Clustering | — | ✅ still **not used** | global model + `city_code` categorical shares information with no aggregation penalty |
+| E9 | Ensemble | — | ✅ tested, **rejected** | leave-one-fold-out alpha = 1.0 on 4 of 5 folds; blend 0.1623 vs model 0.1618 |
+| — | Feature ablation | ❌ | ✅ | nine-stage ladder, `artifacts/pol4/experiments.csv` |
+
+**Rejected with evidence** (recorded so nobody re-runs them):
+
+| Change | WAPE | Verdict |
+|---|---:|---|
+| Global multiplicative calibration | 0.2289 (+0.009) | rejected |
+| Horizon-bucket calibration | 0.2204 (+0.000) | rejected — neutral |
+| Shrunk horizon calibration | 0.2206 (+0.001) | rejected |
+| Scaling the *total* not the remainder | 0.2426 (+0.023) | rejected |
+| Model/baseline ensemble | 0.1623 vs 0.1618 | rejected |
+| CatBoost (MAE), comparable budget | 0.1835 | rejected — worse and slower |
+| 3- and 4-band horizon splits | 0.1574 / 0.1563 | rejected — best pooled, but 7.4% / 10.5% worse on the Azar seasonal analogue |
+
+Why calibration fails: under a sum-of-absolute-errors metric on a heavy-tailed
+target the optimal forecast sits near the conditional **median**, so some
+negative bias is correct rather than a defect. The fitted factors also disagree
+across folds (0.82 to 1.15) — a regime effect, not a fixed offset.
+
+**Still open after Phase 2:**
+
+| ID | Item | Note |
+|---|---|---|
+| — | The 2025-05-21 regime fold (0.2756) | Diagnosed: demand 1.50× the prior 30 days, only 79% of expected pickup observed by cutoff. Error concentrates at 22-30 days. |
+| — | 22-30 day horizon (WAPE 0.282) | Still the largest error source; ~44% of pooled absolute error |
+| E-05 | Folds indexed by forecast issue point | Stability now covers this; folds still step by window |
+| DOC-01/02 | Technical report + PPTX | Phase 3 |
+| UI-* | Frontend cleanup and rebuild | Phase 3 |
+
+---
+
 ## 1. Status matrix
 
 | ID | Area | Requirement | Status | Evidence | File / Function | Problem | Impact | Recommended action | Pri |

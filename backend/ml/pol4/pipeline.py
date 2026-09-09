@@ -4,10 +4,16 @@
 
 Runs, in order:
 
-    load + validate -> fit pickup curves at the competition cutoff
-                    -> pseudo-competition backtest across historical cutoffs
-                    -> final Azar 1404 inference from evaluation.csv
-                    -> write results.csv -> validate it, loudly
+    load + validate  -> pickup curves at the competition cutoff
+                     -> walk-forward comparison: champion vs baseline vs
+                        calibration (and the full feature ladder with --ablation)
+                     -> forecast stability across the D-30 -> D-1 ladder
+                     -> final Azar 1404 inference from evaluation.csv
+                     -> write results.csv -> validate it, loudly
+
+`--model baseline` runs the Phase 1 pickup projection alone: fifteen seconds,
+no model fitting, and the fallback if anything about the champion misbehaves on
+the day.
 
 Nothing here reads a log date after the cutoff it is standing at, and no source
 file has to be edited to run it.
@@ -29,9 +35,20 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from . import stability as stability_module
 from .backtest import run_backtest
 from .baseline import PickupBaseline
+from .champion import ChampionSpec, FittedChampion
 from .config import Pol4Config
+from .experiments import (
+    ExperimentResult,
+    ExperimentSpec,
+    baseline_predictor,
+    calibrated_predictor,
+    gbdt_predictor,
+    run_suite,
+    staged_groups,
+)
 from .loader import CITY, load_pol4
 from .submission import (
     build_grid,
@@ -67,8 +84,22 @@ def _json_ready(value: Any) -> Any:
     return value
 
 
-def run(config: Pol4Config | None = None, skip_backtest: bool = False) -> dict[str, Any]:
+def run(
+    config: Pol4Config | None = None,
+    *,
+    model: str = "champion",
+    ablation: bool = False,
+    skip_backtest: bool = False,
+    skip_stability: bool = False,
+    spec: ChampionSpec | None = None,
+) -> dict[str, Any]:
+    """Load, evaluate, forecast Azar 1404, write and validate results.csv.
+
+    `model="baseline"` runs the Phase 1 pickup projection alone - fast, and the
+    fallback if anything about the champion looks wrong on the day.
+    """
     config = config or Pol4Config()
+    spec = spec or ChampionSpec()
     set_seed(config.seed)
     started = time.perf_counter()
     config.artifacts_dir.mkdir(parents=True, exist_ok=True)
@@ -80,6 +111,7 @@ def run(config: Pol4Config | None = None, skip_backtest: bool = False) -> dict[s
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "python": platform.python_version(),
         "seed": config.seed,
+        "model": model,
         "cutoff": config.cutoff.date().isoformat(),
         "target_window": [
             config.target_start.date().isoformat(),
@@ -89,51 +121,82 @@ def run(config: Pol4Config | None = None, skip_backtest: bool = False) -> dict[s
     }
 
     # -- 2. pickup curves at the competition cutoff -------------------------
-    model = PickupBaseline.fit(data, config.cutoff, config)
-    curves_path = config.artifacts_dir / "pickup_curves.parquet"
-    model.curves.to_frame().to_parquet(curves_path, index=False)
-    summary["model"] = model.summary()
-    log.info("pickup curves written to %s", curves_path)
+    baseline = PickupBaseline.fit(data, config.cutoff, config)
+    baseline.curves.to_frame().to_parquet(
+        config.artifacts_dir / "pickup_curves.parquet", index=False
+    )
+    summary["baseline"] = baseline.summary()
 
     # -- 3. backtest --------------------------------------------------------
     if skip_backtest:
         summary["backtest"] = {"skipped": True}
-    else:
-        log.info("running the pseudo-competition backtest")
+    elif model == "baseline":
+        log.info("running the pickup-baseline backtest")
         backtest = run_backtest(data, config)
-        metrics_path = config.artifacts_dir / "backtest_metrics.json"
-        metrics_path.write_text(
+        (config.artifacts_dir / "backtest_metrics.json").write_text(
             json.dumps(_json_ready(backtest), indent=2, ensure_ascii=False), encoding="utf-8"
         )
         summary["backtest"] = {
             "pooled_wape": backtest["pooled"]["overall"]["wape"],
             "pooled_normalised_bias": backtest["pooled"]["overall"]["normalised_bias"],
-            "folds": {
-                fold["cutoff"]: fold["overall"]["wape"] for fold in backtest["folds"]
-            },
-            "artefact": str(metrics_path.relative_to(config.artifacts_dir.parents[1])),
+            "folds": {f["cutoff"]: f["overall"]["wape"] for f in backtest["folds"]},
         }
-        log.info("backtest written to %s", metrics_path)
+    else:
+        specs = _experiment_specs(config, spec, ablation)
+        log.info(
+            "scoring %d predictor(s) across %d walk-forward folds",
+            len(specs),
+            len(config.backtest_cutoffs),
+        )
+        results = run_suite(data, config, specs)
+        experiments = _write_experiments(results, config)
+        payload = _write_phase2_backtest(results, config)
 
-    # -- 4. final inference -------------------------------------------------
+        champion_scores = payload["champion"]
+        summary["backtest"] = {
+            "pooled_wape": champion_scores["pooled"]["wape"],
+            "pooled_normalised_bias": champion_scores["pooled"]["normalised_bias"],
+            "folds": {k: v["wape"] for k, v in champion_scores["folds"].items()},
+            "baseline_wape": payload["baseline"]["pooled"]["wape"],
+            "relative_improvement": round(
+                1 - champion_scores["pooled"]["wape"] / payload["baseline"]["pooled"]["wape"], 4
+            ),
+            "experiments": experiments["n_experiments"],
+        }
+
+    # -- 4. stability -------------------------------------------------------
+    if skip_stability or model == "baseline":
+        summary["stability"] = {"skipped": True}
+    else:
+        log.info("measuring forecast stability across the D-30 -> D-1 ladder")
+        summary["stability"] = _write_stability(data, spec, config)
+
+    # -- 5. final inference at the competition cutoff -----------------------
     target_dates = config.target_dates()
-    grid = build_grid(data, config.cutoff, target_dates)
-    predictions = model.predict(grid)
+    if model == "baseline":
+        predictions = baseline.predict(build_grid(data, config.cutoff, target_dates))
+        summary["champion"] = {"model": "pickup_baseline", **baseline.summary()}
+    else:
+        fitted = FittedChampion.fit(data, config.cutoff, spec, config)
+        predictions = fitted.predict(target_dates, data)
+        importance = fitted.importance()
+        importance.to_json(
+            config.artifacts_dir / "feature_importance.json", orient="records", indent=2
+        )
+        summary["champion"] = {
+            **spec.describe(),
+            "training_rows": fitted.training_rows,
+            "top_features": importance.head(15).to_dict(orient="records"),
+        }
 
-    # -- 5. results.csv -----------------------------------------------------
+    # -- 6. results.csv, then validate it -----------------------------------
     submission = build_submission(predictions)
     results_path = write_submission(submission, config.artifacts_dir / "results.csv")
+    report = validate_submission(submission, data.city_codes, config, raise_on_error=True)
 
-    # -- 6. validate --------------------------------------------------------
-    report = validate_submission(
-        submission, data.city_codes, config, raise_on_error=True
-    )
     summary["submission"] = report.as_dict()
     summary["submission"]["path"] = str(results_path)
-    # Some cities round to zero across the whole window. That is a measured
-    # result, not an assumption: each one still receives a positive prior, but
-    # its historical demand is so small that the expectation lands below half a
-    # search per night. Reporting their support here keeps that auditable.
+
     city_totals = submission.groupby("cluster_code")["predicted_demand"].sum()
     silent = city_totals.index[city_totals == 0]
     historical = data.search.groupby(CITY)["search_count"].sum()
@@ -145,48 +208,184 @@ def run(config: Pol4Config | None = None, skip_backtest: bool = False) -> dict[s
         "cities_with_no_observation": int(
             predictions.groupby(CITY)["observed"].sum().le(0).sum()
         ),
-        "curve_source_counts": predictions["curve_source"].value_counts().to_dict(),
+        # Some cities round to zero across the whole window. That is a measured
+        # result, not an assumption: each still receives a positive prediction,
+        # but its historical demand is below half a search per night.
         "cities_rounding_to_zero": {
             "count": int(len(silent)),
-            "median_historical_demand": float(
-                historical.reindex(silent).fillna(0.0).median()
-            )
+            "median_historical_demand": float(historical.reindex(silent).fillna(0.0).median())
             if len(silent)
             else None,
-            "max_historical_demand": float(
-                historical.reindex(silent).fillna(0.0).max()
-            )
-            if len(silent)
-            else None,
-            "median_unrounded_prediction": float(
-                unrounded.reindex(silent).fillna(0.0).median()
-            )
+            "median_unrounded_prediction": float(unrounded.reindex(silent).fillna(0.0).median())
             if len(silent)
             else None,
             "note": (
-                "these cities receive a positive prior; it rounds to zero because "
+                "these cities receive a positive prediction; it rounds to zero because "
                 "their measured demand is below half a search per night"
             ),
         },
     }
     summary["elapsed_seconds"] = round(time.perf_counter() - started, 2)
 
-    summary_path = config.artifacts_dir / "run_summary.json"
-    summary_path.write_text(
+    (config.artifacts_dir / "run_summary.json").write_text(
         json.dumps(_json_ready(summary), indent=2, ensure_ascii=False), encoding="utf-8"
     )
     log.info("results.csv written to %s (valid=%s)", results_path, report.valid)
     return summary
 
 
+# ------------------------------------------------------------------ phase 2
+def _experiment_specs(config: Pol4Config, spec: ChampionSpec, ablation: bool) -> list:
+    """The comparison every accepted change had to survive.
+
+    The baseline and both calibration variants always run, because the champion
+    has to be shown beating them rather than asserted to. The full feature
+    ladder is opt-in: it is the expensive part and its conclusions are already
+    recorded in experiments.csv.
+    """
+    specs = [
+        ExperimentSpec("E0 pickup baseline", "baseline", baseline_predictor),
+        ExperimentSpec(
+            "E1 calibrated baseline (global)", "calibration", calibrated_predictor("global")
+        ),
+        ExperimentSpec(
+            "E1 calibrated baseline (horizon, shrunk)",
+            "calibration",
+            calibrated_predictor("horizon_shrunk"),
+        ),
+    ]
+    if ablation:
+        for index, (name, groups) in enumerate(staged_groups(), start=2):
+            specs.append(
+                ExperimentSpec(
+                    f"E{index} +{name}",
+                    "ablation",
+                    gbdt_predictor("lightgbm", groups, params=config.ablation_params),
+                    {"model": "lightgbm", "groups": groups},
+                )
+            )
+    specs.append(
+        ExperimentSpec(
+            f"CHAMPION {spec.kind}",
+            "champion",
+            gbdt_predictor(
+                spec.kind,
+                spec.groups,
+                log1p=spec.log1p,
+                params=spec.params,
+                calibration="none",
+                blend=None if spec.blend >= 1.0 else spec.blend,
+                bands=spec.bands,
+            ),
+            {"model": spec.kind, "groups": spec.groups},
+        )
+    )
+    return specs
+
+
+def _write_experiments(results: list[ExperimentResult], config: Pol4Config) -> dict[str, Any]:
+    rows = pd.DataFrame([r.row() for r in results]).sort_values("wape", ignore_index=True)
+    rows.to_csv(config.artifacts_dir / "experiments.csv", index=False)
+
+    best = min(results, key=lambda r: r.pooled["wape"])
+    baseline = next((r for r in results if r.name.startswith("E0")), None)
+    summary = {
+        "n_experiments": len(results),
+        "best": best.name,
+        "best_wape": best.pooled["wape"],
+        "baseline_wape": baseline.pooled["wape"] if baseline else None,
+        "relative_improvement": (
+            round(1 - best.pooled["wape"] / baseline.pooled["wape"], 4) if baseline else None
+        ),
+        "experiments": [
+            {
+                "name": r.name,
+                "stage": r.stage,
+                "pooled": r.pooled,
+                "folds": r.folds,
+                "horizon_bucket": r.horizon,
+                "runtime_seconds": round(r.runtime_seconds, 1),
+                "meta": {k: list(v) if isinstance(v, tuple) else v for k, v in r.meta.items()},
+            }
+            for r in results
+        ],
+    }
+    (config.artifacts_dir / "experiment_summary.json").write_text(
+        json.dumps(_json_ready(summary), indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+    return summary
+
+
+def _write_phase2_backtest(
+    results: list[ExperimentResult], config: Pol4Config
+) -> dict[str, Any]:
+    champion = next(r for r in results if r.stage == "champion")
+    baseline = next(r for r in results if r.name.startswith("E0"))
+    payload = {
+        "config": {
+            "cutoffs": list(config.backtest_cutoffs),
+            "target_days": config.target_days,
+            "train_horizons": list(config.train_horizons),
+            "train_window_days": config.train_window_days,
+            "max_train_rows": config.max_train_rows,
+        },
+        "champion": {
+            "name": champion.name,
+            "pooled": champion.pooled,
+            "folds": champion.folds,
+            **champion.detail,
+        },
+        "baseline": {
+            "name": baseline.name,
+            "pooled": baseline.pooled,
+            "folds": baseline.folds,
+            **baseline.detail,
+        },
+    }
+    (config.artifacts_dir / "backtest_metrics_phase2.json").write_text(
+        json.dumps(_json_ready(payload), indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+    return payload
+
+
+def _write_stability(
+    data, spec: ChampionSpec, config: Pol4Config
+) -> dict[str, Any]:
+    """Snapshot the champion across the D-30 -> D-1 ladder on a historical window."""
+    target_start = config.cutoff - pd.Timedelta(days=config.stability_window_days - 1)
+    anchor = target_start - pd.Timedelta(days=max(stability_module.SNAPSHOT_HORIZONS))
+    model, baseline = stability_module.fit_snapshot_model(
+        data, anchor, spec.groups, spec.kind, spec.params, spec.log1p, config
+    )
+    report = stability_module.analyse(
+        data,
+        target_start,
+        config.stability_window_days,
+        stability_module.model_snapshot(model, spec.groups, baseline),
+        config,
+    )
+    report.snapshots.to_parquet(config.artifacts_dir / "stability.parquet", index=False)
+    return report.summary
+
 def build_parser() -> argparse.ArgumentParser:
     defaults = Pol4Config()
     parser = argparse.ArgumentParser(
         prog="python -m ml.pol4.pipeline",
-        description="Pol 4 demand forecasting: pickup baseline, backtest, results.csv",
+        description="Pol 4 demand forecasting: backtest, champion model, results.csv",
     )
     parser.add_argument("--raw-dir", type=Path, default=defaults.raw_dir)
     parser.add_argument("--artifacts-dir", type=Path, default=defaults.artifacts_dir)
+    parser.add_argument(
+        "--model",
+        choices=("champion", "baseline"),
+        default="champion",
+        help="champion = the Phase 2 remaining-demand model; baseline = the pickup projection alone",
+    )
+    parser.add_argument(
+        "--ablation",
+        action="store_true",
+        help="also run the full feature ladder and rewrite experiments.csv (slow)",
+    )
     parser.add_argument(
         "--zero-policy",
         choices=("prior", "zero"),
@@ -194,10 +393,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="what to predict when a pair has no observed searches at the cutoff",
     )
     parser.add_argument("--min-city-support", type=int, default=defaults.min_city_support)
+    parser.add_argument("--max-train-rows", type=int, default=defaults.max_train_rows)
     parser.add_argument("--seed", type=int, default=defaults.seed)
-    parser.add_argument(
-        "--skip-backtest", action="store_true", help="final inference only (faster)"
-    )
+    parser.add_argument("--skip-backtest", action="store_true", help="final inference only")
+    parser.add_argument("--skip-stability", action="store_true")
     parser.add_argument("--quiet", action="store_true")
     return parser
 
@@ -215,20 +414,35 @@ def main(argv: list[str] | None = None) -> int:
         artifacts_dir=args.artifacts_dir,
         zero_observation_policy=args.zero_policy,
         min_city_support=args.min_city_support,
+        max_train_rows=args.max_train_rows,
         seed=args.seed,
     )
-    summary = run(config, skip_backtest=args.skip_backtest)
+    summary = run(
+        config,
+        model=args.model,
+        ablation=args.ablation,
+        skip_backtest=args.skip_backtest,
+        skip_stability=args.skip_stability,
+    )
 
     backtest = summary.get("backtest", {})
+    stability = summary.get("stability", {})
+    submission = summary["submission"]
     print("\nPOL 4 PIPELINE")
+    print(f"  model                 {summary['model']}")
     print(f"  cutoff                {summary['cutoff']}")
     print(f"  target window         {summary['target_window'][0]} .. {summary['target_window'][1]}")
     if not backtest.get("skipped"):
         print(f"  backtest WAPE         {backtest['pooled_wape']:.4f}")
         print(f"  normalised bias       {backtest['pooled_normalised_bias']:+.4f}")
+        if "baseline_wape" in backtest:
+            print(f"  pickup baseline WAPE  {backtest['baseline_wape']:.4f}"
+                  f"   (improvement {backtest['relative_improvement']:.1%})")
         for cutoff, wape in backtest["folds"].items():
             print(f"    fold {cutoff}     {wape:.4f}")
-    submission = summary["submission"]
+    if not stability.get("skipped"):
+        print(f"  stability score       {stability['stability_score']:.4f}"
+              f"   (convergence {stability['convergence_rate']:.1%})")
     print(f"  results.csv           {submission['path']}")
     print(f"  rows / cities / dates {submission['rows']} / {submission['cities']} / {submission['dates']}")
     print(f"  total demand          {submission['total_predicted_demand']:,.0f}")

@@ -1,0 +1,434 @@
+{
+  "n_experiments": 4,
+  "best": "CHAMPION lightgbm",
+  "best_wape": 0.158148,
+  "baseline_wape": 0.219991,
+  "relative_improvement": 0.2811,
+  "experiments": [
+    {
+      "name": "E0 pickup baseline",
+      "stage": "baseline",
+      "pooled": {
+        "n": 48150,
+        "actual_total": 64441140.0,
+        "predicted_total": 54776670.79,
+        "wape": 0.219991,
+        "mae": 294.4226,
+        "normalised_bias": -0.149974
+      },
+      "folds": {
+        "2024-11-21": {
+          "n": 9630,
+          "actual_total": 6787514.0,
+          "predicted_total": 5960847.67,
+          "wape": 0.206532,
+          "mae": 145.5702,
+          "normalised_bias": -0.121792
+        },
+        "2025-05-21": {
+          "n": 9630,
+          "actual_total": 16216851.0,
+          "predicted_total": 12492354.61,
+          "wape": 0.299927,
+          "mae": 505.0751,
+          "normalised_bias": -0.229668
+        },
+        "2025-08-21": {
+          "n": 9630,
+          "actual_total": 19510897.0,
+          "predicted_total": 16450449.29,
+          "wape": 0.197624,
+          "mae": 400.3974,
+          "normalised_bias": -0.156858
+        },
+        "2025-09-22": {
+          "n": 9630,
+          "actual_total": 12251705.0,
+          "predicted_total": 11872681.9,
+          "wape": 0.159896,
+          "mae": 203.4266,
+          "normalised_bias": -0.030936
+        },
+        "2025-10-22": {
+          "n": 9630,
+          "actual_total": 9674173.0,
+          "predicted_total": 8000337.31,
+          "wape": 0.21665,
+          "mae": 217.6439,
+          "normalised_bias": -0.173021
+        }
+      },
+      "horizon_bucket": [
+        {
+          "key": "1-3",
+          "n": 4815,
+          "actual_total": 6209526.0,
+          "predicted_total": 6073401.58,
+          "wape": 0.039717,
+          "mae": 51.2199,
+          "normalised_bias": -0.021922
+        },
+        {
+          "key": "4-7",
+          "n": 6420,
+          "actual_total": 6770344.0,
+          "predicted_total": 6695790.87,
+          "wape": 0.100363,
+          "mae": 105.8399,
+          "normalised_bias": -0.011012
+        },
+        {
+          "key": "8-14",
+          "n": 11235,
+          "actual_total": 15110234.0,
+          "predicted_total": 13231334.97,
+          "wape": 0.1664,
+          "mae": 223.7961,
+          "normalised_bias": -0.124346
+        },
+        {
+          "key": "15-21",
+          "n": 11235,
+          "actual_total": 16241922.0,
+          "predicted_total": 13679778.27,
+          "wape": 0.219224,
+          "mae": 316.9225,
+          "normalised_bias": -0.157749
+        },
+        {
+          "key": "22-30",
+          "n": 14445,
+          "actual_total": 20109114.0,
+          "predicted_total": 15096365.1,
+          "wape": 0.356821,
+          "mae": 496.7366,
+          "normalised_bias": -0.249277
+        }
+      ],
+      "runtime_seconds": 0.0,
+      "meta": {}
+    },
+    {
+      "name": "E1 calibrated baseline (global)",
+      "stage": "calibration",
+      "pooled": {
+        "n": 48150,
+        "actual_total": 64441140.0,
+        "predicted_total": 55882944.6,
+        "wape": 0.228945,
+        "mae": 306.4064,
+        "normalised_bias": -0.132806
+      },
+      "folds": {
+        "2024-11-21": {
+          "n": 9630,
+          "actual_total": 6787514.0,
+          "predicted_total": 6483722.97,
+          "wape": 0.189871,
+          "mae": 133.8267,
+          "normalised_bias": -0.044757
+        },
+        "2025-05-21": {
+          "n": 9630,
+          "actual_total": 16216851.0,
+          "predicted_total": 10896535.16,
+          "wape": 0.353096,
+          "mae": 594.6112,
+          "normalised_bias": -0.328073
+        },
+        "2025-08-21": {
+          "n": 9630,
+          "actual_total": 19510897.0,
+          "predicted_total": 16917395.18,
+          "wape": 0.185888,
+          "mae": 376.6197,
+          "normalised_bias": -0.132926
+        },
+        "2025-09-22": {
+          "n": 9630,
+          "actual_total": 12251705.0,
+          "predicted_total": 13059143.94,
+          "wape": 0.185062,
+          "mae": 235.4439,
+          "normalised_bias": 0.065904
+        },
+        "2025-10-22": {
+          "n": 9630,
+          "actual_total": 9674173.0,
+          "predicted_total": 8526147.35,
+          "wape": 0.190656,
+          "mae": 191.5307,
+          "normalised_bias": -0.118669
+        }
+      },
+      "horizon_bucket": [
+        {
+          "key": "1-3",
+          "n": 4815,
+          "actual_total": 6209526.0,
+          "predicted_total": 6137642.89,
+          "wape": 0.038753,
+          "mae": 49.9767,
+          "normalised_bias": -0.011576
+        },
+        {
+          "key": "4-7",
+          "n": 6420,
+          "actual_total": 6770344.0,
+          "predicted_total": 6857929.14,
+          "wape": 0.116411,
+          "mae": 122.7639,
+          "normalised_bias": 0.012937
+        },
+        {
+          "key": "8-14",
+          "n": 11235,
+          "actual_total": 15110234.0,
+          "predicted_total": 13445496.37,
+          "wape": 0.18135,
+          "mae": 243.9021,
+          "normalised_bias": -0.110173
+        },
+        {
+          "key": "15-21",
+          "n": 11235,
+          "actual_total": 16241922.0,
+          "predicted_total": 13992504.66,
+          "wape": 0.220316,
+          "mae": 318.5009,
+          "normalised_bias": -0.138495
+        },
+        {
+          "key": "22-30",
+          "n": 14445,
+          "actual_total": 20109114.0,
+          "predicted_total": 15449371.54,
+          "wape": 0.368295,
+          "mae": 512.7096,
+          "normalised_bias": -0.231723
+        }
+      ],
+      "runtime_seconds": 0.0,
+      "meta": {}
+    },
+    {
+      "name": "E1 calibrated baseline (horizon, shrunk)",
+      "stage": "calibration",
+      "pooled": {
+        "n": 48150,
+        "actual_total": 64441140.0,
+        "predicted_total": 56721307.16,
+        "wape": 0.220576,
+        "mae": 295.2061,
+        "normalised_bias": -0.119797
+      },
+      "folds": {
+        "2024-11-21": {
+          "n": 9630,
+          "actual_total": 6787514.0,
+          "predicted_total": 6442940.01,
+          "wape": 0.186245,
+          "mae": 131.2708,
+          "normalised_bias": -0.050766
+        },
+        "2025-05-21": {
+          "n": 9630,
+          "actual_total": 16216851.0,
+          "predicted_total": 11623546.73,
+          "wape": 0.323531,
+          "mae": 544.8245,
+          "normalised_bias": -0.283243
+        },
+        "2025-08-21": {
+          "n": 9630,
+          "actual_total": 19510897.0,
+          "predicted_total": 16951678.02,
+          "wape": 0.183532,
+          "mae": 371.8456,
+          "normalised_bias": -0.131169
+        },
+        "2025-09-22": {
+          "n": 9630,
+          "actual_total": 12251705.0,
+          "predicted_total": 13139670.25,
+          "wape": 0.188904,
+          "mae": 240.3315,
+          "normalised_bias": 0.072477
+        },
+        "2025-10-22": {
+          "n": 9630,
+          "actual_total": 9674173.0,
+          "predicted_total": 8563472.15,
+          "wape": 0.186901,
+          "mae": 187.758,
+          "normalised_bias": -0.114811
+        }
+      },
+      "horizon_bucket": [
+        {
+          "key": "1-3",
+          "n": 4815,
+          "actual_total": 6209526.0,
+          "predicted_total": 6035070.92,
+          "wape": 0.041659,
+          "mae": 53.7242,
+          "normalised_bias": -0.028095
+        },
+        {
+          "key": "4-7",
+          "n": 6420,
+          "actual_total": 6770344.0,
+          "predicted_total": 6526351.68,
+          "wape": 0.108123,
+          "mae": 114.0233,
+          "normalised_bias": -0.036038
+        },
+        {
+          "key": "8-14",
+          "n": 11235,
+          "actual_total": 15110234.0,
+          "predicted_total": 13926485.59,
+          "wape": 0.154671,
+          "mae": 208.0211,
+          "normalised_bias": -0.078341
+        },
+        {
+          "key": "15-21",
+          "n": 11235,
+          "actual_total": 16241922.0,
+          "predicted_total": 14307268.08,
+          "wape": 0.212962,
+          "mae": 307.869,
+          "normalised_bias": -0.119115
+        },
+        {
+          "key": "22-30",
+          "n": 14445,
+          "actual_total": 20109114.0,
+          "predicted_total": 15926130.9,
+          "wape": 0.369357,
+          "mae": 514.1873,
+          "normalised_bias": -0.208014
+        }
+      ],
+      "runtime_seconds": 0.0,
+      "meta": {}
+    },
+    {
+      "name": "CHAMPION lightgbm",
+      "stage": "champion",
+      "pooled": {
+        "n": 48150,
+        "actual_total": 64441140.0,
+        "predicted_total": 58088168.06,
+        "wape": 0.158148,
+        "mae": 211.6558,
+        "normalised_bias": -0.098586
+      },
+      "folds": {
+        "2024-11-21": {
+          "n": 9630,
+          "actual_total": 6787514.0,
+          "predicted_total": 6837346.28,
+          "wape": 0.12219,
+          "mae": 86.1235,
+          "normalised_bias": 0.007342
+        },
+        "2025-05-21": {
+          "n": 9630,
+          "actual_total": 16216851.0,
+          "predicted_total": 12596538.03,
+          "wape": 0.271148,
+          "mae": 456.6116,
+          "normalised_bias": -0.223244
+        },
+        "2025-08-21": {
+          "n": 9630,
+          "actual_total": 19510897.0,
+          "predicted_total": 18708455.78,
+          "wape": 0.127601,
+          "mae": 258.5263,
+          "normalised_bias": -0.041128
+        },
+        "2025-09-22": {
+          "n": 9630,
+          "actual_total": 12251705.0,
+          "predicted_total": 11220469.63,
+          "wape": 0.108677,
+          "mae": 138.2638,
+          "normalised_bias": -0.084171
+        },
+        "2025-10-22": {
+          "n": 9630,
+          "actual_total": 9674173.0,
+          "predicted_total": 8725358.34,
+          "wape": 0.118212,
+          "mae": 118.7538,
+          "normalised_bias": -0.098077
+        }
+      },
+      "horizon_bucket": [
+        {
+          "key": "1-3",
+          "n": 4815,
+          "actual_total": 6209526.0,
+          "predicted_total": 6142647.96,
+          "wape": 0.029269,
+          "mae": 37.7464,
+          "normalised_bias": -0.01077
+        },
+        {
+          "key": "4-7",
+          "n": 6420,
+          "actual_total": 6770344.0,
+          "predicted_total": 6694682.66,
+          "wape": 0.063576,
+          "mae": 67.0454,
+          "normalised_bias": -0.011175
+        },
+        {
+          "key": "8-14",
+          "n": 11235,
+          "actual_total": 15110234.0,
+          "predicted_total": 14147572.46,
+          "wape": 0.113804,
+          "mae": 153.0585,
+          "normalised_bias": -0.063709
+        },
+        {
+          "key": "15-21",
+          "n": 11235,
+          "actual_total": 16241922.0,
+          "predicted_total": 15329779.31,
+          "wape": 0.13901,
+          "mae": 200.9609,
+          "normalised_bias": -0.05616
+        },
+        {
+          "key": "22-30",
+          "n": 14445,
+          "actual_total": 20109114.0,
+          "predicted_total": 15773485.67,
+          "wape": 0.278562,
+          "mae": 387.7908,
+          "normalised_bias": -0.215605
+        }
+      ],
+      "runtime_seconds": 291.3,
+      "meta": {
+        "model": "lightgbm",
+        "groups": [
+          "base",
+          "pickup",
+          "velocity",
+          "activity",
+          "curve",
+          "calendar",
+          "city",
+          "market",
+          "province"
+        ]
+      }
+    }
+  ]
+}

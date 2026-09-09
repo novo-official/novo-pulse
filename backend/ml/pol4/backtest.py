@@ -108,10 +108,16 @@ class FoldResult:
         return payload
 
 
-def run_fold(
+def fold_frame(
     data: Pol4Data, cutoff: pd.Timestamp, config: Pol4Config | None = None
-) -> FoldResult:
-    """One simulated competition, end to end."""
+) -> pd.DataFrame:
+    """The scoring grid for one simulated competition.
+
+    Every (city, check-in) pair in the 30-day window, the demand observed at the
+    cutoff, and - because this is history - the complete demand it went on to
+    reach. The `actual` column is the only thing here that a real forecaster at
+    the cutoff would not have.
+    """
     config = config or Pol4Config()
     cutoff = pd.Timestamp(cutoff)
     target_dates = pd.date_range(cutoff + pd.Timedelta(days=1), periods=config.target_days)
@@ -120,8 +126,33 @@ def run_fold(
     truth = data.final_demand(target_dates.min(), target_dates.max())
     frame = grid.merge(truth, on=[CITY, CHECKIN], how="left")
     frame["actual"] = frame["final"].fillna(0.0).astype(np.float64)
-    frame = frame.drop(columns=["final"])
+    return frame.drop(columns=["final"])
 
+
+def annotate(frame: pd.DataFrame, province_of: dict[int, int], config: Pol4Config) -> pd.DataFrame:
+    """Add the segment columns every breakdown in this module reports on."""
+    out = frame.copy()
+    out[PROVINCE] = out[CITY].map(province_of)
+    out["weekday"] = out[CHECKIN].dt.dayofweek
+    out["horizon_bucket"] = pd.cut(
+        out["horizon"],
+        bins=[0, *[high for _, high in config.horizon_buckets]],
+        labels=[f"{low}-{high}" for low, high in config.horizon_buckets],
+    )
+    out["demand_bucket"] = demand_buckets(out["actual"], config.demand_bucket_quantiles)
+    out["observation_state"] = np.where(out["observed"] > 0, "observed", "unobserved")
+    return out
+
+
+def run_fold(
+    data: Pol4Data, cutoff: pd.Timestamp, config: Pol4Config | None = None
+) -> FoldResult:
+    """One simulated competition, end to end."""
+    config = config or Pol4Config()
+    cutoff = pd.Timestamp(cutoff)
+    target_dates = pd.date_range(cutoff + pd.Timedelta(days=1), periods=config.target_days)
+
+    frame = fold_frame(data, cutoff, config)
     model = PickupBaseline.fit(data, cutoff, config)
     frame = model.predict(frame)
 
@@ -144,14 +175,7 @@ def run_fold(
     reference["city_weekday_mean"] = score(frame["actual"], frame["city_weekday_mean"])
 
     # -- breakdowns ---------------------------------------------------------
-    frame[PROVINCE] = frame[CITY].map(model.curves.province_of)
-    frame["weekday"] = frame[CHECKIN].dt.dayofweek
-    frame["horizon_bucket"] = pd.cut(
-        frame["horizon"],
-        bins=[0, *[high for _, high in config.horizon_buckets]],
-        labels=[f"{low}-{high}" for low, high in config.horizon_buckets],
-    )
-    frame["demand_bucket"] = demand_buckets(frame["actual"], config.demand_bucket_quantiles)
+    frame = annotate(frame, model.curves.province_of, config)
 
     by_city = pd.DataFrame(_score_by(frame, CITY))
     scored_cities = by_city[np.isfinite(by_city["wape"])]

@@ -49,6 +49,101 @@ The pickup baseline is **biased low by −9.5%**. Fixing that calibration alone 
 
 ---
 
+## 0b. Outcomes (Phase 2, run 2026-09-09)
+
+Every experiment below was run on the five walk-forward cutoffs in §1 and scored
+on the full 321 x 30 grid. Artefacts: `artifacts/pol4/experiments.csv`,
+`experiment_summary.json`, `backtest_metrics_phase2.json`.
+
+| # | Experiment | Pooled WAPE | Verdict |
+|---|---|---:|---|
+| E0 | Pickup baseline (Phase 1 champion) | 0.2200 | reference |
+| E1 | Global multiplicative calibration | 0.2289 | **rejected** |
+| E1 | Horizon-bucket calibration | 0.2204 | **rejected** (neutral) |
+| E1 | Shrunk horizon calibration | 0.2206 | **rejected** |
+| E1x | Scaling the total rather than the remainder | 0.2426 | **rejected** |
+| E2 | GBDT: observed + horizon only | 0.3022 | worse than E0 |
+| E3 | + pickup windows | 0.2774 | — |
+| E4 | + velocity / acceleration | 0.2739 | — |
+| E5 | + activity | 0.2729 | — |
+| E6 | + historical pickup curves | 0.2157 | first to beat E0 |
+| E7 | + calendar (incl. Jalali) | 0.1889 | — |
+| E8 | + city history | 0.1802 | — |
+| E9 | + market signals | 0.1755 | — |
+| E10 | + province signals | 0.1745 | full feature set |
+| M2 | LightGBM, 600 trees, raw target | 0.1692 | — |
+| M2b | LightGBM, 600 trees, log1p target | 0.1618 | — |
+| M3 | CatBoost (MAE), comparable compute budget | 0.1835 | **rejected** |
+| M4 | LightGBM, 4 horizon bands | 0.1563 | rejected on fold risk |
+| M6 | LightGBM, 3 horizon bands | 0.1574 | rejected on fold risk |
+| **M5** | **LightGBM, 2 horizon bands (1-14, 15-30)** | **0.1581** | **CHAMPION** |
+| E9-ens | Model / baseline blend | 0.1623 | **rejected** |
+
+**E2 is the finding worth keeping.** A gradient-boosted model handed only
+`observed_total` and `days_to_checkin` scores 0.3022 - materially *worse* than
+the arithmetic baseline it was meant to replace. The model does not beat the
+baseline by being a model; it beats it only once the pickup curve is handed to
+it as a feature (E6, -0.057), and then again on calendar structure (E7, -0.027).
+
+**Calibration (E2 in the original plan) was built, measured and rejected.**
+It does what it was designed to do - pooled normalised bias moves from -0.150 to
+-0.120 - and does not improve WAPE. Two reasons, both visible in the data:
+under a sum-of-absolute-errors metric on a heavy-tailed target the optimal point
+forecast sits near the conditional *median*, so some negative bias is correct;
+and the fitted factors disagree across folds (0.82 to 1.15), which is a regime
+effect rather than a fixed offset. WAPE is the metric, so calibration is not in
+the champion.
+
+**E5 (target transform) reversed the Phase 1 expectation, with evidence.** The
+audit found the generic platform's automatic `log1p` under-predicting, so it was
+A/B'd here rather than inherited. On *remaining* demand with an **L1** objective
+it improves everything that was the reason for the original concern:
+
+| | raw target | log1p target |
+|---|---:|---:|
+| pooled WAPE | 0.1692 | **0.1618** |
+| top-1% demand WAPE | 0.1681 | **0.1544** |
+| top-1% normalised bias | -0.119 | **-0.100** |
+| worst fold | 0.2813 | **0.2756** |
+
+An L1 objective in log space targets the conditional median, which is what WAPE
+rewards. The platform's L2-on-log1p targeted a conditional mean and then
+under-shot on inverse transform. Same transform, opposite outcome, because the
+objective and the target changed.
+
+**E7 (clustering) was not run and is not needed.** The global model already
+carries `city_code` as a categorical, which shares information across cities
+with no aggregation penalty. Clustering would have to beat 0.1618 by enough to
+pay the brief's penalty; nothing in these results suggests it would.
+
+**Horizon splitting (the plan's "one model or several?" question) was decided on
+the seasonal analogue, not on pooled WAPE alone.** Every split beats the single
+global model pooled, and every split is progressively worse on `2024-11-21` -
+the Azar window one year earlier:
+
+| Bands | Pooled WAPE | 2024-11-21 fold | Regression |
+|---|---:|---:|---:|
+| x1 | 0.1618 | 0.1193 | — |
+| **x2 (1-14, 15-30)** | **0.1581** | 0.1222 | +2.5% |
+| x3 | 0.1574 | 0.1281 | +7.4% |
+| x4 | 0.1563 | 0.1318 | +10.5% |
+
+The regression is monotone in the number of bands, which is a mechanism (less
+data per model generalises worse on a low-season window) rather than noise. Two
+bands take 2.3 of the 3.4 percentage points of pooled gain for a quarter of the
+risk, and the competition is a single shot on precisely a low-season window.
+This is a judgement call and it is recorded as one: `ChampionSpec.bands` is one
+line, and x4 is there for anyone who weighs pooled WAPE more heavily.
+
+**CatBoost lost on both axes.** At a compute budget comparable to LightGBM's
+(300 iterations, depth 6) it scored 0.1835 against 0.1581. At roughly ten times
+that budget (700 iterations, depth 8, MAE loss) it had not completed five folds
+in half an hour - CatBoost's MAE objective is far more expensive than
+LightGBM's - so the tie-break on complexity never had to be made.
+
+**E8 (stability)** is implemented in `ml/pol4/stability.py` and writes
+`artifacts/pol4/stability.parquet`.
+
 ## 1. Experiment protocol
 
 **Simulated cutoffs (walk-forward, no overlap with each other's training windows):**
