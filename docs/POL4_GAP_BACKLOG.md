@@ -7,6 +7,46 @@ Priority: **P0** forecasting-correctness blocker · **P1** required before submi
 
 ---
 
+## 0. Phase 1 status (implemented 2026-09-09)
+
+The two-clock pipeline is built and the P0 block is closed. Everything below
+this section is the original audit record and is kept unedited; this table is
+the delta.
+
+| ID | Item | Was | Now | Where |
+|---|---|---|---|---|
+| F-01 | Two time axes | ❌ | ✅ | `backend/ml/pol4/loader.py` - `log_date`, `checkin`, `days_to_checkin` |
+| F-02 | `final = observed + remaining` | ❌ | ✅ | `backend/ml/pol4/baseline.py` |
+| F-03 | `evaluation.csv` ingested | ❌ | ✅ | `Pol4Data.observed_at`, `submission.build_grid` |
+| F-04 | Pickup curves | ❌ | ✅ | `backend/ml/pol4/pickup.py`, city → province → global |
+| F-05 | Cutoff-aware simulation | ❌ | ✅ | `backend/ml/pol4/backtest.py`, 5 walk-forward cutoffs |
+| F-05b | Curves fitted only on pre-cutoff check-ins | ⚠️ | ✅ | `PickupCurves.fit` + `test_pol4_leakage.py` |
+| F-06 | Cutoff 2025-11-21 enforced | ❌ | ✅ | asserted in `test_pol4_competition.py` |
+| F-07 | `predicted >= observed` | ❌ | ✅ | `PickupBaseline.predict` |
+| B-02 | Pickup baseline | ❌ | ✅ | pooled WAPE **0.2200** across 5 folds |
+| M-02 | Beats meaningful baselines | 🔴 | ✅ | 0.2200 vs 0.3919 last-year, 0.7355 observed-only |
+| S-01 | `results.csv` | ❌ | ✅ | `artifacts/pol4/results.csv`, 9,630 rows, validated |
+| D-02 | Ingestible without manual work | 🔴 | ✅ | `PYTHONPATH=backend python -m ml.pol4.pipeline` |
+| D-03 | Target window never grid-filled to zero | ⚠️ | ✅ | conditional zero-prior; `test_zero_observation_pairs_are_not_predicted_as_zero` |
+| E-02 | Normalised bias per the brief | 🟡 | ✅ | `backtest.normalised_bias` |
+| E-04 | WAPE by demand bucket | ❌ | ✅ | `backtest_metrics.json` → `by_demand_bucket` |
+| R-02 | `jdatetime` in requirements | 🔴 | ✅ | `requirements.txt`; the swallowed `ImportError` is gone |
+| R-03 | Suite green | 🔴 | ✅ | **307 passed, 0 failed, 9 skipped** (skips are optional-model deps) |
+| R-04 | Output contract covered by tests | ❌ | ✅ | `test_pol4.py`, `test_pol4_competition.py` |
+
+**Still open, and now the top of the queue** (unchanged priority, see §2):
+
+| ID | Item | Why it matters now |
+|---|---|---|
+| M-03 / E5 | Normalised bias is **-0.150**, worsening to -0.249 at 22-30 days | The single largest remaining WAPE loss |
+| E-05 | Folds are not indexed by forecast issue point (D-30…D-1) | Blocks the stability story |
+| ST-01 | Forecast stability machinery | Mentor's named differentiator |
+| P1-1 | GBDT on remaining demand | Must beat 0.2200 or be rejected in writing |
+| DOC-01/02 | Technical report + PPTX | Required deliverables |
+| UI-* | Frontend cleanup and rebuild | Phase 2 |
+
+---
+
 ## 1. Status matrix
 
 | ID | Area | Requirement | Status | Evidence | File / Function | Problem | Impact | Recommended action | Pri |

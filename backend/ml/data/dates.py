@@ -12,12 +12,30 @@ Gregorian only - the calendar is an input format, never a modelling concern.
 """
 from __future__ import annotations
 
+import logging
 import re
 from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
 import pandas as pd
+
+log = logging.getLogger(__name__)
+
+# jdatetime is a declared dependency (requirements.txt). It is imported once,
+# here, so a missing install is reported loudly at startup instead of silently
+# degrading every Jalali date in the product to a Gregorian string.
+try:
+    import jdatetime
+except ImportError as exc:  # pragma: no cover - exercised only on a broken install
+    jdatetime = None
+    _JDATETIME_ERROR = exc
+    log.error(
+        "jdatetime is not installed, so Jalali dates cannot be rendered. "
+        "Install the project requirements: pip install -r requirements.txt"
+    )
+else:
+    _JDATETIME_ERROR = None
 
 # Digit maps: Persian (۰-۹) and Arabic-Indic (٠-٩) to ASCII.
 _PERSIAN_DIGITS = "۰۱۲۳۴۵۶۷۸۹"
@@ -70,11 +88,8 @@ class CalendarDetection:
 
 
 def jalali_available() -> bool:
-    try:
-        import jdatetime  # noqa: F401
-    except ImportError:
-        return False
-    return True
+    """Whether Jalali conversion is possible in this install."""
+    return jdatetime is not None
 
 
 def detect_calendar(series: pd.Series, sample_size: int = 500) -> CalendarDetection:
@@ -245,14 +260,23 @@ def parse_timestamps(
 
 
 def to_jalali_string(value: Any) -> str:
-    """Format a Gregorian date as Jalali, for display only."""
+    """Format a Gregorian date as Jalali, for display only.
+
+    Raises when the dependency is missing - that is a broken install, and
+    returning a Gregorian string in a field labelled Jalali is worse than
+    failing. An unparseable *value*, by contrast, is data and is passed through.
+    """
+    if jdatetime is None:
+        raise RuntimeError(
+            "jdatetime is required to render Jalali dates but is not installed; "
+            "run pip install -r requirements.txt"
+        ) from _JDATETIME_ERROR
     if value is None or (isinstance(value, float) and np.isnan(value)):
         return ""
     try:
-        import jdatetime
-
         stamp = pd.Timestamp(value)
         jalali = jdatetime.date.fromgregorian(date=stamp.date())
         return f"{jalali.year:04d}-{jalali.month:02d}-{jalali.day:02d}"
-    except Exception:  # noqa: BLE001 - display helper must never raise
+    except (ValueError, TypeError, OverflowError):
+        # Not a date we can convert - show what we were given rather than "".
         return str(value)
