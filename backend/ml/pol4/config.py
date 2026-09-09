@@ -109,6 +109,8 @@ class Pol4Config:
     ablation_params: dict[str, Any] = field(default_factory=lambda: {"n_estimators": 300})
     #: Check-in days in the historical window used for the stability snapshots.
     stability_window_days: int = 30
+    #: Rows in the committed training-data sample, stratified by horizon.
+    training_sample_rows: int = 5_500
     #: Quantile edges for the demand-bucket error breakdown.
     demand_bucket_quantiles: tuple[float, ...] = (0.0, 0.5, 0.75, 0.9, 0.99, 1.0)
 

@@ -13,6 +13,7 @@ carrying no extra signal.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -88,6 +89,52 @@ def build_training_frame(
         y = y[picked]
 
     return SupervisedFrame(X=X, y=np.maximum(y, 0.0), meta=meta)
+
+
+def export_training_frame(
+    frame: SupervisedFrame, path: Path, sample: int | None = None, seed: int = 42
+) -> Path:
+    """Write the supervised frame - features, target and keys - to one file.
+
+    The target column is named `remaining_demand` so the file is self-describing:
+    it is what the model predicts, not the final demand, and adding
+    `observed` back gives the forecast.
+
+    `sample` writes a horizon-stratified subset instead of the whole frame. The
+    full frame is ~77 MB at the competition cutoff, which is worth exporting on
+    request but not worth committing; the sample is there so the shape is
+    readable without regenerating anything.
+    """
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    table = frame.X.copy()
+    for column in frame.meta.columns:
+        table[column] = frame.meta[column].to_numpy()
+    table["remaining_demand"] = frame.y
+
+    if sample:
+        # Stratify by horizon: the bands are fitted separately, so a sample that
+        # under-covers one of them would misrepresent the model's diet.
+        per_horizon = max(1, sample // table["horizon"].nunique())
+        rng = np.random.default_rng(seed)
+        picked: list[np.ndarray] = []
+        for _, positions in table.groupby("horizon").indices.items():
+            take = min(len(positions), per_horizon)
+            picked.append(rng.choice(positions, size=take, replace=False))
+        table = table.iloc[np.sort(np.concatenate(picked))].sort_values(
+            ["checkin", "city_code", "horizon"], ignore_index=True
+        )
+
+    keys = ["city_code", "checkin", "horizon", "observed", "final", "remaining_demand"]
+    table = table[keys + [c for c in table.columns if c not in keys]]
+    if path.suffix == ".csv":
+        # Full float64 repr triples the file for precision no reader needs; the
+        # parquet export keeps the exact values.
+        table.to_csv(path, index=False, float_format="%.4g")
+    else:
+        table.to_parquet(path, index=False)
+    return path
 
 
 def build_inference_frame(

@@ -19,7 +19,7 @@ import pandas as pd
 
 from .baseline import PickupBaseline
 from .config import Pol4Config
-from .dataset import build_inference_frame, build_training_frame
+from .dataset import build_inference_frame, build_training_frame, export_training_frame
 from .features import GROUP_ORDER, feature_names
 from .loader import CHECKIN, CITY, Pol4Data
 from .models import RemainingDemandModel
@@ -83,6 +83,7 @@ class FittedChampion:
     cutoff: pd.Timestamp
     config: Pol4Config
     training_rows: int
+    training_frame: Any = field(default=None, repr=False)
 
     @classmethod
     def fit(
@@ -127,6 +128,7 @@ class FittedChampion:
             cutoff=cutoff,
             config=config,
             training_rows=len(train),
+            training_frame=train,
         )
 
     @property
@@ -164,6 +166,14 @@ class FittedChampion:
         return infer.meta.assign(
             predicted_demand=predicted,
             predicted_remaining=predicted - observed,
+        )
+
+    def export_training_data(self, path, sample: int | None = None):
+        """Write the exact rows this champion was fitted on."""
+        if self.training_frame is None:
+            raise RuntimeError("training frame was not retained")
+        return export_training_frame(
+            self.training_frame, path, sample=sample, seed=self.config.seed
         )
 
     def importance(self) -> pd.DataFrame:

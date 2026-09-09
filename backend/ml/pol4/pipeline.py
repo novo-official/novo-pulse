@@ -94,6 +94,7 @@ def run(
     skip_backtest: bool = False,
     skip_stability: bool = False,
     spec: ChampionSpec | None = None,
+    training_data_path: Path | None = None,
 ) -> dict[str, Any]:
     """Load, evaluate, forecast Azar 1404, write and validate results.csv.
 
@@ -193,6 +194,17 @@ def run(
     else:
         fitted = FittedChampion.fit(data, config.cutoff, spec, config)
         predictions = fitted.predict(target_dates, data)
+
+        # A horizon-stratified sample of the exact rows the model was fitted on,
+        # so the training data is readable without regenerating it. The full
+        # frame is ~77 MB; `--export-training-data` writes that on request.
+        sample_path = fitted.export_training_data(
+            config.artifacts_dir / "training_sample.csv", sample=config.training_sample_rows
+        )
+        if training_data_path:
+            full_path = fitted.export_training_data(training_data_path)
+            log.info("full training frame written to %s", full_path)
+
         importance = fitted.importance()
         importance.to_json(
             config.artifacts_dir / "feature_importance.json", orient="records", indent=2
@@ -200,6 +212,8 @@ def run(
         summary["champion"] = {
             **spec.describe(),
             "training_rows": fitted.training_rows,
+            "training_sample": str(sample_path.name),
+            "training_data_export": str(training_data_path) if training_data_path else None,
             "top_features": importance.head(15).to_dict(orient="records"),
         }
 
@@ -448,6 +462,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--min-city-support", type=int, default=defaults.min_city_support)
     parser.add_argument("--max-train-rows", type=int, default=defaults.max_train_rows)
     parser.add_argument("--seed", type=int, default=defaults.seed)
+    parser.add_argument(
+        "--export-training-data",
+        type=Path,
+        default=None,
+        help="write the full supervised frame the champion is fitted on (~77 MB parquet)",
+    )
     parser.add_argument("--skip-backtest", action="store_true", help="final inference only")
     parser.add_argument("--skip-stability", action="store_true")
     parser.add_argument("--quiet", action="store_true")
@@ -476,6 +496,7 @@ def main(argv: list[str] | None = None) -> int:
         ablation=args.ablation,
         skip_backtest=args.skip_backtest,
         skip_stability=args.skip_stability,
+        training_data_path=args.export_training_data,
     )
 
     backtest = summary.get("backtest", {})

@@ -284,3 +284,66 @@ def test_weekend_flag_matches_the_iranian_week(builder, pol4):
     weekend = frame["is_weekend"].to_numpy()
     # Thursday (3) and Friday (4) are the Iranian weekend.
     np.testing.assert_array_equal(weekend, np.isin(weekday, (3, 4)).astype(float))
+
+
+# ------------------------------------------------------------------ export
+def test_export_writes_features_target_and_keys(pol4, tmp_path):
+    from ml.pol4.dataset import export_training_frame
+
+    data, config = pol4
+    baseline = PickupBaseline.fit(data, config.cutoff, config)
+    frame = build_training_frame(data, config.cutoff, GROUP_ORDER, baseline, config)
+
+    path = export_training_frame(frame, tmp_path / "train.csv")
+    written = pd.read_csv(path)
+
+    assert len(written) == len(frame)
+    # Keys first, so the file is readable without the schema beside it.
+    assert list(written.columns[:6]) == [
+        "city_code",
+        "checkin",
+        "horizon",
+        "observed",
+        "final",
+        "remaining_demand",
+    ]
+    assert set(feature_names(GROUP_ORDER)).issubset(written.columns)
+
+
+def test_exported_target_reconstructs_the_forecast(pol4, tmp_path):
+    """observed + remaining must equal final, in the file as well as in memory."""
+    from ml.pol4.dataset import export_training_frame
+
+    data, config = pol4
+    baseline = PickupBaseline.fit(data, config.cutoff, config)
+    frame = build_training_frame(data, config.cutoff, GROUP_ORDER, baseline, config)
+    written = pd.read_csv(export_training_frame(frame, tmp_path / "train.csv"))
+
+    np.testing.assert_allclose(
+        written["observed"] + written["remaining_demand"], written["final"], rtol=1e-6
+    )
+
+
+def test_sampled_export_covers_every_horizon(pol4, tmp_path):
+    from ml.pol4.dataset import export_training_frame
+
+    data, config = pol4
+    baseline = PickupBaseline.fit(data, config.cutoff, config)
+    frame = build_training_frame(data, config.cutoff, GROUP_ORDER, baseline, config)
+
+    path = export_training_frame(frame, tmp_path / "sample.csv", sample=220)
+    written = pd.read_csv(path)
+    # Stratified: a band the champion fits separately must not be under-covered.
+    assert set(written["horizon"]) == set(config.train_horizons)
+    assert len(written) < len(frame)
+
+
+def test_export_is_deterministic(pol4, tmp_path):
+    from ml.pol4.dataset import export_training_frame
+
+    data, config = pol4
+    baseline = PickupBaseline.fit(data, config.cutoff, config)
+    frame = build_training_frame(data, config.cutoff, GROUP_ORDER, baseline, config)
+    first = pd.read_csv(export_training_frame(frame, tmp_path / "a.csv", sample=220, seed=7))
+    second = pd.read_csv(export_training_frame(frame, tmp_path / "b.csv", sample=220, seed=7))
+    pd.testing.assert_frame_equal(first, second)

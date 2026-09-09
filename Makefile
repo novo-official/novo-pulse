@@ -20,10 +20,10 @@ METRIC  ?= wape
 .PHONY: help venv install install-optional migrate train dev \
         backend frontend frontend-install test test-backend test-frontend lint report \
         clean download-models docker-up docker-down check profile validate audit e2e \
-        pol4 pol4-baseline pol4-ablation pol4-submission test-pol4
+        pol4 pol4-baseline pol4-ablation pol4-submission pol4-training-data test-pol4
 
 help: ## Show this help
-	@grep -hE '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
+	@grep -hE '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 	 | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 # ---------------------------------------------------------------- setup
@@ -56,6 +56,10 @@ pol4-ablation: ## Pol 4: rerun the full feature ladder and rewrite experiments.c
 
 pol4-submission: ## Pol 4: skip the backtest, just regenerate results.csv
 	PYTHONPATH=backend $(PY) -m ml.pol4.pipeline --skip-backtest --skip-stability
+
+pol4-training-data: ## Pol 4: export the full supervised frame the champion is fitted on
+	PYTHONPATH=backend $(PY) -m ml.pol4.pipeline --skip-backtest --skip-stability \
+	 --export-training-data artifacts/pol4/training_full.parquet
 
 test-pol4: ## Run only the Pol 4 test suite
 	$(PY) -m pytest backend/tests -q -k pol4

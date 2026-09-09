@@ -342,6 +342,7 @@ make pol4                 # champion backtest + stability + results.csv   (~12 m
 make pol4-baseline        # the pickup baseline alone - fast fallback      (~15s)
 make pol4-ablation        # rerun the full feature ladder                  (~35 min)
 make pol4-submission      # regenerate results.csv, nothing else           (~1 min)
+make pol4-training-data   # export the full supervised frame (~77 MB parquet)
 make test-pol4            # the Pol 4 test suite
 ```
 
@@ -357,6 +358,7 @@ Artefacts land in `artifacts/pol4/`:
 |---|---|
 | `results.csv` | the submission: 9,630 rows of `cluster_code, checkin, predicted_demand` |
 | `results_named.csv` | the same rows for humans: city and province names, observed-so-far, predicted remaining |
+| `training_sample.csv` | 5,500 of the rows the champion was fitted on, 500 per horizon - features, keys and target |
 | `backtest_metrics_phase2.json` | champion vs baseline: every fold, WAPE by horizon / province / weekday / demand bucket / observation state / high-demand slice |
 | `experiments.csv` | every experiment run, one row each, sorted by WAPE |
 | `experiment_summary.json` | the same with per-fold detail and the rejections |
@@ -556,6 +558,37 @@ see by the cutoff had actually arrived. When a period accelerates, late pickup i
 disproportionate, the curve overstates how complete the observation is, and the
 projection under-shoots - concentrated at 22-30 days, where WAPE reaches 0.525.
 This is the case the market and province features exist to catch.
+
+### The training data
+
+One row is `(city, check-in night, horizon)`: stand `horizon` days before the
+night, see only what had been searched by then, and predict what is still to
+come.
+
+```
+city_code  checkin     horizon  observed  final  remaining_demand  + 65 features
+2101       2024-05-31  18       421       1972   1551              ...
+```
+
+Read that row as: 18 days before 31 May 2024, city 2101 had seen 421 searches;
+the night finished at 1,972, so the model's target is the 1,551 still to arrive.
+`observed + remaining_demand == final`, always - which is why the forecast can
+never fall below what has already been counted.
+
+| | |
+|---|---:|
+| Rows | 900,000 |
+| Features | 66 |
+| Target | `remaining_demand`, median 8, mean 720, max 216,699 |
+| Zero-target rows | 319,372 (35.5%) |
+| Check-in range | 2024-05-31 … 2025-11-21 (540 days before the cutoff) |
+| Horizons sampled | 1, 2, 3, 5, 7, 10, 14, 18, 21, 25, 30 |
+| Split across the two bands | 572,343 (1-14) · 327,657 (15-30) |
+
+Horizons are sampled rather than enumerated: all 30 per pair is 7 million rows
+carrying no extra signal. `artifacts/pol4/training_sample.csv` holds 5,500 of
+these rows (500 per horizon) so the shape is readable without regenerating
+anything; `make pol4-training-data` writes the full frame.
 
 ### Leakage safety
 
