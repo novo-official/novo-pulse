@@ -1,0 +1,104 @@
+{
+  "generated_at": "2026-09-09T10:12:49.251094+00:00",
+  "python": "3.11.15",
+  "seed": 42,
+  "cutoff": "2025-11-21",
+  "target_window": [
+    "2025-11-22",
+    "2025-12-21"
+  ],
+  "data": {
+    "search_rows": 3298564,
+    "evaluation_rows": 65411,
+    "cities": 321,
+    "provinces": 7,
+    "log_date_min": "2023-09-03",
+    "log_date_max": "2025-11-21",
+    "checkin_min": "2023-11-01",
+    "checkin_max": "2025-11-21",
+    "max_lead_time": 59,
+    "total_searches": 284130228,
+    "evaluation_checkin_min": "2025-11-22",
+    "evaluation_checkin_max": "2025-12-21",
+    "evaluation_searches": 2686508,
+    "findings": [
+      {
+        "severity": "info",
+        "dataset": "search_data.csv",
+        "title": "validated",
+        "detail": "3,298,564 rows, no duplicates, no impossible dates, lead time 0-59 days"
+      },
+      {
+        "severity": "info",
+        "dataset": "evaluation.csv",
+        "title": "validated",
+        "detail": "65,411 rows, no duplicates, no impossible dates, lead time 0-59 days"
+      }
+    ]
+  },
+  "model": {
+    "cutoff": "2025-11-21",
+    "zero_observation_policy": "prior",
+    "min_city_support": 20000,
+    "min_province_support": 50000,
+    "min_fraction": 0.005,
+    "curves": {
+      "cutoff": "2025-11-21",
+      "n_horizons": 60,
+      "cities_with_own_curve": 150,
+      "provinces_with_own_curve": 7,
+      "global_curve": {
+        "D-1": 0.8906,
+        "D-3": 0.6954,
+        "D-7": 0.4605,
+        "D-14": 0.2682,
+        "D-21": 0.1659,
+        "D-30": 0.0868,
+        "D-45": 0.0241,
+        "D-59": 0.0009
+      }
+    }
+  },
+  "backtest": {
+    "pooled_wape": 0.219991,
+    "pooled_normalised_bias": -0.149974,
+    "folds": {
+      "2024-11-21": 0.206532,
+      "2025-05-21": 0.299927,
+      "2025-08-21": 0.197624,
+      "2025-09-22": 0.159896,
+      "2025-10-22": 0.21665
+    },
+    "artefact": "artifacts/pol4/backtest_metrics.json"
+  },
+  "submission": {
+    "valid": true,
+    "rows": 9630,
+    "cities": 321,
+    "dates": 30,
+    "checkin_min": "2025-11-22",
+    "checkin_max": "2025-12-21",
+    "total_predicted_demand": 7493215.0,
+    "rows_predicting_zero": 2537,
+    "problems": [],
+    "path": "/home/user/novo-pulse/artifacts/pol4/results.csv"
+  },
+  "inference": {
+    "observed_total": 2686508.0,
+    "predicted_total": 7493322.894080576,
+    "pairs_with_no_observation": 4282,
+    "cities_with_no_observation": 82,
+    "curve_source_counts": {
+      "province": 5130,
+      "city": 4500
+    },
+    "cities_rounding_to_zero": {
+      "count": 74,
+      "median_historical_demand": 2.0,
+      "max_historical_demand": 391.0,
+      "median_unrounded_prediction": 0.07712765957446809,
+      "note": "these cities receive a positive prior; it rounds to zero because their measured demand is below half a search per night"
+    }
+  },
+  "elapsed_seconds": 15.53
+}

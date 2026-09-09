@@ -16,6 +16,7 @@ numpy>=1.26,<3
 pyarrow>=16.0
 PyYAML>=6.0
 openpyxl>=3.1          # .xlsx ingestion
+jdatetime>=5.0         # Jalali (Shamsi) calendar display
 
 # ML
 scikit-learn>=1.5

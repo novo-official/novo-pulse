@@ -115,7 +115,7 @@ backend/
     anomaly/         residual + forecast anomalies, peak detection
     insights/        insight engine, narrator
     pipelines/       the end-to-end training pipeline
-  tests/             128 tests
+  tests/             268 tests
 frontend/            Next.js 15 · TypeScript · Tailwind · Recharts (RTL/Persian)
 config/              data contract + training profiles
 docs/                COMPETITION_DAY.md
@@ -249,7 +249,9 @@ Metrics: `mae`, `rmse`, `wape`, `mape`, `smape`, `rmsle`, `r2`, `bias`,
 `mase`, `poisson_deviance`. Selecting one re-orients the leaderboard, champion
 selection, ensemble weighting and all reported scores.
 
-Example run (synthetic dataset, `demo` profile, 90-day horizon, listing level):
+Example run - **synthetic dataset, not Pol 4** (`demo` profile, 90-day horizon,
+listing level). For measured competition results see
+[POL 4 Competition Mode](#pol-4-competition-mode):
 
 | Model | WAPE | vs. baseline |
 |---|---:|---:|
@@ -279,6 +281,119 @@ model's own quantiles or conformal residual bounds lands closer to nominal on
 held-out folds, and the run records which one it picked and why.
 
 `reports/model_report.md` is regenerated automatically after each run.
+
+---
+
+## POL 4 Competition Mode
+
+**Everything in this section is measured on the real Pol 4 datasets.** It is
+kept separate from the synthetic demo numbers elsewhere in this README, which
+come from `data/synthetic/` and describe the generic platform, not this
+competition.
+
+### The problem has two clocks
+
+| Clock | Column | Meaning |
+|---|---|---|
+| 1 | `log_date` | when somebody searched |
+| 2 | `checkin` | the night they want to stay |
+
+`days_to_checkin = checkin - log_date`, and in this dataset it never exceeds
+**59** (median 17). So demand for a `(city, checkin)` pair accumulates over the
+~60 days before the stay, and at any cutoff the pair is only *partially*
+observed:
+
+```
+final_demand = observed_demand(cutoff) + remaining_pickup(cutoff)
+```
+
+The generic platform in `backend/ml/` models one time axis and cannot express
+this, so the competition lives in its own domain package, `backend/ml/pol4/`.
+
+### The measured pickup curve
+
+Share of a check-in's final demand that is already visible, by horizon:
+
+| Standing at | D-30 | D-21 | D-14 | D-7 | D-3 | D-1 |
+|---|---:|---:|---:|---:|---:|---:|
+| observed fraction | 0.087 | 0.166 | 0.268 | 0.461 | 0.695 | 0.891 |
+
+This is why `evaluation.csv` matters: at the competition cutoff it already
+carries 2,686,508 searches across 5,348 of the 9,630 target pairs.
+
+### Run it
+
+```bash
+# 1. put the three competition CSVs here (they are gitignored)
+#    data/raw/pol4/{search_data.csv,evaluation.csv,cities.csv}
+
+make pol4                 # curves + backtest + results.csv + validation  (~15s)
+make pol4-submission      # skip the backtest, just regenerate results.csv
+make test-pol4            # the Pol 4 test suite
+```
+
+Or directly, with no source edits:
+
+```bash
+PYTHONPATH=backend python -m ml.pol4.pipeline
+```
+
+Artefacts land in `artifacts/pol4/`:
+
+| File | What it is |
+|---|---|
+| `results.csv` | the submission: 9,630 rows of `cluster_code, checkin, predicted_demand` |
+| `backtest_metrics.json` | every fold, plus WAPE by horizon / province / weekday / demand bucket |
+| `pickup_curves.parquet` | the fitted completion curves (global, province, city) |
+| `run_summary.json` | data validation, model config, submission report |
+
+### Results — pickup baseline, walk-forward
+
+Five simulated competition cutoffs, each followed by a 30-day target window,
+scored on the full 321 x 30 grid:
+
+| Fold cutoff | WAPE |
+|---|---:|
+| 2024-11-21 | 0.2065 |
+| 2025-05-21 | 0.2999 |
+| 2025-08-21 | 0.1976 |
+| 2025-09-22 | 0.1599 |
+| 2025-10-22 | 0.2167 |
+| **Pooled** | **0.2200** |
+
+Against the same grid:
+
+| Method | Pooled WAPE |
+|---|---:|
+| **Pickup baseline** | **0.2200** |
+| Last-year same check-in date | 0.3919 |
+| City x weekday mean | 0.5588 |
+| Observed-so-far, uncorrected | 0.7355 |
+
+By horizon bucket — near-term check-ins are nearly solved by arithmetic, and
+all the remaining error lives further out:
+
+| Days ahead | 1-3 | 4-7 | 8-14 | 15-21 | 22-30 |
+|---|---:|---:|---:|---:|---:|
+| WAPE | 0.040 | 0.100 | 0.166 | 0.219 | 0.357 |
+| normalised bias | -0.022 | -0.011 | -0.124 | -0.158 | -0.249 |
+
+Pooled normalised bias is **-0.150**: the projection systematically
+under-predicts, worsening with horizon. Calibrating it is the first Phase 2
+task (`docs/POL4_EXPERIMENT_PLAN.md`, experiment E2).
+
+### Leakage safety
+
+A curve fitted at cutoff C reads only check-ins completed by C, and observed
+demand reads only log dates up to C. `backend/tests/test_pol4_leakage.py`
+asserts this mechanically: it overwrites every post-cutoff search with garbage,
+re-runs the whole pipeline, and requires every prediction to be unchanged.
+
+### What Phase 1 deliberately does not do
+
+No clustering (`cluster_code = city_code`), no GBDT on remaining demand, no
+geographic neighbours, no frontend changes. Those are Phase 2, and each has to
+beat the number above to earn its place.
 
 ---
 
@@ -433,7 +548,7 @@ make audit          # live API audit against a running backend
 make e2e            # browser walkthrough with real clicks
 ```
 
-**218 unit/integration tests** covering: leakage guarantees, the data adapter,
+**268 unit/integration tests** covering: leakage guarantees, the data adapter,
 schema detection, validation, metrics, time-series splitting, conformal
 calibration, baselines, GBDT models, the optional Chronos/NHITS adapters, the
 registry, the full pipeline, reproducibility, hierarchy coherence, anomaly and
