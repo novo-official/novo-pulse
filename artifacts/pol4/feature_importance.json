@@ -1,332 +1,332 @@
 [
   {
     "feature":"city_hist_mean",
-    "importance":0.2592866978,
-    "share":0.2592866978
+    "importance":0.3066337676,
+    "share":0.3066337676
   },
   {
     "feature":"city_weekday_mean",
-    "importance":0.2294362904,
-    "share":0.2294362904
-  },
-  {
-    "feature":"city_hist_p75",
-    "importance":0.2198152764,
-    "share":0.2198152764
+    "importance":0.2179070328,
+    "share":0.2179070328
   },
   {
     "feature":"city_hist_p90",
-    "importance":0.1073978888,
-    "share":0.1073978888
+    "importance":0.2098816179,
+    "share":0.2098816179
   },
   {
     "feature":"pickup_baseline_remaining",
-    "importance":0.0671219604,
-    "share":0.0671219604
+    "importance":0.0684302138,
+    "share":0.0684302138
   },
   {
-    "feature":"city_hist_median",
-    "importance":0.0228565859,
-    "share":0.0228565859
-  },
-  {
-    "feature":"city_code",
-    "importance":0.0215232642,
-    "share":0.0215232642
+    "feature":"city_hist_p75",
+    "importance":0.0561744761,
+    "share":0.0561744761
   },
   {
     "feature":"city_volatility",
-    "importance":0.0152720799,
-    "share":0.0152720799
+    "importance":0.0358945299,
+    "share":0.0358945299
   },
   {
-    "feature":"pickup_baseline_prediction",
-    "importance":0.0079917902,
-    "share":0.0079917902
+    "feature":"city_hist_median",
+    "importance":0.023631472,
+    "share":0.023631472
+  },
+  {
+    "feature":"city_code",
+    "importance":0.0220975929,
+    "share":0.0220975929
   },
   {
     "feature":"city_hist_std",
-    "importance":0.0068112825,
-    "share":0.0068112825
+    "importance":0.0124340367,
+    "share":0.0124340367
+  },
+  {
+    "feature":"pickup_baseline_prediction",
+    "importance":0.008954879,
+    "share":0.008954879
   },
   {
     "feature":"jalali_month",
-    "importance":0.0056471162,
-    "share":0.0056471162
-  },
-  {
-    "feature":"expected_completion_fraction",
-    "importance":0.0033127822,
-    "share":0.0033127822
+    "importance":0.0066217659,
+    "share":0.0066217659
   },
   {
     "feature":"days_to_checkin",
-    "importance":0.0027770501,
-    "share":0.0027770501
+    "importance":0.0030561168,
+    "share":0.0030561168
   },
   {
-    "feature":"is_weekend",
-    "importance":0.0020063081,
-    "share":0.0020063081
+    "feature":"expected_completion_fraction",
+    "importance":0.0027697869,
+    "share":0.0027697869
   },
   {
     "feature":"jalali_day",
-    "importance":0.0019464371,
-    "share":0.0019464371
-  },
-  {
-    "feature":"days_since_last_search",
-    "importance":0.0017086181,
-    "share":0.0017086181
-  },
-  {
-    "feature":"checkin_weekday",
-    "importance":0.00161747,
-    "share":0.00161747
+    "importance":0.0024932908,
+    "share":0.0024932908
   },
   {
     "feature":"checkin_day_of_month",
-    "importance":0.0015363867,
-    "share":0.0015363867
+    "importance":0.0019943599,
+    "share":0.0019943599
   },
   {
-    "feature":"observed_total",
-    "importance":0.00136731,
-    "share":0.00136731
-  },
-  {
-    "feature":"city_share_of_province",
-    "importance":0.0012364443,
-    "share":0.0012364443
+    "feature":"checkin_weekday",
+    "importance":0.0015057937,
+    "share":0.0015057937
   },
   {
     "feature":"market_observed_total",
-    "importance":0.0011731688,
-    "share":0.0011731688
+    "importance":0.0011581438,
+    "share":0.0011581438
   },
   {
-    "feature":"lat",
-    "importance":0.0010415159,
-    "share":0.0010415159
+    "feature":"city_share_of_province",
+    "importance":0.0011371368,
+    "share":0.0011371368
   },
   {
     "feature":"market_pickup_acceleration_7d",
-    "importance":0.001026681,
-    "share":0.001026681
+    "importance":0.0011325496,
+    "share":0.0011325496
   },
   {
     "feature":"market_pickup_1d",
-    "importance":0.000976513,
-    "share":0.000976513
-  },
-  {
-    "feature":"market_pickup_acceleration_3d",
-    "importance":0.0009679379,
-    "share":0.0009679379
+    "importance":0.0009700685,
+    "share":0.0009700685
   },
   {
     "feature":"market_pickup_3d",
-    "importance":0.0009108369,
-    "share":0.0009108369
+    "importance":0.0009638796,
+    "share":0.0009638796
+  },
+  {
+    "feature":"is_weekend",
+    "importance":0.0008983066,
+    "share":0.0008983066
+  },
+  {
+    "feature":"lat",
+    "importance":0.0008406165,
+    "share":0.0008406165
+  },
+  {
+    "feature":"observed_total",
+    "importance":0.0008316054,
+    "share":0.0008316054
+  },
+  {
+    "feature":"market_pickup_acceleration_3d",
+    "importance":0.0007586103,
+    "share":0.0007586103
   },
   {
     "feature":"market_pickup_14d",
-    "importance":0.0008559966,
-    "share":0.0008559966
-  },
-  {
-    "feature":"days_since_first_search",
-    "importance":0.0008185174,
-    "share":0.0008185174
-  },
-  {
-    "feature":"market_pickup_7d",
-    "importance":0.0007427805,
-    "share":0.0007427805
+    "importance":0.0007102446,
+    "share":0.0007102446
   },
   {
     "feature":"city_share_of_market",
-    "importance":0.0007167776,
-    "share":0.0007167776
-  },
-  {
-    "feature":"expected_remaining_fraction",
-    "importance":0.0006698079,
-    "share":0.0006698079
-  },
-  {
-    "feature":"province_pickup_14d",
-    "importance":0.0006656409,
-    "share":0.0006656409
+    "importance":0.0006362502,
+    "share":0.0006362502
   },
   {
     "feature":"pickup_surprise",
-    "importance":0.0006107128,
-    "share":0.0006107128
+    "importance":0.0006117599,
+    "share":0.0006117599
   },
   {
-    "feature":"province_pickup_acceleration_7d",
-    "importance":0.0006069163,
-    "share":0.0006069163
+    "feature":"province_pickup_14d",
+    "importance":0.0005861782,
+    "share":0.0005861782
   },
   {
-    "feature":"province_pickup_3d",
-    "importance":0.0005788707,
-    "share":0.0005788707
-  },
-  {
-    "feature":"province_pickup_1d",
-    "importance":0.0005573368,
-    "share":0.0005573368
-  },
-  {
-    "feature":"city_weekend_ratio",
-    "importance":0.0005448243,
-    "share":0.0005448243
-  },
-  {
-    "feature":"province_pickup_7d",
-    "importance":0.0004992859,
-    "share":0.0004992859
-  },
-  {
-    "feature":"province_observed_total",
-    "importance":0.0004743648,
-    "share":0.0004743648
-  },
-  {
-    "feature":"active_search_days",
-    "importance":0.0004323342,
-    "share":0.0004323342
-  },
-  {
-    "feature":"search_span",
-    "importance":0.0004039767,
-    "share":0.0004039767
+    "feature":"expected_remaining_fraction",
+    "importance":0.0005573799,
+    "share":0.0005573799
   },
   {
     "feature":"long",
-    "importance":0.0003690041,
-    "share":0.0003690041
+    "importance":0.0005558188,
+    "share":0.0005558188
   },
   {
-    "feature":"pickup_7d_share",
-    "importance":0.0003580923,
-    "share":0.0003580923
+    "feature":"market_pickup_7d",
+    "importance":0.0005488946,
+    "share":0.0005488946
   },
   {
-    "feature":"province_pickup_acceleration_3d",
-    "importance":0.0003219052,
-    "share":0.0003219052
+    "feature":"province_pickup_3d",
+    "importance":0.0005363374,
+    "share":0.0005363374
+  },
+  {
+    "feature":"days_since_last_search",
+    "importance":0.0004891187,
+    "share":0.0004891187
+  },
+  {
+    "feature":"province_observed_total",
+    "importance":0.0004730984,
+    "share":0.0004730984
+  },
+  {
+    "feature":"city_weekend_ratio",
+    "importance":0.0004393011,
+    "share":0.0004393011
+  },
+  {
+    "feature":"province_pickup_acceleration_7d",
+    "importance":0.0004277245,
+    "share":0.0004277245
+  },
+  {
+    "feature":"province_pickup_1d",
+    "importance":0.0004182648,
+    "share":0.0004182648
+  },
+  {
+    "feature":"province_pickup_7d",
+    "importance":0.0004154986,
+    "share":0.0004154986
+  },
+  {
+    "feature":"active_search_days",
+    "importance":0.0003388694,
+    "share":0.0003388694
+  },
+  {
+    "feature":"search_span",
+    "importance":0.0003018493,
+    "share":0.0003018493
+  },
+  {
+    "feature":"days_since_first_search",
+    "importance":0.0002584,
+    "share":0.0002584
   },
   {
     "feature":"pickup_1d_share",
-    "importance":0.0003088951,
-    "share":0.0003088951
+    "importance":0.0002416427,
+    "share":0.0002416427
+  },
+  {
+    "feature":"pickup_7d_share",
+    "importance":0.0002361717,
+    "share":0.0002361717
   },
   {
     "feature":"mean_daily_search",
-    "importance":0.0002874077,
-    "share":0.0002874077
-  },
-  {
-    "feature":"std_daily_search",
-    "importance":0.0002337833,
-    "share":0.0002337833
-  },
-  {
-    "feature":"pickup_3d_share",
-    "importance":0.000225544,
-    "share":0.000225544
-  },
-  {
-    "feature":"max_daily_search",
-    "importance":0.0002032828,
-    "share":0.0002032828
+    "importance":0.0002056676,
+    "share":0.0002056676
   },
   {
     "feature":"province_code",
-    "importance":0.0001942346,
-    "share":0.0001942346
+    "importance":0.00019965,
+    "share":0.00019965
   },
   {
     "feature":"market_pickup_velocity_14d",
-    "importance":0.0001924532,
-    "share":0.0001924532
-  },
-  {
-    "feature":"pickup_acceleration_7d",
-    "importance":0.0001382506,
-    "share":0.0001382506
-  },
-  {
-    "feature":"market_pickup_velocity_3d",
-    "importance":0.000137145,
-    "share":0.000137145
+    "importance":0.0001580581,
+    "share":0.0001580581
   },
   {
     "feature":"province_pickup_velocity_3d",
-    "importance":0.0001338144,
-    "share":0.0001338144
+    "importance":0.0001513731,
+    "share":0.0001513731
+  },
+  {
+    "feature":"max_daily_search",
+    "importance":0.0001491221,
+    "share":0.0001491221
+  },
+  {
+    "feature":"province_pickup_acceleration_3d",
+    "importance":0.0001428565,
+    "share":0.0001428565
+  },
+  {
+    "feature":"pickup_3d_share",
+    "importance":0.0001422756,
+    "share":0.0001422756
+  },
+  {
+    "feature":"std_daily_search",
+    "importance":0.0001412556,
+    "share":0.0001412556
+  },
+  {
+    "feature":"market_pickup_velocity_3d",
+    "importance":0.0001341146,
+    "share":0.0001341146
   },
   {
     "feature":"market_pickup_velocity_7d",
-    "importance":0.0001225133,
-    "share":0.0001225133
-  },
-  {
-    "feature":"pickup_acceleration_3d",
-    "importance":0.0001175315,
-    "share":0.0001175315
+    "importance":0.0000818686,
+    "share":0.0000818686
   },
   {
     "feature":"province_pickup_velocity_14d",
-    "importance":0.0001156041,
-    "share":0.0001156041
+    "importance":0.0000762719,
+    "share":0.0000762719
   },
   {
     "feature":"pickup_14d",
-    "importance":0.0001092402,
-    "share":0.0001092402
-  },
-  {
-    "feature":"pickup_1d",
-    "importance":0.0001037422,
-    "share":0.0001037422
-  },
-  {
-    "feature":"pickup_3d_over_7d",
-    "importance":0.0000972144,
-    "share":0.0000972144
+    "importance":0.0000733581,
+    "share":0.0000733581
   },
   {
     "feature":"pickup_3d",
-    "importance":0.0000952579,
-    "share":0.0000952579
+    "importance":0.0000722944,
+    "share":0.0000722944
   },
   {
-    "feature":"pickup_7d",
-    "importance":0.0000890959,
-    "share":0.0000890959
+    "feature":"pickup_1d",
+    "importance":0.0000705812,
+    "share":0.0000705812
+  },
+  {
+    "feature":"pickup_acceleration_7d",
+    "importance":0.0000641518,
+    "share":0.0000641518
   },
   {
     "feature":"province_pickup_velocity_7d",
-    "importance":0.0000532001,
-    "share":0.0000532001
+    "importance":0.0000608633,
+    "share":0.0000608633
   },
   {
-    "feature":"pickup_velocity_3d",
-    "importance":0.0000213697,
-    "share":0.0000213697
+    "feature":"pickup_acceleration_3d",
+    "importance":0.0000406088,
+    "share":0.0000406088
   },
   {
-    "feature":"pickup_velocity_7d",
-    "importance":0.0000147818,
-    "share":0.0000147818
+    "feature":"pickup_7d",
+    "importance":0.0000332538,
+    "share":0.0000332538
+  },
+  {
+    "feature":"pickup_3d_over_7d",
+    "importance":0.0000160135,
+    "share":0.0000160135
   },
   {
     "feature":"pickup_velocity_14d",
-    "importance":0.0000128,
-    "share":0.0000128
+    "importance":0.0000148675,
+    "share":0.0000148675
+  },
+  {
+    "feature":"pickup_velocity_3d",
+    "importance":0.000013397,
+    "share":0.000013397
+  },
+  {
+    "feature":"pickup_velocity_7d",
+    "importance":0.0000036445,
+    "share":0.0000036445
   }
 ]

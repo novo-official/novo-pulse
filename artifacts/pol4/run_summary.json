@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-09T15:57:58.299948+00:00",
+  "generated_at": "2026-09-09T18:01:23.740199+00:00",
   "python": "3.13.15",
   "seed": 42,
   "model": "champion",
@@ -45,7 +45,7 @@
     ]
   },
   "provenance": {
-    "input_manifest": "artifacts/pol4/input_manifest.json",
+    "input_manifest": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/input_manifest.json",
     "input_digest": "fc71f2f11bb1c781e2dff9aae3987b6af0afa3a7d51c43b1ef2dc8a72841636e",
     "allowed_sources": [
       "search_data.csv",
@@ -78,105 +78,10 @@
     }
   },
   "backtest": {
-    "pooled_wape": 0.158148,
-    "pooled_normalised_bias": -0.098586,
-    "folds": {
-      "2024-11-21": 0.12219,
-      "2025-05-21": 0.271148,
-      "2025-08-21": 0.127601,
-      "2025-09-22": 0.108677,
-      "2025-10-22": 0.118212
-    },
-    "baseline_wape": 0.219991,
-    "relative_improvement": 0.2811,
-    "experiments": 4
+    "skipped": true
   },
   "stability": {
-    "target_start": "2025-10-23",
-    "target_days": 30,
-    "anchor_cutoff": "2025-09-23",
-    "snapshot_horizons": [
-      30,
-      21,
-      14,
-      7,
-      3,
-      1
-    ],
-    "pairs": 9630,
-    "stability_score": 0.8443,
-    "mean_absolute_revision": 63.347,
-    "mean_relative_revision": 0.1557,
-    "convergence_rate": 0.7221,
-    "by_step": [
-      {
-        "step": "30->21",
-        "mean_absolute_revision": 75.4772,
-        "mean_relative_revision": 0.151,
-        "convergence_rate": 0.6634,
-        "n": 9630
-      },
-      {
-        "step": "21->14",
-        "mean_absolute_revision": 66.9177,
-        "mean_relative_revision": 0.1483,
-        "convergence_rate": 0.6804,
-        "n": 9630
-      },
-      {
-        "step": "14->7",
-        "mean_absolute_revision": 77.8212,
-        "mean_relative_revision": 0.1842,
-        "convergence_rate": 0.7202,
-        "n": 9630
-      },
-      {
-        "step": "7->3",
-        "mean_absolute_revision": 61.7227,
-        "mean_relative_revision": 0.156,
-        "convergence_rate": 0.7474,
-        "n": 9630
-      },
-      {
-        "step": "3->1",
-        "mean_absolute_revision": 34.7955,
-        "mean_relative_revision": 0.1389,
-        "convergence_rate": 0.7993,
-        "n": 9630
-      }
-    ],
-    "by_horizon": [
-      {
-        "horizon": 1,
-        "wape": 0.02,
-        "mean_prediction": 996.66
-      },
-      {
-        "horizon": 3,
-        "wape": 0.04,
-        "mean_prediction": 988.25
-      },
-      {
-        "horizon": 7,
-        "wape": 0.08,
-        "mean_prediction": 962.87
-      },
-      {
-        "horizon": 14,
-        "wape": 0.12,
-        "mean_prediction": 918.57
-      },
-      {
-        "horizon": 21,
-        "wape": 0.14,
-        "mean_prediction": 891.88
-      },
-      {
-        "horizon": 30,
-        "wape": 0.17,
-        "mean_prediction": 864.91
-      }
-    ]
+    "skipped": true
   },
   "champion": {
     "model": "lightgbm",
@@ -207,105 +112,105 @@
       "n_estimators": 600
     },
     "blend_weight_on_model": 1.0,
-    "training_rows": 900000,
+    "training_rows": 1906740,
     "trainset": {
-      "path": "artifacts/pol4/trainset",
-      "rows": 900000,
+      "path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/trainset",
+      "rows": 1906740,
       "input_digest": "fc71f2f11bb1c781e2dff9aae3987b6af0afa3a7d51c43b1ef2dc8a72841636e",
       "files": {
-        "features.parquet": "d00b4135f64007114513b064ea27eda5ace02dcd96b7e420adc3161f0c6a87a5",
-        "target.parquet": "3ab016701da0e7fa219f3ea8ada42fcef94a60b4d84cc69a642137c85a4f214d",
-        "meta.parquet": "465107f4c6730c0c470f1f2daa50c50832bfeda6d6d357032e72a5ee0f979db9"
+        "features.parquet": "cc720b6e362f6cd6fef8da71c0cf2ca44cdeead8020ff0b8c9edc3358c172ead",
+        "target.parquet": "2a53386e70ed8e487a2fedb555530666eda307134a320db5c61cee439c67cd7a",
+        "meta.parquet": "8e16ffcee1478d83b420288afeef1cfa2d06736311844c494cd5fa0e7864a173"
       },
-      "reused": true
+      "reused": false
     },
     "model_bundle": {
-      "path": "artifacts/pol4/model_bundle",
-      "bundle_digest": "6b41b28b9b51cf85a8891c581763b761f1377884d6926e13bca0780fc892d6de",
+      "path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/model_bundle",
+      "bundle_digest": "d1c63afb15c1fd9985bfac6683e9fa338fac232f3a0cb584e8cd5a2905ee4916",
       "input_digest": "fc71f2f11bb1c781e2dff9aae3987b6af0afa3a7d51c43b1ef2dc8a72841636e",
       "files": {
-        "lightgbm_h1_14.txt": "31354db3961023ff7b9b9d5ef336eba53244113bc75ca0dd5010153c9074507f",
-        "lightgbm_h15_30.txt": "e23bf01861f4cae80fc17b562c086ca150820659eb2b2b8fd50dd8a27fb7c544",
-        "baseline_state.joblib": "22e00f9afca6a6edfb5dbcea4245ecd08fa89dd457c50e12af59b480077ea277",
-        "model_spec.json": "741c38b3e9bf03d07e7673c11585d37536b49a6fea88c26063b0003cf1cc94c5"
+        "lightgbm_h1_14.txt": "70b65746a58766642b9b618c177c0f69daabcb8acc21b54f0770461be8d84e84",
+        "lightgbm_h15_30.txt": "0b8b80ca1a5feef5a1f7ae4c70f630d5ba96f60837cb16fd9050147f43d92249",
+        "baseline_state.joblib": "88a4536221c89611acf790a5c51c1ea7356eaa113a6edb0b1c7a002172c2a291",
+        "model_spec.json": "ee68498a949149aac5eefec8f3e1341c1de57a5190e492626e1f1c91abb5b492"
       },
       "load_parity_verified": true
     },
     "top_features": [
       {
         "feature": "city_hist_mean",
-        "importance": 0.25928669778733265,
-        "share": 0.2592866977873327
+        "importance": 0.3066337676233292,
+        "share": 0.3066337676233292
       },
       {
         "feature": "city_weekday_mean",
-        "importance": 0.2294362904107911,
-        "share": 0.22943629041079114
-      },
-      {
-        "feature": "city_hist_p75",
-        "importance": 0.2198152763639077,
-        "share": 0.21981527636390774
+        "importance": 0.21790703282638496,
+        "share": 0.21790703282638496
       },
       {
         "feature": "city_hist_p90",
-        "importance": 0.10739788877757946,
-        "share": 0.10739788877757947
+        "importance": 0.2098816179070872,
+        "share": 0.2098816179070872
       },
       {
         "feature": "pickup_baseline_remaining",
-        "importance": 0.06712196043593163,
-        "share": 0.06712196043593165
+        "importance": 0.06843021380845477,
+        "share": 0.06843021380845477
       },
       {
-        "feature": "city_hist_median",
-        "importance": 0.022856585895685202,
-        "share": 0.022856585895685205
-      },
-      {
-        "feature": "city_code",
-        "importance": 0.021523264187862098,
-        "share": 0.0215232641878621
+        "feature": "city_hist_p75",
+        "importance": 0.05617447609645623,
+        "share": 0.05617447609645623
       },
       {
         "feature": "city_volatility",
-        "importance": 0.015272079896062375,
-        "share": 0.015272079896062376
+        "importance": 0.03589452989187612,
+        "share": 0.03589452989187612
       },
       {
-        "feature": "pickup_baseline_prediction",
-        "importance": 0.007991790197274957,
-        "share": 0.007991790197274959
+        "feature": "city_hist_median",
+        "importance": 0.02363147196707025,
+        "share": 0.02363147196707025
+      },
+      {
+        "feature": "city_code",
+        "importance": 0.022097592921933445,
+        "share": 0.022097592921933445
       },
       {
         "feature": "city_hist_std",
-        "importance": 0.006811282525188458,
-        "share": 0.006811282525188459
+        "importance": 0.012434036743609128,
+        "share": 0.012434036743609128
+      },
+      {
+        "feature": "pickup_baseline_prediction",
+        "importance": 0.00895487898011536,
+        "share": 0.00895487898011536
       },
       {
         "feature": "jalali_month",
-        "importance": 0.0056471162385828355,
-        "share": 0.005647116238582836
-      },
-      {
-        "feature": "expected_completion_fraction",
-        "importance": 0.0033127821688090377,
-        "share": 0.003312782168809038
+        "importance": 0.006621765915075197,
+        "share": 0.006621765915075197
       },
       {
         "feature": "days_to_checkin",
-        "importance": 0.002777050136379744,
-        "share": 0.0027770501363797444
+        "importance": 0.003056116848241898,
+        "share": 0.003056116848241898
       },
       {
-        "feature": "is_weekend",
-        "importance": 0.002006308119719049,
-        "share": 0.0020063081197190494
+        "feature": "expected_completion_fraction",
+        "importance": 0.0027697868678477804,
+        "share": 0.0027697868678477804
       },
       {
         "feature": "jalali_day",
-        "importance": 0.0019464370672506188,
-        "share": 0.001946437067250619
+        "importance": 0.002493290785269698,
+        "share": 0.002493290785269698
+      },
+      {
+        "feature": "checkin_day_of_month",
+        "importance": 0.0019943599251736307,
+        "share": 0.0019943599251736307
       }
     ]
   },
@@ -316,71 +221,71 @@
     "dates": 30,
     "checkin_min": "2025-11-22",
     "checkin_max": "2025-12-21",
-    "total_predicted_demand": 8010957.0,
-    "rows_predicting_zero": 3040,
+    "total_predicted_demand": 7946421.0,
+    "rows_predicting_zero": 3036,
     "problems": [],
-    "path": "artifacts/pol4/results.csv",
-    "named_path": "artifacts/pol4/results_named.csv"
+    "path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/results.csv",
+    "named_path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/results_named.csv"
   },
   "inference": {
     "observed_total": 2686508.0,
-    "predicted_total": 8010986.791277152,
+    "predicted_total": 7946490.5127891665,
     "pairs_with_no_observation": 4282,
     "cities_with_no_observation": 82,
     "top_cities": [
       {
         "city": "tehran",
         "city_code": 1183,
-        "predicted_demand": 1113808
+        "predicted_demand": 1090072
       },
       {
         "city": "qeshm",
         "city_code": 4995,
-        "predicted_demand": 975471
+        "predicted_demand": 985110
       },
       {
         "city": "kish",
         "city_code": 2099,
-        "predicted_demand": 726103
+        "predicted_demand": 712768
       },
       {
         "city": "rasht",
         "city_code": 7339,
-        "predicted_demand": 625073
+        "predicted_demand": 615866
       },
       {
         "city": "mashhad",
         "city_code": 9356,
-        "predicted_demand": 568054
+        "predicted_demand": 560687
       },
       {
         "city": "ramsar",
         "city_code": 8978,
-        "predicted_demand": 526056
+        "predicted_demand": 527279
       },
       {
         "city": "kordan",
         "city_code": 9547,
-        "predicted_demand": 370323
+        "predicted_demand": 366404
       },
       {
         "city": "bandar_anzali",
         "city_code": 9814,
-        "predicted_demand": 246470
+        "predicted_demand": 247106
       },
       {
         "city": "isfahan",
         "city_code": 7619,
-        "predicted_demand": 225492
+        "predicted_demand": 225237
       },
       {
         "city": "chalus",
         "city_code": 9770,
-        "predicted_demand": 204650
+        "predicted_demand": 200283
       }
     ],
     "cities_rounding_to_zero": {
-      "count": 77,
+      "count": 78,
       "cities": [
         "amirkola",
         "baghershahr",
@@ -404,7 +309,7 @@
         "gharchak"
       ],
       "median_historical_demand": 2.0,
-      "median_unrounded_prediction": 3.491472498866913e-05,
+      "median_unrounded_prediction": 5.031234247820384e-15,
       "note": "these cities receive a positive prediction; it rounds to zero because their measured demand is below half a search per night"
     }
   },
@@ -419,6 +324,6 @@
     "cities_with_momentum": 239,
     "history_days": 180
   },
-  "model_card": "artifacts/pol4/model_card.json",
-  "elapsed_seconds": 254.27
+  "model_card": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/model_card.json",
+  "elapsed_seconds": 57.56
 }

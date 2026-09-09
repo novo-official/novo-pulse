@@ -1,58 +1,58 @@
 [
   {
     "province": "hormozgan",
-    "predicted_demand": 1942074.0,
+    "predicted_demand": 1935482.0,
     "observed_so_far": 886386.0,
     "cities": 25,
-    "predicted_remaining": 1055688.0,
+    "predicted_remaining": 1049096.0,
     "share": 0.24
   },
   {
     "province": "mazandaran",
-    "predicted_demand": 1925613.0,
+    "predicted_demand": 1915910.0,
     "observed_so_far": 558947.0,
     "cities": 62,
-    "predicted_remaining": 1366666.0,
+    "predicted_remaining": 1356963.0,
     "share": 0.24
   },
   {
     "province": "tehran",
-    "predicted_demand": 1395482.0,
+    "predicted_demand": 1375335.0,
     "observed_so_far": 397967.0,
     "cities": 44,
-    "predicted_remaining": 997515.0,
+    "predicted_remaining": 977368.0,
     "share": 0.17
   },
   {
     "province": "gilan",
-    "predicted_demand": 1385377.0,
+    "predicted_demand": 1370469.0,
     "observed_so_far": 430298.0,
     "cities": 53,
-    "predicted_remaining": 955079.0,
+    "predicted_remaining": 940171.0,
     "share": 0.17
   },
   {
     "province": "khorasan_razavi",
-    "predicted_demand": 584416.0,
+    "predicted_demand": 576913.0,
     "observed_so_far": 233889.0,
     "cities": 41,
-    "predicted_remaining": 350527.0,
+    "predicted_remaining": 343024.0,
     "share": 0.07
   },
   {
     "province": "alborz",
-    "predicted_demand": 467314.0,
+    "predicted_demand": 462088.0,
     "observed_so_far": 95333.0,
     "cities": 18,
-    "predicted_remaining": 371981.0,
+    "predicted_remaining": 366755.0,
     "share": 0.06
   },
   {
     "province": "isfahan",
-    "predicted_demand": 310681.0,
+    "predicted_demand": 310224.0,
     "observed_so_far": 83688.0,
     "cities": 78,
-    "predicted_remaining": 226993.0,
+    "predicted_remaining": 226536.0,
     "share": 0.04
   }
 ]

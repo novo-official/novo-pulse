@@ -1,7 +1,7 @@
 {
   "format_version": 1,
   "cutoff": "2025-11-21T00:00:00",
-  "training_rows": 900000,
+  "training_rows": 1906740,
   "input_digest": "fc71f2f11bb1c781e2dff9aae3987b6af0afa3a7d51c43b1ef2dc8a72841636e",
   "spec": {
     "bands": [
