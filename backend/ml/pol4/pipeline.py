@@ -35,6 +35,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from . import analytics as analytics_module
 from . import stability as stability_module
 from .backtest import run_backtest
 from .baseline import PickupBaseline
@@ -49,7 +50,7 @@ from .experiments import (
     run_suite,
     staged_groups,
 )
-from .loader import CITY, load_pol4
+from .loader import CHECKIN, CITY, load_pol4
 from .submission import (
     build_grid,
     build_named_submission,
@@ -254,6 +255,16 @@ def run(
             ),
         },
     }
+    # -- 7. dashboard analytics --------------------------------------------
+    # Pre-aggregated so the product never reads search_data.csv at request time.
+    bundle = analytics_module.build(data, predictions, config)
+    summary["analytics"] = {
+        "artefacts": bundle.write(config.artifacts_dir),
+        "provinces": len(bundle.provinces),
+        "cities_with_momentum": int(bundle.city_momentum["pickup_ratio"].notna().sum()),
+        "history_days": int(bundle.city_history[CHECKIN].nunique()),
+    }
+
     summary["elapsed_seconds"] = round(time.perf_counter() - started, 2)
 
     (config.artifacts_dir / "run_summary.json").write_text(

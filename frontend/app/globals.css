@@ -862,3 +862,458 @@
 .hierarchy-footnote { width: fit-content; max-width: min(720px, 100%); margin: 18px auto 0; border: 1px solid rgb(var(--indigo) / .15); border-inline-start-width: 2px; border-radius: 14px; background: color-mix(in oklab, rgb(var(--indigo)) 6%, rgb(var(--surface))); padding: 10px 18px; color: rgb(var(--muted)); text-align: center; }.hierarchy-footnote strong { color: rgb(var(--ink) / .90); background: none; }.hierarchy-footnote svg { color: rgb(var(--indigo)); }
 .hierarchy-floating-tooltip { z-index: 60; max-width: min(280px, calc(100vw - 16px)); pointer-events: none; opacity: 0; transform: scale(.96); transition: opacity 150ms ease-out, transform 150ms ease-out; }.hierarchy-floating-tooltip--visible { opacity: 1; transform: scale(1); }.hierarchy-floating-tooltip .glass-chart-tooltip { pointer-events: none; }
 .dark .hierarchy-bottom-up, [data-theme='dark'] .hierarchy-bottom-up { color: rgb(var(--ink) / .85); background: rgb(255 255 255 / .08); }.dark .hierarchy-footnote, [data-theme='dark'] .hierarchy-footnote { background: rgb(255 255 255 / .08); border-color: rgb(var(--indigo) / .20); }.dark .hierarchy-footnote strong, [data-theme='dark'] .hierarchy-footnote strong { color: rgb(var(--ink) / .90); }.dark .hierarchy-node--terminal button, [data-theme='dark'] .hierarchy-node--terminal button { background: linear-gradient(135deg, rgb(var(--indigo-deep)), rgb(var(--violet-deep))); }
+
+/* ===========================================================================
+   Pol 4 demand intelligence dashboard.
+
+   Charts carry the argument, so the chrome stays quiet: one surface, one
+   border weight, no gradients on data, no decorative motion. Density over
+   ornament.
+   =========================================================================== */
+.pol4-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: rgb(var(--surface-subtle));
+}
+
+.pol4-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgb(var(--surface-raised) / 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgb(var(--chart-grid));
+}
+
+.pol4-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.9rem;
+}
+.pol4-brand__mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--pol4-forecast);
+  flex: none;
+}
+.pol4-brand strong {
+  display: block;
+  line-height: 1.2;
+}
+.pol4-brand span span {
+  display: block;
+  font-size: 0.7rem;
+  color: rgb(var(--chart-axis));
+}
+
+.pol4-nav {
+  display: flex;
+  gap: 0.25rem;
+  flex: 1;
+}
+.pol4-nav__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: rgb(var(--chart-axis));
+  transition: background 0.15s, color 0.15s;
+}
+.pol4-nav__item:hover {
+  background: rgb(var(--surface-hover));
+  color: inherit;
+}
+.pol4-nav__item.is-active {
+  background: color-mix(in srgb, var(--pol4-forecast) 12%, transparent);
+  color: var(--pol4-forecast);
+  font-weight: 600;
+}
+
+.pol4-topbar__end {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pol4-content {
+  flex: 1;
+  padding: 1.5rem;
+  max-width: 1680px;
+  width: 100%;
+  margin-inline: auto;
+}
+
+.pol4-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.pol4-page--split {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+@media (max-width: 1024px) {
+  .pol4-page--split {
+    grid-template-columns: 1fr;
+  }
+}
+.pol4-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+.pol4-side {
+  position: sticky;
+  top: 5rem;
+}
+
+.pol4-page__head h1 {
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.pol4-page__head p {
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  color: rgb(var(--chart-axis));
+  max-width: 78ch;
+  line-height: 1.7;
+}
+.pol4-page__method {
+  margin-top: 0.5rem !important;
+  padding: 0.6rem 0.8rem;
+  border-inline-start: 3px solid var(--pol4-expected);
+  background: rgb(var(--surface-raised));
+  border-radius: 0 8px 8px 0;
+}
+
+/* ------------------------------------------------------------------- KPIs */
+.pol4-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.75rem;
+}
+.pol4-kpi {
+  background: rgb(var(--surface-raised));
+  border: 1px solid rgb(var(--chart-grid));
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+}
+.pol4-kpi__label {
+  font-size: 0.72rem;
+  color: rgb(var(--chart-axis));
+}
+.pol4-kpi__value {
+  margin-top: 0.3rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.pol4-kpi__note {
+  margin-top: 0.2rem;
+  font-size: 0.7rem;
+  color: rgb(var(--chart-axis));
+}
+.pol4-kpi--good .pol4-kpi__value { color: rgb(var(--ok)); }
+.pol4-kpi--warn .pol4-kpi__value { color: rgb(var(--warn)); }
+
+/* ------------------------------------------------------------------ cards */
+.pol4-card {
+  background: rgb(var(--surface-raised));
+  border: 1px solid rgb(var(--chart-grid));
+  border-radius: 14px;
+  padding: 1rem 1.1rem 0.85rem;
+}
+.pol4-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+.pol4-card__title {
+  font-size: 0.98rem;
+  font-weight: 650;
+}
+.pol4-card__hint {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: rgb(var(--chart-axis));
+  line-height: 1.65;
+  max-width: 80ch;
+}
+.pol4-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: none;
+}
+.pol4-card__unit {
+  font-size: 0.7rem;
+  color: rgb(var(--chart-axis));
+  white-space: nowrap;
+}
+.pol4-card__body { width: 100%; }
+.pol4-card__source {
+  margin-top: 0.5rem;
+  font-size: 0.68rem;
+  color: rgb(var(--placeholder));
+  direction: ltr;
+  text-align: left;
+}
+
+.pol4-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.74rem;
+  color: rgb(var(--chart-axis));
+}
+.pol4-legend li { display: inline-flex; align-items: center; gap: 0.35rem; }
+.pol4-legend__swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex: none;
+}
+
+.pol4-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.25rem;
+}
+
+/* --------------------------------------------------------------- tooltip */
+.pol4-tooltip {
+  background: rgb(var(--surface-raised));
+  border: 1px solid rgb(var(--chart-grid));
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  box-shadow: 0 8px 24px rgb(var(--overlay) / 0.12);
+  font-size: 0.76rem;
+}
+.pol4-tooltip__label {
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+.pol4-tooltip ul { display: flex; flex-direction: column; gap: 0.25rem; }
+.pol4-tooltip li { display: flex; align-items: center; gap: 0.4rem; }
+.pol4-tooltip__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--dot);
+  flex: none;
+}
+.pol4-tooltip__name { color: rgb(var(--chart-axis)); }
+.pol4-tooltip strong { margin-inline-start: auto; font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------------------- tables */
+.pol4-table-wrap { overflow-x: auto; }
+.pol4-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+.pol4-table th,
+.pol4-table td {
+  padding: 0.45rem 0.6rem;
+  text-align: start;
+  border-bottom: 1px solid rgb(var(--chart-grid));
+  white-space: nowrap;
+}
+.pol4-table th {
+  font-weight: 600;
+  color: rgb(var(--chart-axis));
+  font-size: 0.72rem;
+}
+.pol4-table td { font-variant-numeric: tabular-nums; }
+.pol4-table tbody tr:hover { background: rgb(var(--surface-hover)); }
+
+/* --------------------------------------------------------------- heatmap */
+.pol4-heatmap { overflow: auto; max-height: 100%; }
+/* Fill the card rather than hugging one edge: the grid is the content here, so
+   the cells stretch to the available width instead of leaving dead space. */
+.pol4-heatmap table {
+  border-collapse: separate;
+  border-spacing: 2px;
+  width: 100%;
+  table-layout: fixed;
+}
+.pol4-heatmap thead th:first-child,
+.pol4-heatmap tbody th { width: 120px; }
+.pol4-heatmap th {
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: rgb(var(--chart-axis));
+  padding: 0 0.2rem;
+  position: sticky;
+  white-space: nowrap;
+}
+.pol4-heatmap thead th { top: 0; background: rgb(var(--surface-raised)); z-index: 2; }
+.pol4-heatmap tbody th {
+  inset-inline-start: 0;
+  background: rgb(var(--surface-raised));
+  text-align: start;
+  font-size: 0.7rem;
+  z-index: 1;
+}
+.pol4-heatmap td {
+  height: 18px;
+  min-width: 14px;
+  border-radius: 3px;
+}
+
+/* --------------------------------------------------------------- picker */
+.pol4-picker {
+  background: rgb(var(--surface-raised));
+  border: 1px solid rgb(var(--chart-grid));
+  border-radius: 14px;
+  padding: 0.85rem;
+}
+.pol4-picker__label {
+  font-size: 0.72rem;
+  color: rgb(var(--chart-axis));
+  display: block;
+  margin-bottom: 0.35rem;
+}
+.pol4-picker__input,
+.pol4-select,
+.pol4-input {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgb(var(--chart-grid));
+  border-radius: 8px;
+  background: rgb(var(--surface-subtle));
+  font-size: 0.8rem;
+  font-family: inherit;
+}
+.pol4-select { width: auto; min-width: 140px; }
+.pol4-picker__list {
+  margin-top: 0.5rem;
+  max-height: 460px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.pol4-picker__list button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.15rem 0.5rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 7px;
+  text-align: start;
+  font-size: 0.78rem;
+}
+.pol4-picker__list button:hover { background: rgb(var(--surface-hover)); }
+.pol4-picker__list button.is-selected {
+  background: color-mix(in srgb, var(--pol4-forecast) 12%, transparent);
+  color: var(--pol4-forecast);
+  font-weight: 600;
+}
+.pol4-picker__province {
+  grid-column: 1;
+  font-size: 0.68rem;
+  color: rgb(var(--chart-axis));
+}
+.pol4-picker__value {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  align-self: center;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  color: rgb(var(--chart-axis));
+}
+.pol4-picker__empty,
+.pol4-picker__selected {
+  padding: 0.5rem;
+  font-size: 0.74rem;
+  color: rgb(var(--chart-axis));
+}
+
+/* --------------------------------------------------- toggles and filters */
+.pol4-toggle { display: inline-flex; gap: 2px; }
+.pol4-toggle button {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid rgb(var(--chart-grid));
+  font-size: 0.74rem;
+  background: rgb(var(--surface-subtle));
+}
+.pol4-toggle button:first-child { border-radius: 0 7px 7px 0; }
+.pol4-toggle button:last-child { border-radius: 7px 0 0 7px; }
+.pol4-toggle button.is-active {
+  background: var(--pol4-forecast);
+  border-color: var(--pol4-forecast);
+  color: #fff;
+}
+
+.pol4-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: end;
+  margin-bottom: 0.85rem;
+}
+.pol4-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  color: rgb(var(--chart-axis));
+}
+.pol4-button {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: var(--pol4-forecast);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------- notes */
+.pol4-note {
+  background: rgb(var(--surface-raised));
+  border: 1px solid rgb(var(--chart-grid));
+  border-inline-start: 3px solid var(--pol4-expected);
+  border-radius: 0 14px 14px 0;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.8rem;
+  line-height: 1.8;
+}
+.pol4-note h3 { font-weight: 650; margin-bottom: 0.35rem; }
+.pol4-note ul { list-style: disc; padding-inline-start: 1.1rem; }
+.pol4-note code {
+  font-size: 0.75rem;
+  background: rgb(var(--surface-hover));
+  padding: 0.05rem 0.3rem;
+  border-radius: 4px;
+}
+.pol4-note__caveat { color: rgb(var(--chart-axis)); margin-top: 0.4rem; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

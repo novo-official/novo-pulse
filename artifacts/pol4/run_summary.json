@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-09T12:08:17.496611+00:00",
+  "generated_at": "2026-09-09T13:04:13.905927+00:00",
   "python": "3.11.15",
   "seed": 42,
   "model": "champion",
@@ -375,5 +375,16 @@
       "note": "these cities receive a positive prediction; it rounds to zero because their measured demand is below half a search per night"
     }
   },
-  "elapsed_seconds": 985.06
+  "analytics": {
+    "artefacts": {
+      "target_pickup": "target_pickup.parquet",
+      "city_momentum": "city_momentum.parquet",
+      "city_history": "city_history.parquet",
+      "provinces": "province_summary.json"
+    },
+    "provinces": 7,
+    "cities_with_momentum": 239,
+    "history_days": 180
+  },
+  "elapsed_seconds": 458.1
 }
