@@ -11,7 +11,12 @@ from ml.pol4 import load_pol4
 
 from ml.pol4.baseline import PickupBaseline
 from ml.pol4.calibration import Calibrator, apply_alpha, best_alpha, calibration_cutoffs
-from ml.pol4.dataset import build_inference_frame, build_training_frame
+from ml.pol4.dataset import (
+    build_inference_frame,
+    build_training_frame,
+    load_materialized_training_frame,
+    materialize_training_frame,
+)
 from ml.pol4.experiments import build_context, run_experiment, baseline_predictor
 from ml.pol4.features import GROUP_ORDER, feature_names
 from ml.pol4.loader import CHECKIN, SEARCHES
@@ -174,6 +179,39 @@ def test_feature_subset_selection_matches_declared_names(fitted):
     for size in (1, 4, len(GROUP_ORDER)):
         columns = feature_names(GROUP_ORDER[:size])
         assert set(columns).issubset(train.X.columns)
+
+
+def test_materialised_training_frame_round_trip(fitted, tmp_path):
+    data, config, baseline, _ = fitted
+    train = build_training_frame(data, config.cutoff, GROUP_ORDER, baseline, config)
+    manifest = materialize_training_frame(
+        train,
+        tmp_path / "trainset",
+        GROUP_ORDER,
+        config,
+        input_digest="fixture-input",
+    )
+    restored = load_materialized_training_frame(tmp_path / "trainset")
+
+    assert manifest["input_digest"] == "fixture-input"
+    assert manifest["rows"] == len(train)
+    pd.testing.assert_frame_equal(train.X, restored.X)
+    pd.testing.assert_frame_equal(train.meta, restored.meta)
+    np.testing.assert_array_equal(train.y, restored.y)
+
+
+def test_materialised_training_frame_rejects_modified_data(fitted, tmp_path):
+    data, config, baseline, _ = fitted
+    train = build_training_frame(data, config.cutoff, GROUP_ORDER, baseline, config)
+    directory = tmp_path / "trainset"
+    materialize_training_frame(
+        train, directory, GROUP_ORDER, config, input_digest="fixture-input"
+    )
+    with (directory / "target.parquet").open("ab") as handle:
+        handle.write(b"corrupt")
+
+    with pytest.raises(ValueError, match="checksum mismatch"):
+        load_materialized_training_frame(directory)
 
 
 # --------------------------------------------------------------- ensemble

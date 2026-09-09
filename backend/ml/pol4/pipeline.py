@@ -41,6 +41,12 @@ from .backtest import run_backtest
 from .baseline import PickupBaseline
 from .champion import ChampionSpec, FittedChampion
 from .config import Pol4Config
+from .artifacts import build_input_manifest, write_json_atomic
+from .dataset import (
+    build_training_frame,
+    load_materialized_training_frame,
+    materialize_training_frame,
+)
 from .experiments import (
     ExperimentResult,
     ExperimentSpec,
@@ -93,6 +99,7 @@ def run(
     ablation: bool = False,
     skip_backtest: bool = False,
     skip_stability: bool = False,
+    reuse_trainset: bool = False,
     spec: ChampionSpec | None = None,
 ) -> dict[str, Any]:
     """Load, evaluate, forecast Azar 1404, write and validate results.csv.
@@ -109,6 +116,10 @@ def run(
     # -- 1. load ------------------------------------------------------------
     log.info("loading Pol 4 datasets from %s", config.raw_dir)
     data = load_pol4(config)
+    input_manifest = build_input_manifest(config, data)
+    input_manifest_path = write_json_atomic(
+        input_manifest, config.artifacts_dir / "input_manifest.json"
+    )
     summary: dict[str, Any] = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "python": platform.python_version(),
@@ -120,6 +131,11 @@ def run(
             config.target_end.date().isoformat(),
         ],
         "data": data.summary(),
+        "provenance": {
+            "input_manifest": str(input_manifest_path),
+            "input_digest": input_manifest["input_digest"],
+            "allowed_sources": input_manifest["allowed_sources"],
+        },
     }
 
     # -- 2. pickup curves at the competition cutoff -------------------------
@@ -191,8 +207,64 @@ def run(
         predictions = baseline.predict(build_grid(data, config.cutoff, target_dates))
         summary["champion"] = {"model": "pickup_baseline", **baseline.summary()}
     else:
-        fitted = FittedChampion.fit(data, config.cutoff, spec, config)
-        predictions = fitted.predict(target_dates, data)
+        train_dir = config.artifacts_dir / "trainset"
+        if reuse_trainset:
+            manifest_path = train_dir / "manifest.json"
+            if not manifest_path.is_file():
+                raise ValueError(f"--reuse-trainset requested but {manifest_path} is missing")
+            train_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            if train_manifest.get("input_digest") != input_manifest["input_digest"]:
+                raise ValueError("materialised train set was built from different input CSVs")
+            expected_contract = {
+                "seed": config.seed,
+                "cutoff": pd.Timestamp(config.cutoff).isoformat(),
+                "horizons": list(config.train_horizons),
+                "feature_groups": list(spec.groups),
+            }
+            mismatched = [
+                key for key, expected in expected_contract.items()
+                if train_manifest.get(key) != expected
+            ]
+            if mismatched:
+                raise ValueError(
+                    "materialised train set has a different training contract: "
+                    + ", ".join(mismatched)
+                )
+            train = load_materialized_training_frame(train_dir)
+            log.info("reusing %s materialised training rows", f"{len(train):,}")
+        else:
+            train = build_training_frame(data, config.cutoff, spec.groups, baseline, config)
+            train_manifest = materialize_training_frame(
+                train,
+                train_dir,
+                spec.groups,
+                config,
+                input_digest=input_manifest["input_digest"],
+            )
+            log.info("materialised %s training rows at %s", f"{len(train):,}", train_dir)
+
+        fitted = FittedChampion.fit(
+            data,
+            config.cutoff,
+            spec,
+            config,
+            baseline=baseline,
+            train=train,
+        )
+        before_serialisation = fitted.predict(target_dates, data)
+        model_dir = config.artifacts_dir / "model_bundle"
+        model_manifest = fitted.save(
+            model_dir, input_digest=input_manifest["input_digest"]
+        )
+        restored = FittedChampion.load(model_dir)
+        predictions = restored.predict(target_dates, data)
+        pd.testing.assert_frame_equal(
+            before_serialisation,
+            predictions,
+            check_exact=False,
+            rtol=1e-12,
+            atol=1e-12,
+        )
         importance = fitted.importance()
         importance.to_json(
             config.artifacts_dir / "feature_importance.json", orient="records", indent=2
@@ -200,6 +272,20 @@ def run(
         summary["champion"] = {
             **spec.describe(),
             "training_rows": fitted.training_rows,
+            "trainset": {
+                "path": str(train_dir),
+                "rows": train_manifest["rows"],
+                "input_digest": train_manifest["input_digest"],
+                "files": train_manifest["files"],
+                "reused": reuse_trainset,
+            },
+            "model_bundle": {
+                "path": str(model_dir),
+                "bundle_digest": model_manifest["bundle_digest"],
+                "input_digest": model_manifest["input_digest"],
+                "files": model_manifest["files"],
+                "load_parity_verified": True,
+            },
             "top_features": importance.head(15).to_dict(orient="records"),
         }
 
@@ -264,6 +350,43 @@ def run(
         "cities_with_momentum": int(bundle.city_momentum["pickup_ratio"].notna().sum()),
         "history_days": int(bundle.city_history[CHECKIN].nunique()),
     }
+
+    # A compact, judge-facing contract: what was trained, on which exact data,
+    # how it was evaluated, and what it must not be interpreted as.
+    model_card = {
+        "name": "pol4_remaining_demand_champion",
+        "task": "predict final search-based demand per city and check-in date",
+        "data_cutoff": config.cutoff.date().isoformat(),
+        "target_window": summary["target_window"],
+        "input_digest": input_manifest["input_digest"],
+        "raw_sources": input_manifest["allowed_sources"],
+        "target_definition": "remaining_demand = max(final_demand - observed_so_far, 0)",
+        "algorithm": summary["champion"],
+        "validation": {
+            "method": "five leakage-safe walk-forward simulated competition folds"
+            if model != "baseline"
+            else "walk-forward pickup-baseline backtest",
+            **summary["backtest"],
+        },
+        "safety_invariants": [
+            "features at horizon h only read searches available by checkin - h",
+            "predicted_demand is finite and non-negative",
+            "predicted_demand is never below observed_so_far",
+            "all 321 cities and all 30 target dates are emitted exactly once",
+        ],
+        "limitations": [
+            "demand means observed search volume, not bookings or causal travel intent",
+            "the model is validated on historical temporal folds from the supplied dataset",
+            "city_code is the competition city identifier; no statistical city clustering is used",
+        ],
+        "commands": {
+            "train_and_evaluate": "make pol4",
+            "inference_without_training": "make pol4-predict",
+            "tests": "make test-pol4",
+        },
+    }
+    model_card_path = write_json_atomic(model_card, config.artifacts_dir / "model_card.json")
+    summary["model_card"] = str(model_card_path)
 
     summary["elapsed_seconds"] = round(time.perf_counter() - started, 2)
 
@@ -450,6 +573,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--seed", type=int, default=defaults.seed)
     parser.add_argument("--skip-backtest", action="store_true", help="final inference only")
     parser.add_argument("--skip-stability", action="store_true")
+    parser.add_argument(
+        "--reuse-trainset",
+        action="store_true",
+        help="reuse the checksum-verified materialised train set when input hashes match",
+    )
     parser.add_argument("--quiet", action="store_true")
     return parser
 
@@ -476,6 +604,7 @@ def main(argv: list[str] | None = None) -> int:
         ablation=args.ablation,
         skip_backtest=args.skip_backtest,
         skip_stability=args.skip_stability,
+        reuse_trainset=args.reuse_trainset,
     )
 
     backtest = summary.get("backtest", {})

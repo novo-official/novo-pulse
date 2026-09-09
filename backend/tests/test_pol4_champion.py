@@ -67,6 +67,32 @@ def test_champion_submission_passes_the_validator(fitted):
     assert report.valid, report.problems
 
 
+def test_champion_native_bundle_round_trip_is_prediction_identical(fitted, tmp_path):
+    champion, data, config = fitted
+    before = champion.predict(config.target_dates(), data)
+    manifest = champion.save(tmp_path / "bundle", input_digest="fixture-input")
+    restored = FittedChampion.load(tmp_path / "bundle")
+    after = restored.predict(config.target_dates(), data)
+
+    assert manifest["input_digest"] == "fixture-input"
+    assert {path.name for path in (tmp_path / "bundle").glob("lightgbm_*.txt")} == {
+        "lightgbm_h1_14.txt",
+        "lightgbm_h15_30.txt",
+    }
+    pd.testing.assert_frame_equal(before, after, check_exact=False, rtol=1e-12, atol=1e-12)
+
+
+def test_champion_bundle_rejects_a_modified_model(fitted, tmp_path):
+    champion, _, _ = fitted
+    directory = tmp_path / "bundle"
+    champion.save(directory, input_digest="fixture-input")
+    model_path = next(directory.glob("lightgbm_*.txt"))
+    model_path.write_text(model_path.read_text() + "\n# corrupted\n")
+
+    with pytest.raises(ValueError, match="checksum mismatch"):
+        FittedChampion.load(directory)
+
+
 def test_champion_cannot_see_searches_logged_after_the_cutoff(pol4):
     """End-to-end leakage test for the model, not just the baseline.
 

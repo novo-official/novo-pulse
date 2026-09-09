@@ -1,0 +1,179 @@
+{
+  "name": "pol4_remaining_demand_champion",
+  "task": "predict final search-based demand per city and check-in date",
+  "data_cutoff": "2025-11-21",
+  "target_window": [
+    "2025-11-22",
+    "2025-12-21"
+  ],
+  "input_digest": "fc71f2f11bb1c781e2dff9aae3987b6af0afa3a7d51c43b1ef2dc8a72841636e",
+  "raw_sources": [
+    "search_data.csv",
+    "evaluation.csv",
+    "cities.csv",
+    "city_code_mapping.csv"
+  ],
+  "target_definition": "remaining_demand = max(final_demand - observed_so_far, 0)",
+  "algorithm": {
+    "model": "lightgbm",
+    "horizon_bands": [
+      [
+        1,
+        14
+      ],
+      [
+        15,
+        30
+      ]
+    ],
+    "feature_groups": [
+      "base",
+      "pickup",
+      "velocity",
+      "activity",
+      "curve",
+      "calendar",
+      "city",
+      "market",
+      "province"
+    ],
+    "n_features": 66,
+    "log1p_target": true,
+    "params": {
+      "n_estimators": 600
+    },
+    "blend_weight_on_model": 1.0,
+    "training_rows": 900000,
+    "trainset": {
+      "path": "artifacts/pol4/trainset",
+      "rows": 900000,
+      "input_digest": "fc71f2f11bb1c781e2dff9aae3987b6af0afa3a7d51c43b1ef2dc8a72841636e",
+      "files": {
+        "features.parquet": "d00b4135f64007114513b064ea27eda5ace02dcd96b7e420adc3161f0c6a87a5",
+        "target.parquet": "3ab016701da0e7fa219f3ea8ada42fcef94a60b4d84cc69a642137c85a4f214d",
+        "meta.parquet": "465107f4c6730c0c470f1f2daa50c50832bfeda6d6d357032e72a5ee0f979db9"
+      },
+      "reused": true
+    },
+    "model_bundle": {
+      "path": "artifacts/pol4/model_bundle",
+      "bundle_digest": "6b41b28b9b51cf85a8891c581763b761f1377884d6926e13bca0780fc892d6de",
+      "input_digest": "fc71f2f11bb1c781e2dff9aae3987b6af0afa3a7d51c43b1ef2dc8a72841636e",
+      "files": {
+        "lightgbm_h1_14.txt": "31354db3961023ff7b9b9d5ef336eba53244113bc75ca0dd5010153c9074507f",
+        "lightgbm_h15_30.txt": "e23bf01861f4cae80fc17b562c086ca150820659eb2b2b8fd50dd8a27fb7c544",
+        "baseline_state.joblib": "22e00f9afca6a6edfb5dbcea4245ecd08fa89dd457c50e12af59b480077ea277",
+        "model_spec.json": "741c38b3e9bf03d07e7673c11585d37536b49a6fea88c26063b0003cf1cc94c5"
+      },
+      "load_parity_verified": true
+    },
+    "top_features": [
+      {
+        "feature": "city_hist_mean",
+        "importance": 0.25928669778733265,
+        "share": 0.2592866977873327
+      },
+      {
+        "feature": "city_weekday_mean",
+        "importance": 0.2294362904107911,
+        "share": 0.22943629041079114
+      },
+      {
+        "feature": "city_hist_p75",
+        "importance": 0.2198152763639077,
+        "share": 0.21981527636390774
+      },
+      {
+        "feature": "city_hist_p90",
+        "importance": 0.10739788877757946,
+        "share": 0.10739788877757947
+      },
+      {
+        "feature": "pickup_baseline_remaining",
+        "importance": 0.06712196043593163,
+        "share": 0.06712196043593165
+      },
+      {
+        "feature": "city_hist_median",
+        "importance": 0.022856585895685202,
+        "share": 0.022856585895685205
+      },
+      {
+        "feature": "city_code",
+        "importance": 0.021523264187862098,
+        "share": 0.0215232641878621
+      },
+      {
+        "feature": "city_volatility",
+        "importance": 0.015272079896062375,
+        "share": 0.015272079896062376
+      },
+      {
+        "feature": "pickup_baseline_prediction",
+        "importance": 0.007991790197274957,
+        "share": 0.007991790197274959
+      },
+      {
+        "feature": "city_hist_std",
+        "importance": 0.006811282525188458,
+        "share": 0.006811282525188459
+      },
+      {
+        "feature": "jalali_month",
+        "importance": 0.0056471162385828355,
+        "share": 0.005647116238582836
+      },
+      {
+        "feature": "expected_completion_fraction",
+        "importance": 0.0033127821688090377,
+        "share": 0.003312782168809038
+      },
+      {
+        "feature": "days_to_checkin",
+        "importance": 0.002777050136379744,
+        "share": 0.0027770501363797444
+      },
+      {
+        "feature": "is_weekend",
+        "importance": 0.002006308119719049,
+        "share": 0.0020063081197190494
+      },
+      {
+        "feature": "jalali_day",
+        "importance": 0.0019464370672506188,
+        "share": 0.001946437067250619
+      }
+    ]
+  },
+  "validation": {
+    "method": "five leakage-safe walk-forward simulated competition folds",
+    "pooled_wape": 0.158148,
+    "pooled_normalised_bias": -0.098586,
+    "folds": {
+      "2024-11-21": 0.12219,
+      "2025-05-21": 0.271148,
+      "2025-08-21": 0.127601,
+      "2025-09-22": 0.108677,
+      "2025-10-22": 0.118212
+    },
+    "baseline_wape": 0.219991,
+    "relative_improvement": 0.2811,
+    "experiments": 4
+  },
+  "safety_invariants": [
+    "features at horizon h only read searches available by checkin - h",
+    "predicted_demand is finite and non-negative",
+    "predicted_demand is never below observed_so_far",
+    "all 321 cities and all 30 target dates are emitted exactly once"
+  ],
+  "limitations": [
+    "demand means observed search volume, not bookings or causal travel intent",
+    "the model is validated on historical temporal folds from the supplied dataset",
+    "city_code is the competition city identifier; no statistical city clustering is used"
+  ],
+  "commands": {
+    "train_and_evaluate": "make pol4",
+    "inference_without_training": "make pol4-predict",
+    "tests": "make test-pol4"
+  }
+}

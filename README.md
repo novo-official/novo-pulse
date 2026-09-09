@@ -335,13 +335,14 @@ carries 2,686,508 searches across 5,348 of the 9,630 target pairs.
 ### Run it
 
 ```bash
-# 1. put the three competition CSVs here (they are gitignored)
-#    data/raw/pol4/{search_data.csv,evaluation.csv,cities.csv}
+# 1. put the four competition CSVs here (they are gitignored)
+#    data/raw/pol4/{search_data.csv,evaluation.csv,cities.csv,city_code_mapping.csv}
 
 make pol4                 # champion backtest + stability + results.csv   (~12 min)
 make pol4-baseline        # the pickup baseline alone - fast fallback      (~15s)
 make pol4-ablation        # rerun the full feature ladder                  (~35 min)
 make pol4-submission      # regenerate results.csv, nothing else           (~1 min)
+make pol4-predict         # load serialized LightGBM; no retraining
 make test-pol4            # the Pol 4 test suite
 ```
 
@@ -363,7 +364,21 @@ Artefacts land in `artifacts/pol4/`:
 | `feature_importance.json` | the champion's gain importance, all 66 features |
 | `stability.parquet` | D-30 → D-1 forecast snapshots for a historical window |
 | `pickup_curves.parquet` | the fitted completion curves (global, province, city) |
+| `input_manifest.json` | paths, schemas and SHA-256 hashes for the four raw inputs |
+| `trainset/` | reusable features, target and audit metadata as checksummed Parquet |
+| `model_bundle/` | two native LightGBM boosters, baseline state, feature contract and checksums |
+| `model_card.json` | judge-facing task, algorithm, validation, invariants and limitations |
 | `run_summary.json` | data validation, model config, submission report |
+
+After `make pol4`, inference can be reproduced in a fresh process without
+fitting either LightGBM model:
+
+```bash
+make pol4-predict
+```
+
+This verifies the input and model checksums before writing
+`artifacts/pol4/results_from_bundle.csv`.
 
 ### Results — walk-forward, five simulated competitions
 

@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -116,12 +117,64 @@ class RemainingDemandModel:
         observed = np.asarray(observed, dtype=np.float64)
         return observed + self.predict_remaining(X)
 
+    # ------------------------------------------------------------ persistence
+    def save_native(self, path: str | Path) -> Path:
+        """Save the fitted estimator in its library's stable native format."""
+        if self.model is None:
+            raise RuntimeError("model has not been fitted")
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if self.kind == "lightgbm":
+            booster = getattr(self.model, "booster_", self.model)
+            if not hasattr(booster, "save_model"):
+                raise TypeError("the fitted LightGBM object does not expose save_model")
+            booster.save_model(str(path))
+        elif self.kind == "catboost":
+            self.model.save_model(str(path))
+        else:
+            raise ValueError(f"unknown model kind {self.kind!r}")
+        return path
+
+    @classmethod
+    def load_native(
+        cls,
+        path: str | Path,
+        *,
+        kind: str,
+        params: dict[str, Any],
+        log1p: bool,
+        seed: int,
+        feature_names: list[str],
+        categorical: list[str],
+    ) -> "RemainingDemandModel":
+        """Restore a native estimator with its explicit feature contract."""
+        instance = cls(kind=kind, params=dict(params), log1p=log1p, seed=seed)
+        instance.feature_names = list(feature_names)
+        instance.categorical = list(categorical)
+        if kind == "lightgbm":
+            try:
+                from lightgbm import Booster
+            except ImportError as exc:  # pragma: no cover
+                raise ModelUnavailable("lightgbm is not installed") from exc
+            instance.model = Booster(model_file=str(path))
+        elif kind == "catboost":
+            try:
+                from catboost import CatBoostRegressor
+            except ImportError as exc:  # pragma: no cover
+                raise ModelUnavailable("catboost is not installed") from exc
+            instance.model = CatBoostRegressor()
+            instance.model.load_model(str(path))
+        else:
+            raise ValueError(f"unknown model kind {kind!r}")
+        return instance
+
     # ----------------------------------------------------------- importance
     def importance(self) -> pd.DataFrame:
         if self.model is None:
             raise RuntimeError("model has not been fitted")
         if self.kind == "lightgbm":
-            values = self.model.booster_.feature_importance(importance_type="gain")
+            booster = getattr(self.model, "booster_", self.model)
+            values = booster.feature_importance(importance_type="gain")
         else:
             values = self.model.get_feature_importance()
         frame = pd.DataFrame({"feature": self.feature_names, "importance": values})

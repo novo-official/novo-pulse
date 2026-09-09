@@ -9,6 +9,7 @@ import pytest
 
 from ml.pol4.champion import ChampionSpec
 from ml.pol4.config import SUBMISSION_COLUMNS
+from ml.pol4.inference import run_from_bundle
 from ml.pol4.pipeline import build_parser, run
 from tests.pol4_fixtures import write_dataset
 
@@ -48,15 +49,21 @@ def test_champion_run_writes_every_phase2_artefact(champion_run):
     _, config = champion_run
     for name in (
         "results.csv",
+        "input_manifest.json",
         "experiments.csv",
         "experiment_summary.json",
         "backtest_metrics_phase2.json",
         "feature_importance.json",
+        "model_card.json",
         "stability.parquet",
         "pickup_curves.parquet",
         "run_summary.json",
     ):
         assert (config.artifacts_dir / name).exists(), name
+    for name in ("features.parquet", "target.parquet", "meta.parquet", "manifest.json"):
+        assert (config.artifacts_dir / "trainset" / name).exists(), name
+    for name in ("manifest.json", "model_spec.json", "baseline_state.joblib"):
+        assert (config.artifacts_dir / "model_bundle" / name).exists(), name
 
 
 def test_champion_run_reports_a_valid_submission(champion_run):
@@ -111,7 +118,33 @@ def test_run_summary_records_how_the_champion_was_configured(champion_run):
     assert champion["model"] == "lightgbm"
     assert champion["log1p_target"] is True
     assert champion["training_rows"] > 0
+    assert champion["model_bundle"]["load_parity_verified"] is True
+    assert champion["trainset"]["rows"] == champion["training_rows"]
     assert len(champion["top_features"]) > 0
+
+
+def test_run_records_exactly_the_four_allowed_input_sources(champion_run):
+    summary, config = champion_run
+    manifest = json.loads((config.artifacts_dir / "input_manifest.json").read_text())
+    assert manifest["allowed_sources"] == [
+        "search_data.csv",
+        "evaluation.csv",
+        "cities.csv",
+        "city_code_mapping.csv",
+    ]
+    assert summary["provenance"]["input_digest"] == manifest["input_digest"]
+
+
+def test_saved_bundle_can_produce_submission_without_training(champion_run, tmp_path):
+    _, config = champion_run
+    output = tmp_path / "from_bundle.csv"
+    result = run_from_bundle(config, output_path=output)
+    assert result["valid"] is True
+    assert result["rows"] == len(pd.read_csv(config.artifacts_dir / "results.csv"))
+    pd.testing.assert_frame_equal(
+        pd.read_csv(config.artifacts_dir / "results.csv"),
+        pd.read_csv(output),
+    )
 
 
 def test_champion_and_baseline_agree_on_the_grid_shape(baseline_run, champion_run):
@@ -126,6 +159,7 @@ def test_cli_defaults_to_the_champion():
     args = build_parser().parse_args([])
     assert args.model == "champion"
     assert args.ablation is False
+    assert args.reuse_trainset is False
 
 
 def test_cli_exposes_the_baseline_fallback():

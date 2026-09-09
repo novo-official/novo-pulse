@@ -10,8 +10,14 @@ the same inputs produce the same output.
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import logging
+import os
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from pathlib import Path
+import tempfile
 from typing import Any
 
 import numpy as np
@@ -19,10 +25,16 @@ import pandas as pd
 
 from .baseline import PickupBaseline
 from .config import Pol4Config
-from .dataset import build_inference_frame, build_training_frame
+from .dataset import SupervisedFrame, build_inference_frame, build_training_frame
 from .features import GROUP_ORDER, feature_names
 from .loader import CHECKIN, CITY, Pol4Data
 from .models import RemainingDemandModel
+from .artifacts import (
+    ARTEFACT_FORMAT_VERSION,
+    sha256_file,
+    verify_checksums,
+    write_json_atomic,
+)
 
 log = logging.getLogger(__name__)
 
@@ -91,14 +103,21 @@ class FittedChampion:
         cutoff: pd.Timestamp,
         spec: ChampionSpec | None = None,
         config: Pol4Config | None = None,
+        *,
+        baseline: PickupBaseline | None = None,
+        train: SupervisedFrame | None = None,
     ) -> "FittedChampion":
         spec = spec or ChampionSpec()
         config = config or Pol4Config()
         cutoff = pd.Timestamp(cutoff)
         columns = feature_names(spec.groups)
 
-        baseline = PickupBaseline.fit(data, cutoff, config)
-        train = build_training_frame(data, cutoff, spec.groups, baseline, config)
+        baseline = baseline or PickupBaseline.fit(data, cutoff, config)
+        train = train or build_training_frame(data, cutoff, spec.groups, baseline, config)
+        if train.y is None:
+            raise ValueError("champion training data does not carry a target")
+        if list(train.X.columns) != columns:
+            raise ValueError("champion training features do not match the selected feature schema")
         horizons = train.meta["horizon"].to_numpy()
 
         models: dict[tuple[int, int], RemainingDemandModel] = {}
@@ -127,6 +146,143 @@ class FittedChampion:
             cutoff=cutoff,
             config=config,
             training_rows=len(train),
+        )
+
+    # ------------------------------------------------------------ persistence
+    def save(self, directory: str | Path, *, input_digest: str) -> dict[str, Any]:
+        """Save both native boosters and all state needed by a fresh process."""
+        import joblib
+
+        directory = Path(directory)
+        directory.mkdir(parents=True, exist_ok=True)
+
+        model_entries: list[dict[str, Any]] = []
+        for (low, high), model in sorted(self.models.items()):
+            extension = "txt" if model.kind == "lightgbm" else "cbm"
+            filename = f"{model.kind}_h{low}_{high}.{extension}"
+            model.save_native(directory / filename)
+            model_entries.append(
+                {
+                    "band": [low, high],
+                    "file": filename,
+                    "kind": model.kind,
+                    "params": model.params,
+                    "log1p": model.log1p,
+                    "seed": model.seed,
+                    "feature_names": model.feature_names,
+                    "categorical": model.categorical,
+                }
+            )
+
+        # The baseline is only loaded after its checksum has been verified.
+        # joblib is used here for trusted, locally-built state containing nested
+        # numpy arrays and tuple-key dictionaries; native LightGBM files remain
+        # independently inspectable and portable.
+        baseline_path = directory / "baseline_state.joblib"
+        fd, temporary = tempfile.mkstemp(
+            prefix=f".{baseline_path.name}.", suffix=".tmp", dir=directory
+        )
+        os.close(fd)
+        temporary_path = Path(temporary)
+        try:
+            joblib.dump(self.baseline, temporary_path)
+            temporary_path.replace(baseline_path)
+        except Exception:
+            temporary_path.unlink(missing_ok=True)
+            raise
+
+        spec_payload = {
+            "format_version": ARTEFACT_FORMAT_VERSION,
+            "cutoff": self.cutoff.isoformat(),
+            "training_rows": self.training_rows,
+            "input_digest": input_digest,
+            "spec": {
+                "bands": [list(band) for band in self.spec.bands],
+                "kind": self.spec.kind,
+                "groups": list(self.spec.groups),
+                "log1p": self.spec.log1p,
+                "params": self.spec.params,
+                "blend": self.spec.blend,
+            },
+            "models": model_entries,
+            "baseline_file": baseline_path.name,
+        }
+        write_json_atomic(spec_payload, directory / "model_spec.json")
+
+        protected = [entry["file"] for entry in model_entries]
+        protected += ["baseline_state.joblib", "model_spec.json"]
+        checksums = {name: sha256_file(directory / name) for name in protected}
+        bundle_digest = hashlib.sha256(
+            "\n".join(f"{name}:{checksums[name]}" for name in sorted(checksums)).encode("utf-8")
+        ).hexdigest()
+        manifest = {
+            "format_version": ARTEFACT_FORMAT_VERSION,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "input_digest": input_digest,
+            "bundle_digest": bundle_digest,
+            "files": checksums,
+        }
+        write_json_atomic(manifest, directory / "manifest.json")
+        return manifest
+
+    @classmethod
+    def load(cls, directory: str | Path) -> "FittedChampion":
+        """Verify and restore a fitted champion without training."""
+        import joblib
+
+        directory = Path(directory)
+        manifest_path = directory / "manifest.json"
+        if not manifest_path.is_file():
+            raise ValueError(f"model manifest is missing: {manifest_path}")
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if manifest.get("format_version") != ARTEFACT_FORMAT_VERSION:
+            raise ValueError(f"unsupported model artefact format: {manifest.get('format_version')}")
+        verify_checksums(directory, manifest["files"])
+
+        payload = json.loads((directory / "model_spec.json").read_text(encoding="utf-8"))
+        if payload.get("input_digest") != manifest.get("input_digest"):
+            raise ValueError("model spec and manifest refer to different input data")
+        raw_spec = payload["spec"]
+        spec = ChampionSpec(
+            bands=tuple(tuple(int(value) for value in band) for band in raw_spec["bands"]),
+            kind=raw_spec["kind"],
+            groups=tuple(raw_spec["groups"]),
+            log1p=bool(raw_spec["log1p"]),
+            params=dict(raw_spec["params"]),
+            blend=float(raw_spec["blend"]),
+        )
+        expected_features = feature_names(spec.groups)
+
+        models: dict[tuple[int, int], RemainingDemandModel] = {}
+        for entry in payload["models"]:
+            if entry["feature_names"] != expected_features:
+                raise ValueError("saved model feature schema does not match its champion spec")
+            band = tuple(int(value) for value in entry["band"])
+            models[band] = RemainingDemandModel.load_native(
+                directory / entry["file"],
+                kind=entry["kind"],
+                params=entry["params"],
+                log1p=bool(entry["log1p"]),
+                seed=int(entry["seed"]),
+                feature_names=entry["feature_names"],
+                categorical=entry["categorical"],
+            )
+        if set(models) != set(spec.bands):
+            raise ValueError("saved model bundle does not contain every configured horizon band")
+
+        baseline = joblib.load(directory / payload["baseline_file"])
+        if not isinstance(baseline, PickupBaseline):
+            raise ValueError("saved baseline state has an unexpected type")
+        cutoff = pd.Timestamp(payload["cutoff"])
+        if pd.Timestamp(baseline.cutoff) != cutoff:
+            raise ValueError("saved baseline and champion use different cutoffs")
+        return cls(
+            spec=spec,
+            models=models,
+            baseline=baseline,
+            cutoff=cutoff,
+            config=baseline.config,
+            training_rows=int(payload["training_rows"]),
         )
 
     @property
