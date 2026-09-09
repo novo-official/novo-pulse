@@ -29,9 +29,12 @@ CHECKIN = "checkin"
 SEARCHES = "search_count"
 DTC = "days_to_checkin"
 PROVINCE = "province_code"
+CITY_NAME = "city"
+PROVINCE_NAME = "province"
 
 SEARCH_COLUMNS = (LOG_DATE, CITY, CHECKIN, SEARCHES)
 CITY_COLUMNS = (CITY, PROVINCE, "lat", "long")
+NAME_COLUMNS = (CITY_NAME, CITY, PROVINCE_NAME, PROVINCE)
 
 
 class Pol4DataError(ValueError):
@@ -62,6 +65,51 @@ class Pol4Data:
     @property
     def province_of(self) -> pd.Series:
         return self.cities.set_index(CITY)[PROVINCE]
+
+    @property
+    def has_names(self) -> bool:
+        return CITY_NAME in self.cities.columns
+
+    @property
+    def city_name_of(self) -> pd.Series:
+        """city_code -> readable name, falling back to the code as a string.
+
+        Names are for humans. `results.csv` still carries the numeric
+        `cluster_code` the organisers asked for - see `submission.py`.
+        """
+        if self.has_names:
+            return self.cities.set_index(CITY)[CITY_NAME]
+        return pd.Series(
+            self.cities[CITY].astype(str).to_numpy(), index=self.cities[CITY], name=CITY_NAME
+        )
+
+    @property
+    def province_name_of(self) -> pd.Series:
+        if PROVINCE_NAME in self.cities.columns:
+            return self.cities.set_index(CITY)[PROVINCE_NAME]
+        return pd.Series(
+            self.cities[PROVINCE].astype(str).to_numpy(),
+            index=self.cities[CITY],
+            name=PROVINCE_NAME,
+        )
+
+    def name(self, city_codes) -> np.ndarray:
+        """Readable names for an array of city codes."""
+        return self.city_name_of.reindex(pd.Index(np.asarray(city_codes))).to_numpy()
+
+    def label(self, frame: pd.DataFrame, column: str = CITY) -> pd.DataFrame:
+        """Insert `city` and `province` name columns next to a code column."""
+        out = frame.copy()
+        codes = pd.Index(out[column])
+        out.insert(
+            out.columns.get_loc(column) + 1, CITY_NAME, self.city_name_of.reindex(codes).to_numpy()
+        )
+        out.insert(
+            out.columns.get_loc(CITY_NAME) + 1,
+            PROVINCE_NAME,
+            self.province_name_of.reindex(codes).to_numpy(),
+        )
+        return out
 
     def history_before(self, cutoff: pd.Timestamp) -> pd.DataFrame:
         """Search rows for check-ins that are already complete at `cutoff`.
@@ -105,6 +153,7 @@ class Pol4Data:
     def summary(self) -> dict[str, Any]:
         return {
             "search_rows": int(len(self.search)),
+            "city_names": bool(self.has_names),
             "evaluation_rows": int(len(self.evaluation)),
             "cities": int(len(self.cities)),
             "provinces": int(self.cities[PROVINCE].nunique()),
@@ -207,6 +256,81 @@ def _validate_events(
     return frame
 
 
+def _attach_names(
+    cities: pd.DataFrame,
+    config: Pol4Config,
+    findings: list[dict[str, Any]],
+    strict: bool,
+) -> pd.DataFrame:
+    """Join readable city and province names, when the mapping is present.
+
+    The mapping is optional on purpose: the pipeline must still run on a clone
+    that only has the three official files. Without it every report falls back
+    to the numeric codes rather than failing.
+    """
+    path = config.city_names_path
+    if not path.exists():
+        findings.append(
+            {
+                "severity": "low",
+                "dataset": path.name,
+                "title": "no city name mapping",
+                "detail": (
+                    f"{path} not found; reports will show numeric city codes. "
+                    "Add the mapping to label them."
+                ),
+            }
+        )
+        return cities
+
+    names = pd.read_csv(path, dtype={CITY: "int32"}).dropna(how="all")
+    missing = [c for c in NAME_COLUMNS if c not in names.columns]
+    if missing:
+        raise Pol4DataError(f"{path.name} is missing column(s): {missing}")
+    names = names.loc[:, list(NAME_COLUMNS)].drop_duplicates(CITY)
+
+    unnamed = sorted(set(cities[CITY]) - set(names[CITY]))
+    if unnamed:
+        detail = f"{len(unnamed)} city(ies) have no name in {path.name}, e.g. {unnamed[:5]}"
+        if strict:
+            raise Pol4DataError(detail)
+        findings.append(
+            {"severity": "medium", "dataset": path.name, "title": "unnamed cities", "detail": detail}
+        )
+
+    merged = cities.merge(names, on=CITY, how="left", suffixes=("", "_named"))
+    # The mapping repeats province_code; it must agree with cities.csv or one of
+    # the two files is wrong about which province a city is in.
+    if f"{PROVINCE}_named" in merged.columns:
+        clash = merged[PROVINCE] != merged[f"{PROVINCE}_named"]
+        if clash.any():
+            detail = (
+                f"{int(clash.sum())} city(ies) have a different province_code in "
+                f"{path.name} than in cities.csv"
+            )
+            if strict:
+                raise Pol4DataError(detail)
+            findings.append(
+                {
+                    "severity": "high",
+                    "dataset": path.name,
+                    "title": "province mismatch",
+                    "detail": detail,
+                }
+            )
+        merged = merged.drop(columns=[f"{PROVINCE}_named"])
+
+    findings.append(
+        {
+            "severity": "info",
+            "dataset": path.name,
+            "title": "city names attached",
+            "detail": f"{merged[CITY_NAME].notna().sum()} of {len(merged)} cities named",
+        }
+    )
+    return merged
+
+
 def load_pol4(config: Pol4Config | None = None, strict: bool = True) -> Pol4Data:
     """Load search_data.csv, evaluation.csv and cities.csv with validation.
 
@@ -230,6 +354,7 @@ def load_pol4(config: Pol4Config | None = None, strict: bool = True) -> Pol4Data
     if missing:
         raise Pol4DataError(f"cities.csv is missing column(s): {missing}")
     cities = cities.loc[:, list(CITY_COLUMNS)].drop_duplicates(CITY).reset_index(drop=True)
+    cities = _attach_names(cities, config, findings, strict)
 
     # -- city coverage, both directions ------------------------------------
     known = set(cities[CITY])

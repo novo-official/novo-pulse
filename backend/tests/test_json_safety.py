@@ -166,13 +166,17 @@ def test_a_run_whose_champion_has_no_interval_still_saves(
         )
 
 
-def test_every_shipped_demo_artifact_is_strict_json():
-    """The committed demo artefacts are what DEMO_MODE serves on a fresh clone."""
-    from ml.paths import DEMO_ARTIFACTS_DIR
+def test_every_shipped_artifact_is_strict_json():
+    """The committed Pol 4 artefacts are the only ones that ship.
 
-    files = list(DEMO_ARTIFACTS_DIR.glob("*.json"))
+    NaN and Infinity are valid Python `json` output and invalid JSON, so a
+    metrics file carrying either would parse here and fail in the browser.
+    """
+    from ml.pol4.config import ARTIFACTS_DIR
+
+    files = list(ARTIFACTS_DIR.glob("*.json"))
     if not files:
-        pytest.skip("no precomputed demo artefacts in this checkout")
+        pytest.skip("no Pol 4 artefacts in this checkout")
 
     for path in files:
         json.loads(

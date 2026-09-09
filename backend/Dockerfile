@@ -19,7 +19,7 @@ COPY config/ ./config/
 COPY scripts/ ./scripts/
 
 # Writable locations for artefacts and uploads.
-RUN mkdir -p /app/data/raw /app/data/synthetic /app/data/uploads /app/runs /app/reports
+RUN mkdir -p /app/data/raw /app/data/uploads /app/runs /app/reports /app/artifacts
 
 ENV DJANGO_SETTINGS_MODULE=config.settings \
     PYTHONPATH=/app/backend

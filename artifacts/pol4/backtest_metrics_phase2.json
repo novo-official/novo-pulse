@@ -1,0 +1,1217 @@
+{
+  "config": {
+    "cutoffs": [
+      "2024-11-21",
+      "2025-05-21",
+      "2025-08-21",
+      "2025-09-22",
+      "2025-10-22"
+    ],
+    "target_days": 30,
+    "train_horizons": [
+      1,
+      2,
+      3,
+      5,
+      7,
+      10,
+      14,
+      18,
+      21,
+      25,
+      30
+    ],
+    "train_window_days": 540,
+    "max_train_rows": 900000
+  },
+  "champion": {
+    "name": "CHAMPION lightgbm",
+    "pooled": {
+      "n": 48150,
+      "actual_total": 64441140.0,
+      "predicted_total": 58088168.06,
+      "wape": 0.158148,
+      "mae": 211.6558,
+      "normalised_bias": -0.098586
+    },
+    "folds": {
+      "2024-11-21": {
+        "n": 9630,
+        "actual_total": 6787514.0,
+        "predicted_total": 6837346.28,
+        "wape": 0.12219,
+        "mae": 86.1235,
+        "normalised_bias": 0.007342
+      },
+      "2025-05-21": {
+        "n": 9630,
+        "actual_total": 16216851.0,
+        "predicted_total": 12596538.03,
+        "wape": 0.271148,
+        "mae": 456.6116,
+        "normalised_bias": -0.223244
+      },
+      "2025-08-21": {
+        "n": 9630,
+        "actual_total": 19510897.0,
+        "predicted_total": 18708455.78,
+        "wape": 0.127601,
+        "mae": 258.5263,
+        "normalised_bias": -0.041128
+      },
+      "2025-09-22": {
+        "n": 9630,
+        "actual_total": 12251705.0,
+        "predicted_total": 11220469.63,
+        "wape": 0.108677,
+        "mae": 138.2638,
+        "normalised_bias": -0.084171
+      },
+      "2025-10-22": {
+        "n": 9630,
+        "actual_total": 9674173.0,
+        "predicted_total": 8725358.34,
+        "wape": 0.118212,
+        "mae": 118.7538,
+        "normalised_bias": -0.098077
+      }
+    },
+    "by_horizon": [
+      {
+        "key": 1,
+        "n": 1605,
+        "actual_total": 2445231.0,
+        "predicted_total": 2416998.2,
+        "wape": 0.02201,
+        "mae": 33.5325,
+        "normalised_bias": -0.011546
+      },
+      {
+        "key": 2,
+        "n": 1605,
+        "actual_total": 1983424.0,
+        "predicted_total": 1953807.24,
+        "wape": 0.030366,
+        "mae": 37.5256,
+        "normalised_bias": -0.014932
+      },
+      {
+        "key": 3,
+        "n": 1605,
+        "actual_total": 1780871.0,
+        "predicted_total": 1771842.52,
+        "wape": 0.038016,
+        "mae": 42.1812,
+        "normalised_bias": -0.00507
+      },
+      {
+        "key": 4,
+        "n": 1605,
+        "actual_total": 1438398.0,
+        "predicted_total": 1407517.09,
+        "wape": 0.050143,
+        "mae": 44.9379,
+        "normalised_bias": -0.021469
+      },
+      {
+        "key": 5,
+        "n": 1605,
+        "actual_total": 1534207.0,
+        "predicted_total": 1541638.72,
+        "wape": 0.047772,
+        "mae": 45.6647,
+        "normalised_bias": 0.004844
+      },
+      {
+        "key": 6,
+        "n": 1605,
+        "actual_total": 1659725.0,
+        "predicted_total": 1651819.75,
+        "wape": 0.062251,
+        "mae": 64.3736,
+        "normalised_bias": -0.004763
+      },
+      {
+        "key": 7,
+        "n": 1605,
+        "actual_total": 2138014.0,
+        "predicted_total": 2093707.1,
+        "wape": 0.084983,
+        "mae": 113.2056,
+        "normalised_bias": -0.020723
+      },
+      {
+        "key": 8,
+        "n": 1605,
+        "actual_total": 2169580.0,
+        "predicted_total": 2031200.22,
+        "wape": 0.100379,
+        "mae": 135.6887,
+        "normalised_bias": -0.063782
+      },
+      {
+        "key": 9,
+        "n": 1605,
+        "actual_total": 1744283.0,
+        "predicted_total": 1670442.82,
+        "wape": 0.08549,
+        "mae": 92.9089,
+        "normalised_bias": -0.042333
+      },
+      {
+        "key": 10,
+        "n": 1605,
+        "actual_total": 1885905.0,
+        "predicted_total": 1744260.33,
+        "wape": 0.110503,
+        "mae": 129.8435,
+        "normalised_bias": -0.075107
+      },
+      {
+        "key": 11,
+        "n": 1605,
+        "actual_total": 1566502.0,
+        "predicted_total": 1440210.32,
+        "wape": 0.107229,
+        "mae": 104.6565,
+        "normalised_bias": -0.08062
+      },
+      {
+        "key": 12,
+        "n": 1605,
+        "actual_total": 1702579.0,
+        "predicted_total": 1626962.8,
+        "wape": 0.086493,
+        "mae": 91.7515,
+        "normalised_bias": -0.044413
+      },
+      {
+        "key": 13,
+        "n": 1605,
+        "actual_total": 2327008.0,
+        "predicted_total": 2357586.61,
+        "wape": 0.095359,
+        "mae": 138.256,
+        "normalised_bias": 0.013141
+      },
+      {
+        "key": 14,
+        "n": 1605,
+        "actual_total": 3714377.0,
+        "predicted_total": 3276909.36,
+        "wape": 0.163467,
+        "mae": 378.3044,
+        "normalised_bias": -0.117777
+      },
+      {
+        "key": 15,
+        "n": 1605,
+        "actual_total": 2990185.0,
+        "predicted_total": 2899834.25,
+        "wape": 0.1236,
+        "mae": 230.273,
+        "normalised_bias": -0.030216
+      },
+      {
+        "key": 16,
+        "n": 1605,
+        "actual_total": 1871315.0,
+        "predicted_total": 1935290.35,
+        "wape": 0.164182,
+        "mae": 191.4241,
+        "normalised_bias": 0.034187
+      },
+      {
+        "key": 17,
+        "n": 1605,
+        "actual_total": 1933551.0,
+        "predicted_total": 1892986.24,
+        "wape": 0.166014,
+        "mae": 199.9984,
+        "normalised_bias": -0.020979
+      },
+      {
+        "key": 18,
+        "n": 1605,
+        "actual_total": 1690581.0,
+        "predicted_total": 1651393.65,
+        "wape": 0.127812,
+        "mae": 134.6273,
+        "normalised_bias": -0.02318
+      },
+      {
+        "key": 19,
+        "n": 1605,
+        "actual_total": 2003969.0,
+        "predicted_total": 1849086.56,
+        "wape": 0.10534,
+        "mae": 131.5255,
+        "normalised_bias": -0.077288
+      },
+      {
+        "key": 20,
+        "n": 1605,
+        "actual_total": 2776614.0,
+        "predicted_total": 2400763.92,
+        "wape": 0.15601,
+        "mae": 269.8944,
+        "normalised_bias": -0.135363
+      },
+      {
+        "key": 21,
+        "n": 1605,
+        "actual_total": 2975707.0,
+        "predicted_total": 2700424.33,
+        "wape": 0.134294,
+        "mae": 248.9839,
+        "normalised_bias": -0.09251
+      },
+      {
+        "key": 22,
+        "n": 1605,
+        "actual_total": 2566587.0,
+        "predicted_total": 2273022.01,
+        "wape": 0.162642,
+        "mae": 260.0845,
+        "normalised_bias": -0.11438
+      },
+      {
+        "key": 23,
+        "n": 1605,
+        "actual_total": 2317533.0,
+        "predicted_total": 1851371.18,
+        "wape": 0.233056,
+        "mae": 336.5209,
+        "normalised_bias": -0.201146
+      },
+      {
+        "key": 24,
+        "n": 1605,
+        "actual_total": 2059851.0,
+        "predicted_total": 1807579.2,
+        "wape": 0.173086,
+        "mae": 222.1385,
+        "normalised_bias": -0.122471
+      },
+      {
+        "key": 25,
+        "n": 1605,
+        "actual_total": 1813315.0,
+        "predicted_total": 1517720.1,
+        "wape": 0.214183,
+        "mae": 241.9823,
+        "normalised_bias": -0.163014
+      },
+      {
+        "key": 26,
+        "n": 1605,
+        "actual_total": 1989278.0,
+        "predicted_total": 1500680.01,
+        "wape": 0.294081,
+        "mae": 364.4914,
+        "normalised_bias": -0.245616
+      },
+      {
+        "key": 27,
+        "n": 1605,
+        "actual_total": 2284077.0,
+        "predicted_total": 1621195.37,
+        "wape": 0.351932,
+        "mae": 500.8343,
+        "normalised_bias": -0.290219
+      },
+      {
+        "key": 28,
+        "n": 1605,
+        "actual_total": 2650852.0,
+        "predicted_total": 2044318.16,
+        "wape": 0.343138,
+        "mae": 566.734,
+        "normalised_bias": -0.228807
+      },
+      {
+        "key": 29,
+        "n": 1605,
+        "actual_total": 2464406.0,
+        "predicted_total": 1809502.4,
+        "wape": 0.336764,
+        "mae": 517.0858,
+        "normalised_bias": -0.265745
+      },
+      {
+        "key": 30,
+        "n": 1605,
+        "actual_total": 1963215.0,
+        "predicted_total": 1348097.24,
+        "wape": 0.392619,
+        "mae": 480.2458,
+        "normalised_bias": -0.313322
+      }
+    ],
+    "by_horizon_bucket": [
+      {
+        "key": "1-3",
+        "n": 4815,
+        "actual_total": 6209526.0,
+        "predicted_total": 6142647.96,
+        "wape": 0.029269,
+        "mae": 37.7464,
+        "normalised_bias": -0.01077
+      },
+      {
+        "key": "4-7",
+        "n": 6420,
+        "actual_total": 6770344.0,
+        "predicted_total": 6694682.66,
+        "wape": 0.063576,
+        "mae": 67.0454,
+        "normalised_bias": -0.011175
+      },
+      {
+        "key": "8-14",
+        "n": 11235,
+        "actual_total": 15110234.0,
+        "predicted_total": 14147572.46,
+        "wape": 0.113804,
+        "mae": 153.0585,
+        "normalised_bias": -0.063709
+      },
+      {
+        "key": "15-21",
+        "n": 11235,
+        "actual_total": 16241922.0,
+        "predicted_total": 15329779.31,
+        "wape": 0.13901,
+        "mae": 200.9609,
+        "normalised_bias": -0.05616
+      },
+      {
+        "key": "22-30",
+        "n": 14445,
+        "actual_total": 20109114.0,
+        "predicted_total": 15773485.67,
+        "wape": 0.278562,
+        "mae": 387.7908,
+        "normalised_bias": -0.215605
+      }
+    ],
+    "by_province": [
+      {
+        "key": "mazandaran",
+        "n": 9300,
+        "actual_total": 23702705.0,
+        "predicted_total": 20834341.15,
+        "wape": 0.180249,
+        "mae": 459.3963,
+        "normalised_bias": -0.121014
+      },
+      {
+        "key": "khorasan_razavi",
+        "n": 6150,
+        "actual_total": 5476245.0,
+        "predicted_total": 5276051.19,
+        "wape": 0.0985,
+        "mae": 87.7091,
+        "normalised_bias": -0.036557
+      },
+      {
+        "key": "isfahan",
+        "n": 11700,
+        "actual_total": 2808208.0,
+        "predicted_total": 2541887.3,
+        "wape": 0.163501,
+        "mae": 39.2432,
+        "normalised_bias": -0.094837
+      },
+      {
+        "key": "hormozgan",
+        "n": 3750,
+        "actual_total": 5227343.0,
+        "predicted_total": 4989342.71,
+        "wape": 0.079067,
+        "mae": 110.2167,
+        "normalised_bias": -0.04553
+      },
+      {
+        "key": "gilan",
+        "n": 7950,
+        "actual_total": 15003243.0,
+        "predicted_total": 13491088.55,
+        "wape": 0.157252,
+        "mae": 296.7664,
+        "normalised_bias": -0.100789
+      },
+      {
+        "key": "alborz",
+        "n": 2700,
+        "actual_total": 3692806.0,
+        "predicted_total": 3238607.18,
+        "wape": 0.215071,
+        "mae": 294.1538,
+        "normalised_bias": -0.122996
+      },
+      {
+        "key": "tehran",
+        "n": 6600,
+        "actual_total": 8530590.0,
+        "predicted_total": 7716849.97,
+        "wape": 0.15866,
+        "mae": 205.0704,
+        "normalised_bias": -0.095391
+      }
+    ],
+    "by_weekday": [
+      {
+        "key": 0,
+        "n": 6420,
+        "actual_total": 6724589.0,
+        "predicted_total": 6119263.21,
+        "wape": 0.147188,
+        "mae": 154.1712,
+        "normalised_bias": -0.090017
+      },
+      {
+        "key": 1,
+        "n": 6741,
+        "actual_total": 8436861.0,
+        "predicted_total": 7614155.67,
+        "wape": 0.153281,
+        "mae": 191.8427,
+        "normalised_bias": -0.097513
+      },
+      {
+        "key": 2,
+        "n": 6741,
+        "actual_total": 11817912.0,
+        "predicted_total": 10036501.17,
+        "wape": 0.186011,
+        "mae": 326.1028,
+        "normalised_bias": -0.150738
+      },
+      {
+        "key": 3,
+        "n": 7062,
+        "actual_total": 15009911.0,
+        "predicted_total": 13397232.73,
+        "wape": 0.162496,
+        "mae": 345.3767,
+        "normalised_bias": -0.107441
+      },
+      {
+        "key": 4,
+        "n": 7704,
+        "actual_total": 8887660.0,
+        "predicted_total": 7826864.4,
+        "wape": 0.180296,
+        "mae": 207.9974,
+        "normalised_bias": -0.119356
+      },
+      {
+        "key": 5,
+        "n": 7062,
+        "actual_total": 7212036.0,
+        "predicted_total": 7058504.79,
+        "wape": 0.116155,
+        "mae": 118.6231,
+        "normalised_bias": -0.021288
+      },
+      {
+        "key": 6,
+        "n": 6420,
+        "actual_total": 6352171.0,
+        "predicted_total": 6035646.09,
+        "wape": 0.13079,
+        "mae": 129.408,
+        "normalised_bias": -0.049829
+      }
+    ],
+    "by_demand_bucket": [
+      {
+        "key": "q0.00-0.50",
+        "n": 24171,
+        "actual_total": 69101.0,
+        "predicted_total": 66893.92,
+        "wape": 0.542608,
+        "mae": 1.5512,
+        "normalised_bias": -0.03194
+      },
+      {
+        "key": "q0.50-0.75",
+        "n": 11948,
+        "actual_total": 918002.0,
+        "predicted_total": 828554.7,
+        "wape": 0.277603,
+        "mae": 21.3291,
+        "normalised_bias": -0.097437
+      },
+      {
+        "key": "q0.75-0.90",
+        "n": 7217,
+        "actual_total": 5435588.0,
+        "predicted_total": 4951130.13,
+        "wape": 0.201945,
+        "mae": 152.0981,
+        "normalised_bias": -0.089127
+      },
+      {
+        "key": "q0.90-0.99",
+        "n": 4329,
+        "actual_total": 35139123.0,
+        "predicted_total": 31672423.84,
+        "wape": 0.159831,
+        "mae": 1297.3699,
+        "normalised_bias": -0.098656
+      },
+      {
+        "key": "q0.99-1.00",
+        "n": 485,
+        "actual_total": 22879326.0,
+        "predicted_total": 20569165.46,
+        "wape": 0.139204,
+        "mae": 6566.7773,
+        "normalised_bias": -0.100972
+      }
+    ],
+    "by_observation_state": [
+      {
+        "key": "observed",
+        "n": 27689,
+        "actual_total": 64346928.0,
+        "predicted_total": 58034025.69,
+        "wape": 0.157446,
+        "mae": 365.8917,
+        "normalised_bias": -0.098107
+      },
+      {
+        "key": "unobserved",
+        "n": 20461,
+        "actual_total": 94212.0,
+        "predicted_total": 54142.37,
+        "wape": 0.637422,
+        "mae": 2.935,
+        "normalised_bias": -0.425313
+      }
+    ],
+    "high_demand": {
+      "top_1pct": {
+        "n": 482,
+        "actual_total": 23942076.0,
+        "predicted_total": 21563760.04,
+        "wape": 0.145696,
+        "mae": 7237.0491,
+        "normalised_bias": -0.099336
+      },
+      "top_5pct": {
+        "n": 2408,
+        "actual_total": 50151783.0,
+        "predicted_total": 45011978.58,
+        "wape": 0.150152,
+        "mae": 3127.2324,
+        "normalised_bias": -0.102485
+      },
+      "top_10pct": {
+        "n": 4815,
+        "actual_total": 58553989.0,
+        "predicted_total": 52603724.72,
+        "wape": 0.152973,
+        "mae": 1860.2642,
+        "normalised_bias": -0.10162
+      }
+    }
+  },
+  "baseline": {
+    "name": "E0 pickup baseline",
+    "pooled": {
+      "n": 48150,
+      "actual_total": 64441140.0,
+      "predicted_total": 54776670.79,
+      "wape": 0.219991,
+      "mae": 294.4226,
+      "normalised_bias": -0.149974
+    },
+    "folds": {
+      "2024-11-21": {
+        "n": 9630,
+        "actual_total": 6787514.0,
+        "predicted_total": 5960847.67,
+        "wape": 0.206532,
+        "mae": 145.5702,
+        "normalised_bias": -0.121792
+      },
+      "2025-05-21": {
+        "n": 9630,
+        "actual_total": 16216851.0,
+        "predicted_total": 12492354.61,
+        "wape": 0.299927,
+        "mae": 505.0751,
+        "normalised_bias": -0.229668
+      },
+      "2025-08-21": {
+        "n": 9630,
+        "actual_total": 19510897.0,
+        "predicted_total": 16450449.29,
+        "wape": 0.197624,
+        "mae": 400.3974,
+        "normalised_bias": -0.156858
+      },
+      "2025-09-22": {
+        "n": 9630,
+        "actual_total": 12251705.0,
+        "predicted_total": 11872681.9,
+        "wape": 0.159896,
+        "mae": 203.4266,
+        "normalised_bias": -0.030936
+      },
+      "2025-10-22": {
+        "n": 9630,
+        "actual_total": 9674173.0,
+        "predicted_total": 8000337.31,
+        "wape": 0.21665,
+        "mae": 217.6439,
+        "normalised_bias": -0.173021
+      }
+    },
+    "by_horizon": [
+      {
+        "key": 1,
+        "n": 1605,
+        "actual_total": 2445231.0,
+        "predicted_total": 2375258.29,
+        "wape": 0.033806,
+        "mae": 51.5034,
+        "normalised_bias": -0.028616
+      },
+      {
+        "key": 2,
+        "n": 1605,
+        "actual_total": 1983424.0,
+        "predicted_total": 1939863.23,
+        "wape": 0.036213,
+        "mae": 44.7506,
+        "normalised_bias": -0.021962
+      },
+      {
+        "key": 3,
+        "n": 1605,
+        "actual_total": 1780871.0,
+        "predicted_total": 1758280.07,
+        "wape": 0.051736,
+        "mae": 57.4056,
+        "normalised_bias": -0.012685
+      },
+      {
+        "key": 4,
+        "n": 1605,
+        "actual_total": 1438398.0,
+        "predicted_total": 1453981.2,
+        "wape": 0.058997,
+        "mae": 52.873,
+        "normalised_bias": 0.010834
+      },
+      {
+        "key": 5,
+        "n": 1605,
+        "actual_total": 1534207.0,
+        "predicted_total": 1588904.54,
+        "wape": 0.079573,
+        "mae": 76.063,
+        "normalised_bias": 0.035652
+      },
+      {
+        "key": 6,
+        "n": 1605,
+        "actual_total": 1659725.0,
+        "predicted_total": 1684143.66,
+        "wape": 0.094617,
+        "mae": 97.8433,
+        "normalised_bias": 0.014712
+      },
+      {
+        "key": 7,
+        "n": 1605,
+        "actual_total": 2138014.0,
+        "predicted_total": 1968761.48,
+        "wape": 0.147572,
+        "mae": 196.5805,
+        "normalised_bias": -0.079163
+      },
+      {
+        "key": 8,
+        "n": 1605,
+        "actual_total": 2169580.0,
+        "predicted_total": 1868034.26,
+        "wape": 0.185067,
+        "mae": 250.1673,
+        "normalised_bias": -0.138988
+      },
+      {
+        "key": 9,
+        "n": 1605,
+        "actual_total": 1744283.0,
+        "predicted_total": 1589219.19,
+        "wape": 0.122738,
+        "mae": 133.3896,
+        "normalised_bias": -0.088898
+      },
+      {
+        "key": 10,
+        "n": 1605,
+        "actual_total": 1885905.0,
+        "predicted_total": 1655717.57,
+        "wape": 0.145671,
+        "mae": 171.1661,
+        "normalised_bias": -0.122057
+      },
+      {
+        "key": 11,
+        "n": 1605,
+        "actual_total": 1566502.0,
+        "predicted_total": 1432283.63,
+        "wape": 0.125555,
+        "mae": 122.5435,
+        "normalised_bias": -0.08568
+      },
+      {
+        "key": 12,
+        "n": 1605,
+        "actual_total": 1702579.0,
+        "predicted_total": 1648457.09,
+        "wape": 0.115009,
+        "mae": 122.0011,
+        "normalised_bias": -0.031788
+      },
+      {
+        "key": 13,
+        "n": 1605,
+        "actual_total": 2327008.0,
+        "predicted_total": 2117426.91,
+        "wape": 0.144294,
+        "mae": 209.2045,
+        "normalised_bias": -0.090065
+      },
+      {
+        "key": 14,
+        "n": 1605,
+        "actual_total": 3714377.0,
+        "predicted_total": 2920196.33,
+        "wape": 0.241158,
+        "mae": 558.1003,
+        "normalised_bias": -0.213813
+      },
+      {
+        "key": 15,
+        "n": 1605,
+        "actual_total": 2990185.0,
+        "predicted_total": 2427143.58,
+        "wape": 0.218603,
+        "mae": 407.2675,
+        "normalised_bias": -0.188297
+      },
+      {
+        "key": 16,
+        "n": 1605,
+        "actual_total": 1871315.0,
+        "predicted_total": 1668095.05,
+        "wape": 0.164735,
+        "mae": 192.0696,
+        "normalised_bias": -0.108597
+      },
+      {
+        "key": 17,
+        "n": 1605,
+        "actual_total": 1933551.0,
+        "predicted_total": 1700159.09,
+        "wape": 0.203103,
+        "mae": 244.6792,
+        "normalised_bias": -0.120706
+      },
+      {
+        "key": 18,
+        "n": 1605,
+        "actual_total": 1690581.0,
+        "predicted_total": 1550495.52,
+        "wape": 0.164726,
+        "mae": 173.5092,
+        "normalised_bias": -0.082862
+      },
+      {
+        "key": 19,
+        "n": 1605,
+        "actual_total": 2003969.0,
+        "predicted_total": 1807142.18,
+        "wape": 0.183805,
+        "mae": 229.4951,
+        "normalised_bias": -0.098218
+      },
+      {
+        "key": 20,
+        "n": 1605,
+        "actual_total": 2776614.0,
+        "predicted_total": 2199167.12,
+        "wape": 0.265366,
+        "mae": 459.0772,
+        "normalised_bias": -0.207968
+      },
+      {
+        "key": 21,
+        "n": 1605,
+        "actual_total": 2975707.0,
+        "predicted_total": 2327575.73,
+        "wape": 0.27635,
+        "mae": 512.3601,
+        "normalised_bias": -0.217807
+      },
+      {
+        "key": 22,
+        "n": 1605,
+        "actual_total": 2566587.0,
+        "predicted_total": 1892193.07,
+        "wape": 0.30995,
+        "mae": 495.6467,
+        "normalised_bias": -0.262759
+      },
+      {
+        "key": 23,
+        "n": 1605,
+        "actual_total": 2317533.0,
+        "predicted_total": 1808978.33,
+        "wape": 0.277663,
+        "mae": 400.9299,
+        "normalised_bias": -0.219438
+      },
+      {
+        "key": 24,
+        "n": 1605,
+        "actual_total": 2059851.0,
+        "predicted_total": 1706327.24,
+        "wape": 0.261425,
+        "mae": 335.5121,
+        "normalised_bias": -0.171626
+      },
+      {
+        "key": 25,
+        "n": 1605,
+        "actual_total": 1813315.0,
+        "predicted_total": 1531002.69,
+        "wape": 0.277452,
+        "mae": 313.4631,
+        "normalised_bias": -0.155689
+      },
+      {
+        "key": 26,
+        "n": 1605,
+        "actual_total": 1989278.0,
+        "predicted_total": 1603505.81,
+        "wape": 0.337652,
+        "mae": 418.494,
+        "normalised_bias": -0.193926
+      },
+      {
+        "key": 27,
+        "n": 1605,
+        "actual_total": 2284077.0,
+        "predicted_total": 1703017.97,
+        "wape": 0.394832,
+        "mae": 561.8856,
+        "normalised_bias": -0.254396
+      },
+      {
+        "key": 28,
+        "n": 1605,
+        "actual_total": 2650852.0,
+        "predicted_total": 1949365.23,
+        "wape": 0.426125,
+        "mae": 703.7971,
+        "normalised_bias": -0.264627
+      },
+      {
+        "key": 29,
+        "n": 1605,
+        "actual_total": 2464406.0,
+        "predicted_total": 1688773.25,
+        "wape": 0.426541,
+        "mae": 654.9341,
+        "normalised_bias": -0.314734
+      },
+      {
+        "key": 30,
+        "n": 1605,
+        "actual_total": 1963215.0,
+        "predicted_total": 1213201.49,
+        "wape": 0.479049,
+        "mae": 585.9664,
+        "normalised_bias": -0.382033
+      }
+    ],
+    "by_horizon_bucket": [
+      {
+        "key": "1-3",
+        "n": 4815,
+        "actual_total": 6209526.0,
+        "predicted_total": 6073401.58,
+        "wape": 0.039717,
+        "mae": 51.2199,
+        "normalised_bias": -0.021922
+      },
+      {
+        "key": "4-7",
+        "n": 6420,
+        "actual_total": 6770344.0,
+        "predicted_total": 6695790.87,
+        "wape": 0.100363,
+        "mae": 105.8399,
+        "normalised_bias": -0.011012
+      },
+      {
+        "key": "8-14",
+        "n": 11235,
+        "actual_total": 15110234.0,
+        "predicted_total": 13231334.97,
+        "wape": 0.1664,
+        "mae": 223.7961,
+        "normalised_bias": -0.124346
+      },
+      {
+        "key": "15-21",
+        "n": 11235,
+        "actual_total": 16241922.0,
+        "predicted_total": 13679778.27,
+        "wape": 0.219224,
+        "mae": 316.9225,
+        "normalised_bias": -0.157749
+      },
+      {
+        "key": "22-30",
+        "n": 14445,
+        "actual_total": 20109114.0,
+        "predicted_total": 15096365.1,
+        "wape": 0.356821,
+        "mae": 496.7366,
+        "normalised_bias": -0.249277
+      }
+    ],
+    "by_province": [
+      {
+        "key": "mazandaran",
+        "n": 9300,
+        "actual_total": 23702705.0,
+        "predicted_total": 19638565.72,
+        "wape": 0.233889,
+        "mae": 596.108,
+        "normalised_bias": -0.171463
+      },
+      {
+        "key": "khorasan_razavi",
+        "n": 6150,
+        "actual_total": 5476245.0,
+        "predicted_total": 5008434.45,
+        "wape": 0.169501,
+        "mae": 150.9316,
+        "normalised_bias": -0.085425
+      },
+      {
+        "key": "isfahan",
+        "n": 11700,
+        "actual_total": 2808208.0,
+        "predicted_total": 2234363.43,
+        "wape": 0.292404,
+        "mae": 70.1823,
+        "normalised_bias": -0.204345
+      },
+      {
+        "key": "hormozgan",
+        "n": 3750,
+        "actual_total": 5227343.0,
+        "predicted_total": 4298364.98,
+        "wape": 0.185295,
+        "mae": 258.2933,
+        "normalised_bias": -0.177715
+      },
+      {
+        "key": "gilan",
+        "n": 7950,
+        "actual_total": 15003243.0,
+        "predicted_total": 12250780.66,
+        "wape": 0.222658,
+        "mae": 420.1998,
+        "normalised_bias": -0.183458
+      },
+      {
+        "key": "alborz",
+        "n": 2700,
+        "actual_total": 3692806.0,
+        "predicted_total": 3372938.55,
+        "wape": 0.215131,
+        "mae": 294.2358,
+        "normalised_bias": -0.086619
+      },
+      {
+        "key": "tehran",
+        "n": 6600,
+        "actual_total": 8530590.0,
+        "predicted_total": 7973223.01,
+        "wape": 0.208621,
+        "mae": 269.6452,
+        "normalised_bias": -0.065337
+      }
+    ],
+    "by_weekday": [
+      {
+        "key": 0,
+        "n": 6420,
+        "actual_total": 6724589.0,
+        "predicted_total": 6307476.54,
+        "wape": 0.185836,
+        "mae": 194.6528,
+        "normalised_bias": -0.062028
+      },
+      {
+        "key": 1,
+        "n": 6741,
+        "actual_total": 8436861.0,
+        "predicted_total": 7600883.48,
+        "wape": 0.191456,
+        "mae": 239.6218,
+        "normalised_bias": -0.099086
+      },
+      {
+        "key": 2,
+        "n": 6741,
+        "actual_total": 11817912.0,
+        "predicted_total": 9343861.91,
+        "wape": 0.248322,
+        "mae": 435.3432,
+        "normalised_bias": -0.209347
+      },
+      {
+        "key": 3,
+        "n": 7062,
+        "actual_total": 15009911.0,
+        "predicted_total": 11425134.73,
+        "wape": 0.269408,
+        "mae": 572.6134,
+        "normalised_bias": -0.238827
+      },
+      {
+        "key": 4,
+        "n": 7704,
+        "actual_total": 8887660.0,
+        "predicted_total": 7109837.36,
+        "wape": 0.24331,
+        "mae": 280.6933,
+        "normalised_bias": -0.200033
+      },
+      {
+        "key": 5,
+        "n": 7062,
+        "actual_total": 7212036.0,
+        "predicted_total": 6906888.04,
+        "wape": 0.151948,
+        "mae": 155.1758,
+        "normalised_bias": -0.042311
+      },
+      {
+        "key": 6,
+        "n": 6420,
+        "actual_total": 6352171.0,
+        "predicted_total": 6082588.74,
+        "wape": 0.169191,
+        "mae": 167.4034,
+        "normalised_bias": -0.042439
+      }
+    ],
+    "by_demand_bucket": [
+      {
+        "key": "q0.00-0.50",
+        "n": 24171,
+        "actual_total": 69101.0,
+        "predicted_total": 84130.05,
+        "wape": 0.792584,
+        "mae": 2.2659,
+        "normalised_bias": 0.217494
+      },
+      {
+        "key": "q0.50-0.75",
+        "n": 11948,
+        "actual_total": 918002.0,
+        "predicted_total": 860379.63,
+        "wape": 0.427751,
+        "mae": 32.8654,
+        "normalised_bias": -0.062769
+      },
+      {
+        "key": "q0.75-0.90",
+        "n": 7217,
+        "actual_total": 5435588.0,
+        "predicted_total": 4759156.43,
+        "wape": 0.29189,
+        "mae": 219.8411,
+        "normalised_bias": -0.124445
+      },
+      {
+        "key": "q0.90-0.99",
+        "n": 4329,
+        "actual_total": 35139123.0,
+        "predicted_total": 29494280.77,
+        "wape": 0.217305,
+        "mae": 1763.8993,
+        "normalised_bias": -0.160643
+      },
+      {
+        "key": "q0.99-1.00",
+        "n": 485,
+        "actual_total": 22879326.0,
+        "predicted_total": 19578723.91,
+        "wape": 0.196968,
+        "mae": 9291.7339,
+        "normalised_bias": -0.144261
+      }
+    ],
+    "by_observation_state": [
+      {
+        "key": "observed",
+        "n": 27689,
+        "actual_total": 64346928.0,
+        "predicted_total": 54718422.16,
+        "wape": 0.219188,
+        "mae": 509.3736,
+        "normalised_bias": -0.149634
+      },
+      {
+        "key": "unobserved",
+        "n": 20461,
+        "actual_total": 94212.0,
+        "predicted_total": 58248.63,
+        "wape": 0.768529,
+        "mae": 3.5387,
+        "normalised_bias": -0.381728
+      }
+    ],
+    "high_demand": {
+      "top_1pct": {
+        "n": 482,
+        "actual_total": 23942076.0,
+        "predicted_total": 20505058.11,
+        "wape": 0.201453,
+        "mae": 10006.6645,
+        "normalised_bias": -0.143556
+      },
+      "top_5pct": {
+        "n": 2408,
+        "actual_total": 50151783.0,
+        "predicted_total": 42164201.85,
+        "wape": 0.207569,
+        "mae": 4323.0693,
+        "normalised_bias": -0.159268
+      },
+      "top_10pct": {
+        "n": 4815,
+        "actual_total": 58553989.0,
+        "predicted_total": 49465263.8,
+        "wape": 0.210321,
+        "mae": 2557.6568,
+        "normalised_bias": -0.15522
+      }
+    }
+  }
+}

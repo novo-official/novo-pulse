@@ -21,6 +21,7 @@ from ml.pol4.pickup import PickupCurves
 from ml.pol4.submission import (
     SubmissionError,
     build_grid,
+    build_named_submission,
     build_submission,
     validate_submission,
 )
@@ -321,3 +322,98 @@ def test_competition_constants_match_the_brief():
     assert TARGET_END == pd.Timestamp("2025-12-21")
     assert N_SUBMISSION_ROWS == 321 * 30 == 9630
     assert SUBMISSION_COLUMNS == ("cluster_code", "checkin", "predicted_demand")
+
+
+# ------------------------------------------------------------- city names
+def test_names_are_optional(tmp_path):
+    """A clone with only the three official files must still run."""
+    config = write_dataset(tmp_path)
+    config.city_names_path.unlink(missing_ok=True)
+    data = load_pol4(config)
+    assert data.has_names is False
+    # Falls back to the code as a string rather than failing or inventing one.
+    assert data.name([1])[0] == "1"
+
+
+def test_names_are_attached_when_the_mapping_is_present(tmp_path):
+    config = write_dataset(tmp_path)
+    pd.DataFrame(
+        {
+            "city": [f"city_{c}" for c in [1, 2, 3, 4, 5, 6]],
+            "city_code": [1, 2, 3, 4, 5, 6],
+            "province": ["north"] * 3 + ["south"] * 3,
+            "province_code": [10, 10, 10, 20, 20, 20],
+        }
+    ).to_csv(config.city_names_path, index=False)
+
+    data = load_pol4(config)
+    assert data.has_names is True
+    assert list(data.name([1, 4])) == ["city_1", "city_4"]
+    assert data.province_name_of[1] == "north"
+
+
+def test_a_mismatched_province_in_the_mapping_is_rejected(tmp_path):
+    config = write_dataset(tmp_path)
+    pd.DataFrame(
+        {
+            "city": [f"city_{c}" for c in [1, 2, 3, 4, 5, 6]],
+            "city_code": [1, 2, 3, 4, 5, 6],
+            "province": ["north"] * 6,
+            "province_code": [10] * 6,  # cities 4-6 are really province 20
+        }
+    ).to_csv(config.city_names_path, index=False)
+    with pytest.raises(Pol4DataError, match="different province_code"):
+        load_pol4(config)
+
+
+def test_an_incomplete_mapping_is_rejected(tmp_path):
+    config = write_dataset(tmp_path)
+    pd.DataFrame(
+        {
+            "city": ["city_1"],
+            "city_code": [1],
+            "province": ["north"],
+            "province_code": [10],
+        }
+    ).to_csv(config.city_names_path, index=False)
+    with pytest.raises(Pol4DataError, match="no name"):
+        load_pol4(config)
+
+
+def test_label_inserts_names_next_to_the_code(tmp_path):
+    config = write_dataset(tmp_path)
+    pd.DataFrame(
+        {
+            "city": [f"city_{c}" for c in [1, 2, 3, 4, 5, 6]],
+            "city_code": [1, 2, 3, 4, 5, 6],
+            "province": ["north"] * 3 + ["south"] * 3,
+            "province_code": [10, 10, 10, 20, 20, 20],
+        }
+    ).to_csv(config.city_names_path, index=False)
+    data = load_pol4(config)
+    labelled = data.label(pd.DataFrame({CITY: [1, 6], "x": [0, 0]}))
+    assert list(labelled.columns) == [CITY, "city", "province", "x"]
+    assert list(labelled["city"]) == ["city_1", "city_6"]
+
+
+def test_results_csv_still_uses_the_numeric_cluster_code(pol4):
+    """Names are for humans; the scored file keeps the codes the brief asks for."""
+    data, config = pol4
+    model = PickupBaseline.fit(data, config.cutoff, config)
+    predictions = model.predict(build_grid(data, config.cutoff, config.target_dates()))
+    submission = build_submission(predictions)
+    assert tuple(submission.columns) == SUBMISSION_COLUMNS
+    assert pd.api.types.is_integer_dtype(submission["cluster_code"])
+
+
+def test_named_submission_matches_the_scored_one_row_for_row(pol4):
+    data, config = pol4
+    model = PickupBaseline.fit(data, config.cutoff, config)
+    predictions = model.predict(build_grid(data, config.cutoff, config.target_dates()))
+    scored = build_submission(predictions)
+    named = build_named_submission(predictions, data)
+
+    assert len(named) == len(scored)
+    assert named["predicted_demand"].sum() == scored["predicted_demand"].sum()
+    assert (named["predicted_remaining"] >= 0).all()
+    assert (named["predicted_demand"] >= named["observed_so_far"]).all()

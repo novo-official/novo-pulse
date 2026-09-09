@@ -147,7 +147,6 @@ CACHES = {
 }
 
 # ------------------------------------------------------- Novo Pulse config
-DEMO_MODE = env_bool("DEMO_MODE", True)
 SYNC_TASKS = env_bool("SYNC_TASKS", True)
 DEFAULT_HORIZON = int(os.getenv("DEFAULT_HORIZON", "90"))
 PRIMARY_METRIC = os.getenv("PRIMARY_METRIC", "wape")

@@ -1,0 +1,5 @@
+experiment,stage,wape,normalised_bias,mae,runtime_seconds,n_features,model,feature_groups,wape_2024-11-21,wape_2025-05-21,wape_2025-08-21,wape_2025-09-22,wape_2025-10-22,wape_h1-3,wape_h4-7,wape_h8-14,wape_h15-21,wape_h22-30
+CHAMPION lightgbm,champion,0.158148,-0.098586,211.6558,838.2,,lightgbm,"base,pickup,velocity,activity,curve,calendar,city,market,province",0.12219,0.271148,0.127601,0.108677,0.118212,0.029269,0.063576,0.113804,0.13901,0.278562
+E0 pickup baseline,baseline,0.219991,-0.149974,294.4226,0.01,,,,0.206532,0.299927,0.197624,0.159896,0.21665,0.039717,0.100363,0.1664,0.219224,0.356821
+"E1 calibrated baseline (horizon, shrunk)",calibration,0.220576,-0.119797,295.2061,0.01,,,,0.186245,0.323531,0.183532,0.188904,0.186901,0.041659,0.108123,0.154671,0.212962,0.369357
+E1 calibrated baseline (global),calibration,0.228945,-0.132806,306.4064,0.0,,,,0.189871,0.353096,0.185888,0.185062,0.190656,0.038753,0.116411,0.18135,0.220316,0.368295
