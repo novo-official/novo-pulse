@@ -50,6 +50,8 @@ models/local_*/
 !artifacts/
 !artifacts/pol4/
 !artifacts/pol4/**
+# Training datasets are local-only and must never be committed.
+artifacts/pol4/trainset/
 
 # OS
 .DS_Store
@@ -59,4 +61,3 @@ models/local_*/
 frontend/e2e/*.png
 
 .claude
-
