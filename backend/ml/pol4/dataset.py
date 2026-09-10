@@ -158,6 +158,7 @@ def materialize_training_frame(
         "cutoff": pd.Timestamp(config.cutoff).isoformat(),
         "train_window_days": config.train_window_days,
         "city_history_days": config.city_history_days,
+        "city_history_mode": config.city_history_mode,
         "max_train_rows": config.max_train_rows,
         "checkin_min": dates.min().isoformat(),
         "checkin_max": dates.max().isoformat(),

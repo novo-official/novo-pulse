@@ -18,7 +18,7 @@ Three rules make the decision defensible rather than asserted:
   is clustered or not, and the comparison between the two stays attributable to
   the aggregation itself.
 * **Hubs are protected.** A city holding more than `cluster_eligible_share` of
-  national demand is never merged. Pooling a hub with its small neighbours
+  in-panel demand is never merged. Pooling a hub with its small neighbours
   would cancel large errors and flatter the metric - which is precisely the
   "excessive aggregation" the brief penalises - and it cannot be justified by
   sparsity, because a hub is not sparse.

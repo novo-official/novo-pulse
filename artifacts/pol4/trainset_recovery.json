@@ -1,0 +1,11 @@
+{
+  "rows": 2655312,
+  "recorded_rows": 2655312,
+  "file_hash_matches": {
+    "features.parquet": true,
+    "target.parquet": true,
+    "meta.parquet": true
+  },
+  "input_digest_matches": true,
+  "note": "Rebuilt with original bundle parameters; byte hashes can differ with parquet/library versions."
+}

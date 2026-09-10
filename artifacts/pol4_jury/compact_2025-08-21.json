@@ -1,0 +1,30 @@
+{
+  "seconds": 39.586420173996885,
+  "training_rows": 2330460,
+  "history_mode": "fold",
+  "spec": {
+    "model": "lightgbm",
+    "horizon_bands": [
+      [
+        1,
+        14
+      ],
+      [
+        15,
+        30
+      ]
+    ],
+    "feature_groups": [
+      "compact"
+    ],
+    "n_features": 22,
+    "log1p_target": true,
+    "params": {
+      "n_estimators": 600,
+      "n_jobs": 4
+    },
+    "calibration_method": "none",
+    "blend_weight_on_model": 1.0
+  },
+  "predictions_sha256": "334767c050efebd79ace9cffa8f8b9f20426c5e4a04e8b19d24fc614afef93db"
+}

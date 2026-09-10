@@ -335,12 +335,12 @@
     "share":0.0000046037
   },
   {
-    "feature":"n_cities_in_cluster",
+    "feature":"cluster_max_member_share",
     "importance":0.0,
     "share":0.0
   },
   {
-    "feature":"cluster_max_member_share",
+    "feature":"n_cities_in_cluster",
     "importance":0.0,
     "share":0.0
   }

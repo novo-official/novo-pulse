@@ -192,7 +192,7 @@ def build_full_audit_markdown(
         )
     lines += [
         "",
-        f"Calibration changes the rounded national forecast by **{_fmt(comparison['delta']['forecast_total'])} ({_percent(comparison['delta']['percent'])})** and changes **{_fmt(comparison['delta']['changed_rows'])}** of 9,630 city-date rows.",
+        f"Calibration changes the rounded in-panel forecast by **{_fmt(comparison['delta']['forecast_total'])} ({_percent(comparison['delta']['percent'])})** and changes **{_fmt(comparison['delta']['changed_rows'])}** of 9,630 city-date rows.",
         "",
         "## 5. Evaluation audit",
         "",

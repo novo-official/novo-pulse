@@ -1,0 +1,6242 @@
+{
+  "contract": {
+    "input_digest": "fc71f2f11bb1c781e2dff9aae3987b6af0afa3a7d51c43b1ef2dc8a72841636e",
+    "cutoffs": [
+      "2024-11-21",
+      "2025-05-21",
+      "2025-08-21",
+      "2025-09-22",
+      "2025-10-22"
+    ],
+    "trees": 600,
+    "arms": [
+      "origin66"
+    ],
+    "seed": 42,
+    "train_window_days": 752,
+    "city_history_days": 752,
+    "horizons": [
+      1,
+      2,
+      3,
+      5,
+      7,
+      10,
+      14,
+      18,
+      21,
+      25,
+      30
+    ],
+    "max_train_rows": null,
+    "cluster_cut_height": 1.970305,
+    "calibration": "guarded_bias_horizon",
+    "code_sha256": {
+      "baseline.py": "6e7e5c08582c0c3c1a8a4e038d15f2bf885eff9cb6f26cb5da46016bd319fdba",
+      "pickup.py": "b7f5da2ebfec12c876c02d603a70d6da92283aacb3c121659d6f27728f608892",
+      "backtest.py": "b69087efbceb1d9572be3dbbf8407ff906034fa86f5dc7ae4494fe39104f3dc4",
+      "loader.py": "b65d33353b83910555b4d0b12d2b5e7a8b6d3b983af3c25a30ea9888b7880c8f",
+      "models.py": "59b88d46c5ae3bbeac34e2f84029409829faf81b91c760c9c3d4f519b0a05cde",
+      "submission.py": "067903e5d1cfc301ea2da1ab58cb8431df4386c5db2b5756c564abb3e5696413",
+      "analytics.py": "e372cde7e3f6ff4894f30c60621dad43f8f10d1eb30f00fd47570352ef3884f6",
+      "artifacts.py": "501ff1224256636fe4840e15e67e5ecd27c87ba1482e3fc5d7cff1ff6a181a1c",
+      "audit.py": "b15899d51d0f6f58b98d46b0f53acb2c3ef857f9f344adb30b951e28c466578c",
+      "calibration.py": "8b83b891e501b1190cda4180e7486266468152b8077d5f6d95eefb3a242fe537",
+      "champion.py": "0151f6114bdfe20a3e831a81965a15b1f552ced5ae46c1000679c06ad0528384",
+      "dataset.py": "d547582ac9ac4c19a63d7d441d87d8a1ea127ec67947559bbf6ffc2440ff66c9",
+      "experiments.py": "d3345435b5880b790af3d8aa24e98acca1eaf9d9a2d2e624688364469ec7e8e8",
+      "inference.py": "a2c9eda8531ed5a61a229d9b3d0136ae85bbc3c1d15cb91adaa12e625455055a",
+      "pipeline.py": "da67d4214caa3a9cc8d18179e98f86fae863c5d8117f82364d696009608f6c6c",
+      "stability.py": "86381cbe971544c1f25cd7b96007eb015bc0d4d76c19c8f0d3249201efaee5f0",
+      "validation.py": "ca802ad8b4646b9df93ef7d2893ebc13883dbe9d414e79bb00d24ef63198b1aa",
+      "__init__.py": "47c72fd83754ff8ff0f3062ae2b1e6f1b4657c7f4163d38f6c56af92b9898051",
+      "aggregate.py": "f31b5af304ec37d3977232f5f39e67082102ddababa6f5e809dbb096c8ba69a5",
+      "clustering.py": "0677c83d3b765405e6bb382e71613933232ccd3b8e616954009195162714d0c6",
+      "config.py": "b5ff0dc79b9dc98a2eda75e87aa71bbfd26720ac0c58b2979bc50897e947eda1",
+      "features.py": "7920964be947445282ab7ee591ab857050f65b70256edc1948ae02be25d4b4a8",
+      "paths_compat.py": "424ed120cc5d7b11f9b495da75bac0b4d000ac024a9d6d0debc1f19a3b72f829",
+      "cluster_experiment.py": "8b26cc694370ba49b0712a1f0398003d79d9b9e5f22ce118d38d082bca8893f4",
+      "cluster_pipeline.py": "ccdd2a225db666d5d0dcbbbdeefa090c02f293a01e84cc9cf243940ccaccf115",
+      "origin_history.py": "5cc6a1bad7271c57476d9927ec7d3bf27d207313ebf0b86ed76fa4d3db7e0d92",
+      "jury_experiments.py": "a76f467d7325951aeb6ff51753b99e90421dbd234d0bcc9c8d9b45eb8460cb6e",
+      "jury.py": "239d0393c4ef34172a00e0fe845b29a011bc0c487fb92ee3a4e8594f380b784b",
+      "uncertainty.py": "16a1361f9eb3b13c522148b915015baa9c4882e87d19450ba381f9f426429cbc"
+    }
+  },
+  "status": "completed",
+  "selection": "no automatic promotion",
+  "limitations": [
+    "Exploratory fixed specifications; selection is not nested",
+    "Origin ablation changes city history only; pickup curves remain fold-fitted",
+    "Cluster cut height was chosen on historical experiments",
+    "Five folds do not establish significance of small gains"
+  ],
+  "arms": {
+    "origin66": {
+      "raw": {
+        "pooled": {
+          "n": 48150,
+          "actual_total": 64441140.0,
+          "predicted_total": 58520971.69,
+          "wape": 0.156905,
+          "mae": 209.9921,
+          "normalised_bias": -0.091869
+        },
+        "folds": {
+          "2024-11-21": {
+            "n": 9630,
+            "actual_total": 6787514.0,
+            "predicted_total": 6963843.65,
+            "wape": 0.129318,
+            "mae": 91.1471,
+            "normalised_bias": 0.025979
+          },
+          "2025-05-21": {
+            "n": 9630,
+            "actual_total": 16216851.0,
+            "predicted_total": 12723429.84,
+            "wape": 0.268068,
+            "mae": 451.4241,
+            "normalised_bias": -0.215419
+          },
+          "2025-08-21": {
+            "n": 9630,
+            "actual_total": 19510897.0,
+            "predicted_total": 18646907.51,
+            "wape": 0.128288,
+            "mae": 259.9174,
+            "normalised_bias": -0.044282
+          },
+          "2025-09-22": {
+            "n": 9630,
+            "actual_total": 12251705.0,
+            "predicted_total": 11374332.02,
+            "wape": 0.105317,
+            "mae": 133.9887,
+            "normalised_bias": -0.071612
+          },
+          "2025-10-22": {
+            "n": 9630,
+            "actual_total": 9674173.0,
+            "predicted_total": 8812458.68,
+            "wape": 0.112965,
+            "mae": 113.4833,
+            "normalised_bias": -0.089074
+          }
+        },
+        "interval": {
+          "method": "exact fold-cluster bootstrap",
+          "confidence": 0.95,
+          "lower": 0.111456,
+          "upper": 0.223935
+        },
+        "by_fold_horizon": [
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 1,
+            "n": 321,
+            "actual_total": 196369.0,
+            "predicted_total": 194966.32,
+            "wape": 0.023242,
+            "mae": 14.2178,
+            "normalised_bias": -0.007143
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 2,
+            "n": 321,
+            "actual_total": 173257.0,
+            "predicted_total": 171737.65,
+            "wape": 0.033006,
+            "mae": 17.8146,
+            "normalised_bias": -0.008769
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 3,
+            "n": 321,
+            "actual_total": 160332.0,
+            "predicted_total": 159595.38,
+            "wape": 0.034952,
+            "mae": 17.4575,
+            "normalised_bias": -0.004594
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 4,
+            "n": 321,
+            "actual_total": 160780.0,
+            "predicted_total": 158489.6,
+            "wape": 0.045393,
+            "mae": 22.7362,
+            "normalised_bias": -0.014246
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 5,
+            "n": 321,
+            "actual_total": 183708.0,
+            "predicted_total": 176775.84,
+            "wape": 0.0623,
+            "mae": 35.6543,
+            "normalised_bias": -0.037735
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 6,
+            "n": 321,
+            "actual_total": 261561.0,
+            "predicted_total": 261410.85,
+            "wape": 0.068104,
+            "mae": 55.493,
+            "normalised_bias": -0.000574
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 7,
+            "n": 321,
+            "actual_total": 393317.0,
+            "predicted_total": 387812.62,
+            "wape": 0.076323,
+            "mae": 93.5174,
+            "normalised_bias": -0.013995
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 8,
+            "n": 321,
+            "actual_total": 185239.0,
+            "predicted_total": 176029.77,
+            "wape": 0.084396,
+            "mae": 48.702,
+            "normalised_bias": -0.049715
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 9,
+            "n": 321,
+            "actual_total": 159136.0,
+            "predicted_total": 164249.87,
+            "wape": 0.072348,
+            "mae": 35.8666,
+            "normalised_bias": 0.032135
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 10,
+            "n": 321,
+            "actual_total": 153314.0,
+            "predicted_total": 160782.33,
+            "wape": 0.078579,
+            "mae": 37.5305,
+            "normalised_bias": 0.048713
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 11,
+            "n": 321,
+            "actual_total": 166416.0,
+            "predicted_total": 177421.22,
+            "wape": 0.086379,
+            "mae": 44.7815,
+            "normalised_bias": 0.066131
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 12,
+            "n": 321,
+            "actual_total": 213035.0,
+            "predicted_total": 221718.59,
+            "wape": 0.09612,
+            "mae": 63.7912,
+            "normalised_bias": 0.040761
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 13,
+            "n": 321,
+            "actual_total": 427488.0,
+            "predicted_total": 393205.9,
+            "wape": 0.112129,
+            "mae": 149.3269,
+            "normalised_bias": -0.080194
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 14,
+            "n": 321,
+            "actual_total": 701273.0,
+            "predicted_total": 592216.58,
+            "wape": 0.167049,
+            "mae": 364.9441,
+            "normalised_bias": -0.155512
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 15,
+            "n": 321,
+            "actual_total": 235175.0,
+            "predicted_total": 244604.65,
+            "wape": 0.089286,
+            "mae": 65.414,
+            "normalised_bias": 0.040096
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 16,
+            "n": 321,
+            "actual_total": 170295.0,
+            "predicted_total": 175472.64,
+            "wape": 0.09382,
+            "mae": 49.7728,
+            "normalised_bias": 0.030404
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 17,
+            "n": 321,
+            "actual_total": 159546.0,
+            "predicted_total": 163611.88,
+            "wape": 0.101249,
+            "mae": 50.3235,
+            "normalised_bias": 0.025484
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 18,
+            "n": 321,
+            "actual_total": 165207.0,
+            "predicted_total": 169154.07,
+            "wape": 0.125177,
+            "mae": 64.4238,
+            "normalised_bias": 0.023892
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 19,
+            "n": 321,
+            "actual_total": 191897.0,
+            "predicted_total": 188177.65,
+            "wape": 0.098075,
+            "mae": 58.6299,
+            "normalised_bias": -0.019382
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 20,
+            "n": 321,
+            "actual_total": 287163.0,
+            "predicted_total": 262193.58,
+            "wape": 0.12314,
+            "mae": 110.16,
+            "normalised_bias": -0.086952
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 21,
+            "n": 321,
+            "actual_total": 409571.0,
+            "predicted_total": 412235.9,
+            "wape": 0.113037,
+            "mae": 144.2263,
+            "normalised_bias": 0.006507
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 22,
+            "n": 321,
+            "actual_total": 185175.0,
+            "predicted_total": 195585.46,
+            "wape": 0.124973,
+            "mae": 72.0928,
+            "normalised_bias": 0.05622
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 23,
+            "n": 321,
+            "actual_total": 161509.0,
+            "predicted_total": 171682.04,
+            "wape": 0.113693,
+            "mae": 57.2038,
+            "normalised_bias": 0.062987
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 24,
+            "n": 321,
+            "actual_total": 157359.0,
+            "predicted_total": 177510.41,
+            "wape": 0.161182,
+            "mae": 79.0139,
+            "normalised_bias": 0.12806
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 25,
+            "n": 321,
+            "actual_total": 163478.0,
+            "predicted_total": 187798.95,
+            "wape": 0.171445,
+            "mae": 87.313,
+            "normalised_bias": 0.148772
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 26,
+            "n": 321,
+            "actual_total": 178806.0,
+            "predicted_total": 209789.57,
+            "wape": 0.197793,
+            "mae": 110.1764,
+            "normalised_bias": 0.17328
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 27,
+            "n": 321,
+            "actual_total": 212590.0,
+            "predicted_total": 263761.55,
+            "wape": 0.269783,
+            "mae": 178.6701,
+            "normalised_bias": 0.240705
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 28,
+            "n": 321,
+            "actual_total": 288252.0,
+            "predicted_total": 392480.43,
+            "wape": 0.379801,
+            "mae": 341.0546,
+            "normalised_bias": 0.361588
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 29,
+            "n": 321,
+            "actual_total": 144207.0,
+            "predicted_total": 174637.02,
+            "wape": 0.300593,
+            "mae": 135.0392,
+            "normalised_bias": 0.211016
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 30,
+            "n": 321,
+            "actual_total": 142059.0,
+            "predicted_total": 178735.35,
+            "wape": 0.291637,
+            "mae": 129.0642,
+            "normalised_bias": 0.258177
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 1,
+            "n": 321,
+            "actual_total": 521037.0,
+            "predicted_total": 517984.19,
+            "wape": 0.02325,
+            "mae": 37.7393,
+            "normalised_bias": -0.005859
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 2,
+            "n": 321,
+            "actual_total": 282598.0,
+            "predicted_total": 284183.23,
+            "wape": 0.026427,
+            "mae": 23.2657,
+            "normalised_bias": 0.005609
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 3,
+            "n": 321,
+            "actual_total": 285205.0,
+            "predicted_total": 294592.78,
+            "wape": 0.045911,
+            "mae": 40.7914,
+            "normalised_bias": 0.032916
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 4,
+            "n": 321,
+            "actual_total": 281782.0,
+            "predicted_total": 280628.56,
+            "wape": 0.045223,
+            "mae": 39.6978,
+            "normalised_bias": -0.004093
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 5,
+            "n": 321,
+            "actual_total": 283431.0,
+            "predicted_total": 288334.79,
+            "wape": 0.047432,
+            "mae": 41.8808,
+            "normalised_bias": 0.017302
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 6,
+            "n": 321,
+            "actual_total": 295839.0,
+            "predicted_total": 286962.87,
+            "wape": 0.065189,
+            "mae": 60.0789,
+            "normalised_bias": -0.030003
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 7,
+            "n": 321,
+            "actual_total": 377355.0,
+            "predicted_total": 353182.21,
+            "wape": 0.081359,
+            "mae": 95.642,
+            "normalised_bias": -0.064058
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 8,
+            "n": 321,
+            "actual_total": 539992.0,
+            "predicted_total": 491896.81,
+            "wape": 0.107527,
+            "mae": 180.8834,
+            "normalised_bias": -0.089066
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 9,
+            "n": 321,
+            "actual_total": 298402.0,
+            "predicted_total": 270968.96,
+            "wape": 0.106152,
+            "mae": 98.6789,
+            "normalised_bias": -0.091933
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 10,
+            "n": 321,
+            "actual_total": 288679.0,
+            "predicted_total": 255781.55,
+            "wape": 0.122259,
+            "mae": 109.9493,
+            "normalised_bias": -0.113959
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 11,
+            "n": 321,
+            "actual_total": 292888.0,
+            "predicted_total": 257263.5,
+            "wape": 0.135011,
+            "mae": 123.1872,
+            "normalised_bias": -0.121632
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 12,
+            "n": 321,
+            "actual_total": 353268.0,
+            "predicted_total": 326574.77,
+            "wape": 0.109727,
+            "mae": 120.7569,
+            "normalised_bias": -0.075561
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 13,
+            "n": 321,
+            "actual_total": 694496.0,
+            "predicted_total": 755346.96,
+            "wape": 0.115951,
+            "mae": 250.8642,
+            "normalised_bias": 0.087619
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 14,
+            "n": 321,
+            "actual_total": 1602049.0,
+            "predicted_total": 1316678.67,
+            "wape": 0.193775,
+            "mae": 967.0938,
+            "normalised_bias": -0.178128
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 15,
+            "n": 321,
+            "actual_total": 1315153.0,
+            "predicted_total": 1227883.79,
+            "wape": 0.146496,
+            "mae": 600.2023,
+            "normalised_bias": -0.066357
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 16,
+            "n": 321,
+            "actual_total": 352814.0,
+            "predicted_total": 360738.5,
+            "wape": 0.121014,
+            "mae": 133.0076,
+            "normalised_bias": 0.022461
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 17,
+            "n": 321,
+            "actual_total": 286457.0,
+            "predicted_total": 275500.13,
+            "wape": 0.113488,
+            "mae": 101.2754,
+            "normalised_bias": -0.03825
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 18,
+            "n": 321,
+            "actual_total": 301507.0,
+            "predicted_total": 272951.63,
+            "wape": 0.154923,
+            "mae": 145.5154,
+            "normalised_bias": -0.094709
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 19,
+            "n": 321,
+            "actual_total": 309776.0,
+            "predicted_total": 280623.65,
+            "wape": 0.155767,
+            "mae": 150.3201,
+            "normalised_bias": -0.094108
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 20,
+            "n": 321,
+            "actual_total": 325284.0,
+            "predicted_total": 308411.68,
+            "wape": 0.134147,
+            "mae": 135.937,
+            "normalised_bias": -0.05187
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 21,
+            "n": 321,
+            "actual_total": 427774.0,
+            "predicted_total": 423255.66,
+            "wape": 0.120183,
+            "mae": 160.1598,
+            "normalised_bias": -0.010562
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 22,
+            "n": 321,
+            "actual_total": 798926.0,
+            "predicted_total": 663688.35,
+            "wape": 0.203509,
+            "mae": 506.5069,
+            "normalised_bias": -0.169274
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 23,
+            "n": 321,
+            "actual_total": 769451.0,
+            "predicted_total": 502582.04,
+            "wape": 0.368246,
+            "mae": 882.7016,
+            "normalised_bias": -0.34683
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 24,
+            "n": 321,
+            "actual_total": 377483.0,
+            "predicted_total": 328892.78,
+            "wape": 0.203338,
+            "mae": 239.1177,
+            "normalised_bias": -0.128722
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 25,
+            "n": 321,
+            "actual_total": 462135.0,
+            "predicted_total": 322568.03,
+            "wape": 0.36994,
+            "mae": 532.5922,
+            "normalised_bias": -0.302005
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 26,
+            "n": 321,
+            "actual_total": 629226.0,
+            "predicted_total": 309524.68,
+            "wape": 0.53847,
+            "mae": 1055.5122,
+            "normalised_bias": -0.508087
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 27,
+            "n": 321,
+            "actual_total": 818233.0,
+            "predicted_total": 333877.13,
+            "wape": 0.624932,
+            "mae": 1592.9587,
+            "normalised_bias": -0.591953
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 28,
+            "n": 321,
+            "actual_total": 936100.0,
+            "predicted_total": 392132.43,
+            "wape": 0.617894,
+            "mae": 1801.9031,
+            "normalised_bias": -0.5811
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 29,
+            "n": 321,
+            "actual_total": 983653.0,
+            "predicted_total": 470868.17,
+            "wape": 0.585823,
+            "mae": 1795.1598,
+            "normalised_bias": -0.521307
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 30,
+            "n": 321,
+            "actual_total": 725858.0,
+            "predicted_total": 269551.38,
+            "wape": 0.671907,
+            "mae": 1519.3425,
+            "normalised_bias": -0.628644
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 1,
+            "n": 321,
+            "actual_total": 706219.0,
+            "predicted_total": 694276.44,
+            "wape": 0.020594,
+            "mae": 45.3071,
+            "normalised_bias": -0.016911
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 2,
+            "n": 321,
+            "actual_total": 697176.0,
+            "predicted_total": 680799.04,
+            "wape": 0.043348,
+            "mae": 94.1466,
+            "normalised_bias": -0.02349
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 3,
+            "n": 321,
+            "actual_total": 402476.0,
+            "predicted_total": 399417.4,
+            "wape": 0.042711,
+            "mae": 53.5518,
+            "normalised_bias": -0.007599
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 4,
+            "n": 321,
+            "actual_total": 381465.0,
+            "predicted_total": 385287.37,
+            "wape": 0.042503,
+            "mae": 50.5093,
+            "normalised_bias": 0.01002
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 5,
+            "n": 321,
+            "actual_total": 393930.0,
+            "predicted_total": 411373.49,
+            "wape": 0.065009,
+            "mae": 79.7789,
+            "normalised_bias": 0.044281
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 6,
+            "n": 321,
+            "actual_total": 423972.0,
+            "predicted_total": 443983.68,
+            "wape": 0.079825,
+            "mae": 105.432,
+            "normalised_bias": 0.0472
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 7,
+            "n": 321,
+            "actual_total": 561492.0,
+            "predicted_total": 608066.75,
+            "wape": 0.094557,
+            "mae": 165.3988,
+            "normalised_bias": 0.082948
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 8,
+            "n": 321,
+            "actual_total": 422457.0,
+            "predicted_total": 429980.63,
+            "wape": 0.102504,
+            "mae": 134.902,
+            "normalised_bias": 0.017809
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 9,
+            "n": 321,
+            "actual_total": 481446.0,
+            "predicted_total": 476122.26,
+            "wape": 0.083196,
+            "mae": 124.7794,
+            "normalised_bias": -0.011058
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 10,
+            "n": 321,
+            "actual_total": 505280.0,
+            "predicted_total": 472381.16,
+            "wape": 0.109741,
+            "mae": 172.7411,
+            "normalised_bias": -0.06511
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 11,
+            "n": 321,
+            "actual_total": 528846.0,
+            "predicted_total": 475719.98,
+            "wape": 0.113682,
+            "mae": 187.2909,
+            "normalised_bias": -0.100457
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 12,
+            "n": 321,
+            "actual_total": 551827.0,
+            "predicted_total": 501382.88,
+            "wape": 0.109971,
+            "mae": 189.0504,
+            "normalised_bias": -0.091413
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 13,
+            "n": 321,
+            "actual_total": 595554.0,
+            "predicted_total": 596282.04,
+            "wape": 0.074124,
+            "mae": 137.5238,
+            "normalised_bias": 0.001222
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 14,
+            "n": 321,
+            "actual_total": 655880.0,
+            "predicted_total": 674102.69,
+            "wape": 0.079586,
+            "mae": 162.6126,
+            "normalised_bias": 0.027784
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 15,
+            "n": 321,
+            "actual_total": 451015.0,
+            "predicted_total": 489352.47,
+            "wape": 0.121233,
+            "mae": 170.3362,
+            "normalised_bias": 0.085003
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 16,
+            "n": 321,
+            "actual_total": 569444.0,
+            "predicted_total": 672978.46,
+            "wape": 0.199477,
+            "mae": 353.8657,
+            "normalised_bias": 0.181817
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 17,
+            "n": 321,
+            "actual_total": 586790.0,
+            "predicted_total": 676560.83,
+            "wape": 0.186165,
+            "mae": 340.3099,
+            "normalised_bias": 0.152986
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 18,
+            "n": 321,
+            "actual_total": 677236.0,
+            "predicted_total": 722465.11,
+            "wape": 0.096056,
+            "mae": 202.6561,
+            "normalised_bias": 0.066785
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 19,
+            "n": 321,
+            "actual_total": 978181.0,
+            "predicted_total": 891812.2,
+            "wape": 0.117506,
+            "mae": 358.0756,
+            "normalised_bias": -0.088295
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 20,
+            "n": 321,
+            "actual_total": 1608206.0,
+            "predicted_total": 1286389.17,
+            "wape": 0.203464,
+            "mae": 1019.3504,
+            "normalised_bias": -0.200109
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 21,
+            "n": 321,
+            "actual_total": 1462589.0,
+            "predicted_total": 1276347.2,
+            "wape": 0.15158,
+            "mae": 690.65,
+            "normalised_bias": -0.127337
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 22,
+            "n": 321,
+            "actual_total": 687036.0,
+            "predicted_total": 659157.36,
+            "wape": 0.15675,
+            "mae": 335.492,
+            "normalised_bias": -0.040578
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 23,
+            "n": 321,
+            "actual_total": 681503.0,
+            "predicted_total": 648353.58,
+            "wape": 0.13909,
+            "mae": 295.2968,
+            "normalised_bias": -0.048642
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 24,
+            "n": 321,
+            "actual_total": 687197.0,
+            "predicted_total": 641866.7,
+            "wape": 0.156331,
+            "mae": 334.6737,
+            "normalised_bias": -0.065964
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 25,
+            "n": 321,
+            "actual_total": 675540.0,
+            "predicted_total": 592550.52,
+            "wape": 0.172435,
+            "mae": 362.8875,
+            "normalised_bias": -0.122849
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 26,
+            "n": 321,
+            "actual_total": 684626.0,
+            "predicted_total": 597624.07,
+            "wape": 0.175939,
+            "mae": 375.2411,
+            "normalised_bias": -0.12708
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 27,
+            "n": 321,
+            "actual_total": 733013.0,
+            "predicted_total": 625585.45,
+            "wape": 0.188782,
+            "mae": 431.0894,
+            "normalised_bias": -0.146556
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 28,
+            "n": 321,
+            "actual_total": 797532.0,
+            "predicted_total": 762807.48,
+            "wape": 0.152429,
+            "mae": 378.7135,
+            "normalised_bias": -0.04354
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 29,
+            "n": 321,
+            "actual_total": 484109.0,
+            "predicted_total": 446438.2,
+            "wape": 0.17218,
+            "mae": 259.6689,
+            "normalised_bias": -0.077815
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 30,
+            "n": 321,
+            "actual_total": 438860.0,
+            "predicted_total": 407442.88,
+            "wape": 0.136188,
+            "mae": 186.191,
+            "normalised_bias": -0.071588
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 1,
+            "n": 321,
+            "actual_total": 446045.0,
+            "predicted_total": 442421.53,
+            "wape": 0.022497,
+            "mae": 31.2613,
+            "normalised_bias": -0.008124
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 2,
+            "n": 321,
+            "actual_total": 539595.0,
+            "predicted_total": 531823.34,
+            "wape": 0.02327,
+            "mae": 39.1158,
+            "normalised_bias": -0.014403
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 3,
+            "n": 321,
+            "actual_total": 670231.0,
+            "predicted_total": 665441.02,
+            "wape": 0.033042,
+            "mae": 68.991,
+            "normalised_bias": -0.007147
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 4,
+            "n": 321,
+            "actual_total": 370348.0,
+            "predicted_total": 355928.53,
+            "wape": 0.056438,
+            "mae": 65.1147,
+            "normalised_bias": -0.038935
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 5,
+            "n": 321,
+            "actual_total": 431327.0,
+            "predicted_total": 447324.79,
+            "wape": 0.051558,
+            "mae": 69.2788,
+            "normalised_bias": 0.03709
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 6,
+            "n": 321,
+            "actual_total": 410058.0,
+            "predicted_total": 424638.52,
+            "wape": 0.056513,
+            "mae": 72.1915,
+            "normalised_bias": 0.035557
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 7,
+            "n": 321,
+            "actual_total": 400623.0,
+            "predicted_total": 411465.18,
+            "wape": 0.057695,
+            "mae": 72.0061,
+            "normalised_bias": 0.027063
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 8,
+            "n": 321,
+            "actual_total": 413017.0,
+            "predicted_total": 416426.64,
+            "wape": 0.061792,
+            "mae": 79.5051,
+            "normalised_bias": 0.008255
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 9,
+            "n": 321,
+            "actual_total": 524026.0,
+            "predicted_total": 507747.78,
+            "wape": 0.077621,
+            "mae": 126.7153,
+            "normalised_bias": -0.031064
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 10,
+            "n": 321,
+            "actual_total": 702142.0,
+            "predicted_total": 637127.42,
+            "wape": 0.102103,
+            "mae": 223.3365,
+            "normalised_bias": -0.092595
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 11,
+            "n": 321,
+            "actual_total": 351811.0,
+            "predicted_total": 319872.26,
+            "wape": 0.102729,
+            "mae": 112.5889,
+            "normalised_bias": -0.090784
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 12,
+            "n": 321,
+            "actual_total": 349183.0,
+            "predicted_total": 337199.36,
+            "wape": 0.058535,
+            "mae": 63.6743,
+            "normalised_bias": -0.034319
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 13,
+            "n": 321,
+            "actual_total": 334989.0,
+            "predicted_total": 345692.41,
+            "wape": 0.063518,
+            "mae": 66.2856,
+            "normalised_bias": 0.031952
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 14,
+            "n": 321,
+            "actual_total": 340893.0,
+            "predicted_total": 343354.76,
+            "wape": 0.079537,
+            "mae": 84.4661,
+            "normalised_bias": 0.007221
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 15,
+            "n": 321,
+            "actual_total": 378996.0,
+            "predicted_total": 375240.97,
+            "wape": 0.07129,
+            "mae": 84.1706,
+            "normalised_bias": -0.009908
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 16,
+            "n": 321,
+            "actual_total": 507387.0,
+            "predicted_total": 449225.6,
+            "wape": 0.129043,
+            "mae": 203.9706,
+            "normalised_bias": -0.114629
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 17,
+            "n": 321,
+            "actual_total": 674381.0,
+            "predicted_total": 558869.78,
+            "wape": 0.178518,
+            "mae": 375.044,
+            "normalised_bias": -0.171285
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 18,
+            "n": 321,
+            "actual_total": 331920.0,
+            "predicted_total": 291897.35,
+            "wape": 0.136542,
+            "mae": 141.1871,
+            "normalised_bias": -0.120579
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 19,
+            "n": 321,
+            "actual_total": 298796.0,
+            "predicted_total": 264462.07,
+            "wape": 0.128894,
+            "mae": 119.9781,
+            "normalised_bias": -0.114908
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 20,
+            "n": 321,
+            "actual_total": 290339.0,
+            "predicted_total": 282451.06,
+            "wape": 0.096179,
+            "mae": 86.992,
+            "normalised_bias": -0.027168
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 21,
+            "n": 321,
+            "actual_total": 296295.0,
+            "predicted_total": 267980.02,
+            "wape": 0.119772,
+            "mae": 110.5545,
+            "normalised_bias": -0.095563
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 22,
+            "n": 321,
+            "actual_total": 332673.0,
+            "predicted_total": 289570.34,
+            "wape": 0.145869,
+            "mae": 151.1739,
+            "normalised_bias": -0.129565
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 23,
+            "n": 321,
+            "actual_total": 454452.0,
+            "predicted_total": 363037.0,
+            "wape": 0.205031,
+            "mae": 290.2707,
+            "normalised_bias": -0.201154
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 24,
+            "n": 321,
+            "actual_total": 624651.0,
+            "predicted_total": 523819.29,
+            "wape": 0.177052,
+            "mae": 344.5355,
+            "normalised_bias": -0.161421
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 25,
+            "n": 321,
+            "actual_total": 303286.0,
+            "predicted_total": 276540.04,
+            "wape": 0.121386,
+            "mae": 114.6878,
+            "normalised_bias": -0.088187
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 26,
+            "n": 321,
+            "actual_total": 281566.0,
+            "predicted_total": 245989.63,
+            "wape": 0.151264,
+            "mae": 132.6812,
+            "normalised_bias": -0.126352
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 27,
+            "n": 321,
+            "actual_total": 272028.0,
+            "predicted_total": 238861.23,
+            "wape": 0.151903,
+            "mae": 128.7289,
+            "normalised_bias": -0.121924
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 28,
+            "n": 321,
+            "actual_total": 274659.0,
+            "predicted_total": 250189.85,
+            "wape": 0.130264,
+            "mae": 111.4589,
+            "normalised_bias": -0.089089
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 29,
+            "n": 321,
+            "actual_total": 299657.0,
+            "predicted_total": 269815.17,
+            "wape": 0.121727,
+            "mae": 113.6338,
+            "normalised_bias": -0.099587
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 30,
+            "n": 321,
+            "actual_total": 346331.0,
+            "predicted_total": 239919.07,
+            "wape": 0.311483,
+            "mae": 336.0631,
+            "normalised_bias": -0.307255
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 1,
+            "n": 321,
+            "actual_total": 575561.0,
+            "predicted_total": 568522.81,
+            "wape": 0.019219,
+            "mae": 34.4598,
+            "normalised_bias": -0.012228
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 2,
+            "n": 321,
+            "actual_total": 290798.0,
+            "predicted_total": 286980.28,
+            "wape": 0.033171,
+            "mae": 30.0504,
+            "normalised_bias": -0.013128
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 3,
+            "n": 321,
+            "actual_total": 262627.0,
+            "predicted_total": 264942.26,
+            "wape": 0.031145,
+            "mae": 25.4818,
+            "normalised_bias": 0.008816
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 4,
+            "n": 321,
+            "actual_total": 244023.0,
+            "predicted_total": 244744.32,
+            "wape": 0.048856,
+            "mae": 37.1399,
+            "normalised_bias": 0.002956
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 5,
+            "n": 321,
+            "actual_total": 241811.0,
+            "predicted_total": 239716.17,
+            "wape": 0.039417,
+            "mae": 29.6933,
+            "normalised_bias": -0.008663
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 6,
+            "n": 321,
+            "actual_total": 268295.0,
+            "predicted_total": 259203.78,
+            "wape": 0.066212,
+            "mae": 55.3408,
+            "normalised_bias": -0.033885
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 7,
+            "n": 321,
+            "actual_total": 405227.0,
+            "predicted_total": 372694.09,
+            "wape": 0.089998,
+            "mae": 113.6124,
+            "normalised_bias": -0.080283
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 8,
+            "n": 321,
+            "actual_total": 608875.0,
+            "predicted_total": 548096.01,
+            "wape": 0.109044,
+            "mae": 206.8363,
+            "normalised_bias": -0.099822
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 9,
+            "n": 321,
+            "actual_total": 281273.0,
+            "predicted_total": 266594.92,
+            "wape": 0.080827,
+            "mae": 70.8242,
+            "normalised_bias": -0.052184
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 10,
+            "n": 321,
+            "actual_total": 236490.0,
+            "predicted_total": 226312.68,
+            "wape": 0.074082,
+            "mae": 54.578,
+            "normalised_bias": -0.043035
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 11,
+            "n": 321,
+            "actual_total": 226541.0,
+            "predicted_total": 216980.8,
+            "wape": 0.069212,
+            "mae": 48.8452,
+            "normalised_bias": -0.042201
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 12,
+            "n": 321,
+            "actual_total": 235266.0,
+            "predicted_total": 215056.75,
+            "wape": 0.108521,
+            "mae": 79.5368,
+            "normalised_bias": -0.0859
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 13,
+            "n": 321,
+            "actual_total": 274481.0,
+            "predicted_total": 252310.53,
+            "wape": 0.101545,
+            "mae": 86.8296,
+            "normalised_bias": -0.080772
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 14,
+            "n": 321,
+            "actual_total": 414282.0,
+            "predicted_total": 350341.9,
+            "wape": 0.168008,
+            "mae": 216.8305,
+            "normalised_bias": -0.15434
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 15,
+            "n": 321,
+            "actual_total": 609846.0,
+            "predicted_total": 536540.29,
+            "wape": 0.148785,
+            "mae": 282.6672,
+            "normalised_bias": -0.120204
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 16,
+            "n": 321,
+            "actual_total": 271375.0,
+            "predicted_total": 249774.58,
+            "wape": 0.11353,
+            "mae": 95.9784,
+            "normalised_bias": -0.079596
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 17,
+            "n": 321,
+            "actual_total": 226377.0,
+            "predicted_total": 205819.93,
+            "wape": 0.121127,
+            "mae": 85.422,
+            "normalised_bias": -0.090809
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 18,
+            "n": 321,
+            "actual_total": 214711.0,
+            "predicted_total": 198584.99,
+            "wape": 0.09651,
+            "mae": 64.5535,
+            "normalised_bias": -0.075106
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 19,
+            "n": 321,
+            "actual_total": 225319.0,
+            "predicted_total": 208453.08,
+            "wape": 0.108193,
+            "mae": 75.9441,
+            "normalised_bias": -0.074854
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 20,
+            "n": 321,
+            "actual_total": 265622.0,
+            "predicted_total": 246587.48,
+            "wape": 0.125678,
+            "mae": 103.9961,
+            "normalised_bias": -0.07166
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 21,
+            "n": 321,
+            "actual_total": 379478.0,
+            "predicted_total": 335152.85,
+            "wape": 0.142899,
+            "mae": 168.9311,
+            "normalised_bias": -0.116806
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 22,
+            "n": 321,
+            "actual_total": 562777.0,
+            "predicted_total": 472997.15,
+            "wape": 0.176547,
+            "mae": 309.522,
+            "normalised_bias": -0.15953
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 23,
+            "n": 321,
+            "actual_total": 250618.0,
+            "predicted_total": 225723.28,
+            "wape": 0.121806,
+            "mae": 95.0989,
+            "normalised_bias": -0.099333
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 24,
+            "n": 321,
+            "actual_total": 213161.0,
+            "predicted_total": 201887.04,
+            "wape": 0.097807,
+            "mae": 64.949,
+            "normalised_bias": -0.052889
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 25,
+            "n": 321,
+            "actual_total": 208876.0,
+            "predicted_total": 196430.46,
+            "wape": 0.097088,
+            "mae": 63.1755,
+            "normalised_bias": -0.059583
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 26,
+            "n": 321,
+            "actual_total": 215054.0,
+            "predicted_total": 196248.58,
+            "wape": 0.125061,
+            "mae": 83.7849,
+            "normalised_bias": -0.087445
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 27,
+            "n": 321,
+            "actual_total": 248213.0,
+            "predicted_total": 220522.84,
+            "wape": 0.128434,
+            "mae": 99.3116,
+            "normalised_bias": -0.111558
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 28,
+            "n": 321,
+            "actual_total": 354309.0,
+            "predicted_total": 308198.65,
+            "wape": 0.160681,
+            "mae": 177.3542,
+            "normalised_bias": -0.130142
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 29,
+            "n": 321,
+            "actual_total": 552780.0,
+            "predicted_total": 447463.98,
+            "wape": 0.197811,
+            "mae": 340.642,
+            "normalised_bias": -0.190521
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 30,
+            "n": 321,
+            "actual_total": 310107.0,
+            "predicted_total": 249576.18,
+            "wape": 0.210245,
+            "mae": 203.1108,
+            "normalised_bias": -0.195193
+          }
+        ],
+        "by_fold_date": [
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-22",
+            "n": 321,
+            "actual_total": 196369.0,
+            "predicted_total": 194966.32,
+            "wape": 0.023242,
+            "mae": 14.2178,
+            "normalised_bias": -0.007143
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-23",
+            "n": 321,
+            "actual_total": 173257.0,
+            "predicted_total": 171737.65,
+            "wape": 0.033006,
+            "mae": 17.8146,
+            "normalised_bias": -0.008769
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-24",
+            "n": 321,
+            "actual_total": 160332.0,
+            "predicted_total": 159595.38,
+            "wape": 0.034952,
+            "mae": 17.4575,
+            "normalised_bias": -0.004594
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-25",
+            "n": 321,
+            "actual_total": 160780.0,
+            "predicted_total": 158489.6,
+            "wape": 0.045393,
+            "mae": 22.7362,
+            "normalised_bias": -0.014246
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-26",
+            "n": 321,
+            "actual_total": 183708.0,
+            "predicted_total": 176775.84,
+            "wape": 0.0623,
+            "mae": 35.6543,
+            "normalised_bias": -0.037735
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-27",
+            "n": 321,
+            "actual_total": 261561.0,
+            "predicted_total": 261410.85,
+            "wape": 0.068104,
+            "mae": 55.493,
+            "normalised_bias": -0.000574
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-28",
+            "n": 321,
+            "actual_total": 393317.0,
+            "predicted_total": 387812.62,
+            "wape": 0.076323,
+            "mae": 93.5174,
+            "normalised_bias": -0.013995
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-29",
+            "n": 321,
+            "actual_total": 185239.0,
+            "predicted_total": 176029.77,
+            "wape": 0.084396,
+            "mae": 48.702,
+            "normalised_bias": -0.049715
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-30",
+            "n": 321,
+            "actual_total": 159136.0,
+            "predicted_total": 164249.87,
+            "wape": 0.072348,
+            "mae": 35.8666,
+            "normalised_bias": 0.032135
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-01",
+            "n": 321,
+            "actual_total": 153314.0,
+            "predicted_total": 160782.33,
+            "wape": 0.078579,
+            "mae": 37.5305,
+            "normalised_bias": 0.048713
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-02",
+            "n": 321,
+            "actual_total": 166416.0,
+            "predicted_total": 177421.22,
+            "wape": 0.086379,
+            "mae": 44.7815,
+            "normalised_bias": 0.066131
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-03",
+            "n": 321,
+            "actual_total": 213035.0,
+            "predicted_total": 221718.59,
+            "wape": 0.09612,
+            "mae": 63.7912,
+            "normalised_bias": 0.040761
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-04",
+            "n": 321,
+            "actual_total": 427488.0,
+            "predicted_total": 393205.9,
+            "wape": 0.112129,
+            "mae": 149.3269,
+            "normalised_bias": -0.080194
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-05",
+            "n": 321,
+            "actual_total": 701273.0,
+            "predicted_total": 592216.58,
+            "wape": 0.167049,
+            "mae": 364.9441,
+            "normalised_bias": -0.155512
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-06",
+            "n": 321,
+            "actual_total": 235175.0,
+            "predicted_total": 244604.65,
+            "wape": 0.089286,
+            "mae": 65.414,
+            "normalised_bias": 0.040096
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-07",
+            "n": 321,
+            "actual_total": 170295.0,
+            "predicted_total": 175472.64,
+            "wape": 0.09382,
+            "mae": 49.7728,
+            "normalised_bias": 0.030404
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-08",
+            "n": 321,
+            "actual_total": 159546.0,
+            "predicted_total": 163611.88,
+            "wape": 0.101249,
+            "mae": 50.3235,
+            "normalised_bias": 0.025484
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-09",
+            "n": 321,
+            "actual_total": 165207.0,
+            "predicted_total": 169154.07,
+            "wape": 0.125177,
+            "mae": 64.4238,
+            "normalised_bias": 0.023892
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-10",
+            "n": 321,
+            "actual_total": 191897.0,
+            "predicted_total": 188177.65,
+            "wape": 0.098075,
+            "mae": 58.6299,
+            "normalised_bias": -0.019382
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-11",
+            "n": 321,
+            "actual_total": 287163.0,
+            "predicted_total": 262193.58,
+            "wape": 0.12314,
+            "mae": 110.16,
+            "normalised_bias": -0.086952
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-12",
+            "n": 321,
+            "actual_total": 409571.0,
+            "predicted_total": 412235.9,
+            "wape": 0.113037,
+            "mae": 144.2263,
+            "normalised_bias": 0.006507
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-13",
+            "n": 321,
+            "actual_total": 185175.0,
+            "predicted_total": 195585.46,
+            "wape": 0.124973,
+            "mae": 72.0928,
+            "normalised_bias": 0.05622
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-14",
+            "n": 321,
+            "actual_total": 161509.0,
+            "predicted_total": 171682.04,
+            "wape": 0.113693,
+            "mae": 57.2038,
+            "normalised_bias": 0.062987
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-15",
+            "n": 321,
+            "actual_total": 157359.0,
+            "predicted_total": 177510.41,
+            "wape": 0.161182,
+            "mae": 79.0139,
+            "normalised_bias": 0.12806
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-16",
+            "n": 321,
+            "actual_total": 163478.0,
+            "predicted_total": 187798.95,
+            "wape": 0.171445,
+            "mae": 87.313,
+            "normalised_bias": 0.148772
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-17",
+            "n": 321,
+            "actual_total": 178806.0,
+            "predicted_total": 209789.57,
+            "wape": 0.197793,
+            "mae": 110.1764,
+            "normalised_bias": 0.17328
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-18",
+            "n": 321,
+            "actual_total": 212590.0,
+            "predicted_total": 263761.55,
+            "wape": 0.269783,
+            "mae": 178.6701,
+            "normalised_bias": 0.240705
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-19",
+            "n": 321,
+            "actual_total": 288252.0,
+            "predicted_total": 392480.43,
+            "wape": 0.379801,
+            "mae": 341.0546,
+            "normalised_bias": 0.361588
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-20",
+            "n": 321,
+            "actual_total": 144207.0,
+            "predicted_total": 174637.02,
+            "wape": 0.300593,
+            "mae": 135.0392,
+            "normalised_bias": 0.211016
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-21",
+            "n": 321,
+            "actual_total": 142059.0,
+            "predicted_total": 178735.35,
+            "wape": 0.291637,
+            "mae": 129.0642,
+            "normalised_bias": 0.258177
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-22",
+            "n": 321,
+            "actual_total": 521037.0,
+            "predicted_total": 517984.19,
+            "wape": 0.02325,
+            "mae": 37.7393,
+            "normalised_bias": -0.005859
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-23",
+            "n": 321,
+            "actual_total": 282598.0,
+            "predicted_total": 284183.23,
+            "wape": 0.026427,
+            "mae": 23.2657,
+            "normalised_bias": 0.005609
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-24",
+            "n": 321,
+            "actual_total": 285205.0,
+            "predicted_total": 294592.78,
+            "wape": 0.045911,
+            "mae": 40.7914,
+            "normalised_bias": 0.032916
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-25",
+            "n": 321,
+            "actual_total": 281782.0,
+            "predicted_total": 280628.56,
+            "wape": 0.045223,
+            "mae": 39.6978,
+            "normalised_bias": -0.004093
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-26",
+            "n": 321,
+            "actual_total": 283431.0,
+            "predicted_total": 288334.79,
+            "wape": 0.047432,
+            "mae": 41.8808,
+            "normalised_bias": 0.017302
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-27",
+            "n": 321,
+            "actual_total": 295839.0,
+            "predicted_total": 286962.87,
+            "wape": 0.065189,
+            "mae": 60.0789,
+            "normalised_bias": -0.030003
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-28",
+            "n": 321,
+            "actual_total": 377355.0,
+            "predicted_total": 353182.21,
+            "wape": 0.081359,
+            "mae": 95.642,
+            "normalised_bias": -0.064058
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-29",
+            "n": 321,
+            "actual_total": 539992.0,
+            "predicted_total": 491896.81,
+            "wape": 0.107527,
+            "mae": 180.8834,
+            "normalised_bias": -0.089066
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-30",
+            "n": 321,
+            "actual_total": 298402.0,
+            "predicted_total": 270968.96,
+            "wape": 0.106152,
+            "mae": 98.6789,
+            "normalised_bias": -0.091933
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-31",
+            "n": 321,
+            "actual_total": 288679.0,
+            "predicted_total": 255781.55,
+            "wape": 0.122259,
+            "mae": 109.9493,
+            "normalised_bias": -0.113959
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-01",
+            "n": 321,
+            "actual_total": 292888.0,
+            "predicted_total": 257263.5,
+            "wape": 0.135011,
+            "mae": 123.1872,
+            "normalised_bias": -0.121632
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-02",
+            "n": 321,
+            "actual_total": 353268.0,
+            "predicted_total": 326574.77,
+            "wape": 0.109727,
+            "mae": 120.7569,
+            "normalised_bias": -0.075561
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-03",
+            "n": 321,
+            "actual_total": 694496.0,
+            "predicted_total": 755346.96,
+            "wape": 0.115951,
+            "mae": 250.8642,
+            "normalised_bias": 0.087619
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-04",
+            "n": 321,
+            "actual_total": 1602049.0,
+            "predicted_total": 1316678.67,
+            "wape": 0.193775,
+            "mae": 967.0938,
+            "normalised_bias": -0.178128
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-05",
+            "n": 321,
+            "actual_total": 1315153.0,
+            "predicted_total": 1227883.79,
+            "wape": 0.146496,
+            "mae": 600.2023,
+            "normalised_bias": -0.066357
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-06",
+            "n": 321,
+            "actual_total": 352814.0,
+            "predicted_total": 360738.5,
+            "wape": 0.121014,
+            "mae": 133.0076,
+            "normalised_bias": 0.022461
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-07",
+            "n": 321,
+            "actual_total": 286457.0,
+            "predicted_total": 275500.13,
+            "wape": 0.113488,
+            "mae": 101.2754,
+            "normalised_bias": -0.03825
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-08",
+            "n": 321,
+            "actual_total": 301507.0,
+            "predicted_total": 272951.63,
+            "wape": 0.154923,
+            "mae": 145.5154,
+            "normalised_bias": -0.094709
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-09",
+            "n": 321,
+            "actual_total": 309776.0,
+            "predicted_total": 280623.65,
+            "wape": 0.155767,
+            "mae": 150.3201,
+            "normalised_bias": -0.094108
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-10",
+            "n": 321,
+            "actual_total": 325284.0,
+            "predicted_total": 308411.68,
+            "wape": 0.134147,
+            "mae": 135.937,
+            "normalised_bias": -0.05187
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-11",
+            "n": 321,
+            "actual_total": 427774.0,
+            "predicted_total": 423255.66,
+            "wape": 0.120183,
+            "mae": 160.1598,
+            "normalised_bias": -0.010562
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-12",
+            "n": 321,
+            "actual_total": 798926.0,
+            "predicted_total": 663688.35,
+            "wape": 0.203509,
+            "mae": 506.5069,
+            "normalised_bias": -0.169274
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-13",
+            "n": 321,
+            "actual_total": 769451.0,
+            "predicted_total": 502582.04,
+            "wape": 0.368246,
+            "mae": 882.7016,
+            "normalised_bias": -0.34683
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-14",
+            "n": 321,
+            "actual_total": 377483.0,
+            "predicted_total": 328892.78,
+            "wape": 0.203338,
+            "mae": 239.1177,
+            "normalised_bias": -0.128722
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-15",
+            "n": 321,
+            "actual_total": 462135.0,
+            "predicted_total": 322568.03,
+            "wape": 0.36994,
+            "mae": 532.5922,
+            "normalised_bias": -0.302005
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-16",
+            "n": 321,
+            "actual_total": 629226.0,
+            "predicted_total": 309524.68,
+            "wape": 0.53847,
+            "mae": 1055.5122,
+            "normalised_bias": -0.508087
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-17",
+            "n": 321,
+            "actual_total": 818233.0,
+            "predicted_total": 333877.13,
+            "wape": 0.624932,
+            "mae": 1592.9587,
+            "normalised_bias": -0.591953
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-18",
+            "n": 321,
+            "actual_total": 936100.0,
+            "predicted_total": 392132.43,
+            "wape": 0.617894,
+            "mae": 1801.9031,
+            "normalised_bias": -0.5811
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-19",
+            "n": 321,
+            "actual_total": 983653.0,
+            "predicted_total": 470868.17,
+            "wape": 0.585823,
+            "mae": 1795.1598,
+            "normalised_bias": -0.521307
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-20",
+            "n": 321,
+            "actual_total": 725858.0,
+            "predicted_total": 269551.38,
+            "wape": 0.671907,
+            "mae": 1519.3425,
+            "normalised_bias": -0.628644
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-22",
+            "n": 321,
+            "actual_total": 706219.0,
+            "predicted_total": 694276.44,
+            "wape": 0.020594,
+            "mae": 45.3071,
+            "normalised_bias": -0.016911
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-23",
+            "n": 321,
+            "actual_total": 697176.0,
+            "predicted_total": 680799.04,
+            "wape": 0.043348,
+            "mae": 94.1466,
+            "normalised_bias": -0.02349
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-24",
+            "n": 321,
+            "actual_total": 402476.0,
+            "predicted_total": 399417.4,
+            "wape": 0.042711,
+            "mae": 53.5518,
+            "normalised_bias": -0.007599
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-25",
+            "n": 321,
+            "actual_total": 381465.0,
+            "predicted_total": 385287.37,
+            "wape": 0.042503,
+            "mae": 50.5093,
+            "normalised_bias": 0.01002
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-26",
+            "n": 321,
+            "actual_total": 393930.0,
+            "predicted_total": 411373.49,
+            "wape": 0.065009,
+            "mae": 79.7789,
+            "normalised_bias": 0.044281
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-27",
+            "n": 321,
+            "actual_total": 423972.0,
+            "predicted_total": 443983.68,
+            "wape": 0.079825,
+            "mae": 105.432,
+            "normalised_bias": 0.0472
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-28",
+            "n": 321,
+            "actual_total": 561492.0,
+            "predicted_total": 608066.75,
+            "wape": 0.094557,
+            "mae": 165.3988,
+            "normalised_bias": 0.082948
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-29",
+            "n": 321,
+            "actual_total": 422457.0,
+            "predicted_total": 429980.63,
+            "wape": 0.102504,
+            "mae": 134.902,
+            "normalised_bias": 0.017809
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-30",
+            "n": 321,
+            "actual_total": 481446.0,
+            "predicted_total": 476122.26,
+            "wape": 0.083196,
+            "mae": 124.7794,
+            "normalised_bias": -0.011058
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-31",
+            "n": 321,
+            "actual_total": 505280.0,
+            "predicted_total": 472381.16,
+            "wape": 0.109741,
+            "mae": 172.7411,
+            "normalised_bias": -0.06511
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-01",
+            "n": 321,
+            "actual_total": 528846.0,
+            "predicted_total": 475719.98,
+            "wape": 0.113682,
+            "mae": 187.2909,
+            "normalised_bias": -0.100457
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-02",
+            "n": 321,
+            "actual_total": 551827.0,
+            "predicted_total": 501382.88,
+            "wape": 0.109971,
+            "mae": 189.0504,
+            "normalised_bias": -0.091413
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-03",
+            "n": 321,
+            "actual_total": 595554.0,
+            "predicted_total": 596282.04,
+            "wape": 0.074124,
+            "mae": 137.5238,
+            "normalised_bias": 0.001222
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-04",
+            "n": 321,
+            "actual_total": 655880.0,
+            "predicted_total": 674102.69,
+            "wape": 0.079586,
+            "mae": 162.6126,
+            "normalised_bias": 0.027784
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-05",
+            "n": 321,
+            "actual_total": 451015.0,
+            "predicted_total": 489352.47,
+            "wape": 0.121233,
+            "mae": 170.3362,
+            "normalised_bias": 0.085003
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-06",
+            "n": 321,
+            "actual_total": 569444.0,
+            "predicted_total": 672978.46,
+            "wape": 0.199477,
+            "mae": 353.8657,
+            "normalised_bias": 0.181817
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-07",
+            "n": 321,
+            "actual_total": 586790.0,
+            "predicted_total": 676560.83,
+            "wape": 0.186165,
+            "mae": 340.3099,
+            "normalised_bias": 0.152986
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-08",
+            "n": 321,
+            "actual_total": 677236.0,
+            "predicted_total": 722465.11,
+            "wape": 0.096056,
+            "mae": 202.6561,
+            "normalised_bias": 0.066785
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-09",
+            "n": 321,
+            "actual_total": 978181.0,
+            "predicted_total": 891812.2,
+            "wape": 0.117506,
+            "mae": 358.0756,
+            "normalised_bias": -0.088295
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-10",
+            "n": 321,
+            "actual_total": 1608206.0,
+            "predicted_total": 1286389.17,
+            "wape": 0.203464,
+            "mae": 1019.3504,
+            "normalised_bias": -0.200109
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-11",
+            "n": 321,
+            "actual_total": 1462589.0,
+            "predicted_total": 1276347.2,
+            "wape": 0.15158,
+            "mae": 690.65,
+            "normalised_bias": -0.127337
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-12",
+            "n": 321,
+            "actual_total": 687036.0,
+            "predicted_total": 659157.36,
+            "wape": 0.15675,
+            "mae": 335.492,
+            "normalised_bias": -0.040578
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-13",
+            "n": 321,
+            "actual_total": 681503.0,
+            "predicted_total": 648353.58,
+            "wape": 0.13909,
+            "mae": 295.2968,
+            "normalised_bias": -0.048642
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-14",
+            "n": 321,
+            "actual_total": 687197.0,
+            "predicted_total": 641866.7,
+            "wape": 0.156331,
+            "mae": 334.6737,
+            "normalised_bias": -0.065964
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-15",
+            "n": 321,
+            "actual_total": 675540.0,
+            "predicted_total": 592550.52,
+            "wape": 0.172435,
+            "mae": 362.8875,
+            "normalised_bias": -0.122849
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-16",
+            "n": 321,
+            "actual_total": 684626.0,
+            "predicted_total": 597624.07,
+            "wape": 0.175939,
+            "mae": 375.2411,
+            "normalised_bias": -0.12708
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-17",
+            "n": 321,
+            "actual_total": 733013.0,
+            "predicted_total": 625585.45,
+            "wape": 0.188782,
+            "mae": 431.0894,
+            "normalised_bias": -0.146556
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-18",
+            "n": 321,
+            "actual_total": 797532.0,
+            "predicted_total": 762807.48,
+            "wape": 0.152429,
+            "mae": 378.7135,
+            "normalised_bias": -0.04354
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-19",
+            "n": 321,
+            "actual_total": 484109.0,
+            "predicted_total": 446438.2,
+            "wape": 0.17218,
+            "mae": 259.6689,
+            "normalised_bias": -0.077815
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-20",
+            "n": 321,
+            "actual_total": 438860.0,
+            "predicted_total": 407442.88,
+            "wape": 0.136188,
+            "mae": 186.191,
+            "normalised_bias": -0.071588
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-09-23",
+            "n": 321,
+            "actual_total": 446045.0,
+            "predicted_total": 442421.53,
+            "wape": 0.022497,
+            "mae": 31.2613,
+            "normalised_bias": -0.008124
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-09-24",
+            "n": 321,
+            "actual_total": 539595.0,
+            "predicted_total": 531823.34,
+            "wape": 0.02327,
+            "mae": 39.1158,
+            "normalised_bias": -0.014403
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-09-25",
+            "n": 321,
+            "actual_total": 670231.0,
+            "predicted_total": 665441.02,
+            "wape": 0.033042,
+            "mae": 68.991,
+            "normalised_bias": -0.007147
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-09-26",
+            "n": 321,
+            "actual_total": 370348.0,
+            "predicted_total": 355928.53,
+            "wape": 0.056438,
+            "mae": 65.1147,
+            "normalised_bias": -0.038935
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-09-27",
+            "n": 321,
+            "actual_total": 431327.0,
+            "predicted_total": 447324.79,
+            "wape": 0.051558,
+            "mae": 69.2788,
+            "normalised_bias": 0.03709
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-09-28",
+            "n": 321,
+            "actual_total": 410058.0,
+            "predicted_total": 424638.52,
+            "wape": 0.056513,
+            "mae": 72.1915,
+            "normalised_bias": 0.035557
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-09-29",
+            "n": 321,
+            "actual_total": 400623.0,
+            "predicted_total": 411465.18,
+            "wape": 0.057695,
+            "mae": 72.0061,
+            "normalised_bias": 0.027063
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-09-30",
+            "n": 321,
+            "actual_total": 413017.0,
+            "predicted_total": 416426.64,
+            "wape": 0.061792,
+            "mae": 79.5051,
+            "normalised_bias": 0.008255
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-01",
+            "n": 321,
+            "actual_total": 524026.0,
+            "predicted_total": 507747.78,
+            "wape": 0.077621,
+            "mae": 126.7153,
+            "normalised_bias": -0.031064
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-02",
+            "n": 321,
+            "actual_total": 702142.0,
+            "predicted_total": 637127.42,
+            "wape": 0.102103,
+            "mae": 223.3365,
+            "normalised_bias": -0.092595
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-03",
+            "n": 321,
+            "actual_total": 351811.0,
+            "predicted_total": 319872.26,
+            "wape": 0.102729,
+            "mae": 112.5889,
+            "normalised_bias": -0.090784
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-04",
+            "n": 321,
+            "actual_total": 349183.0,
+            "predicted_total": 337199.36,
+            "wape": 0.058535,
+            "mae": 63.6743,
+            "normalised_bias": -0.034319
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-05",
+            "n": 321,
+            "actual_total": 334989.0,
+            "predicted_total": 345692.41,
+            "wape": 0.063518,
+            "mae": 66.2856,
+            "normalised_bias": 0.031952
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-06",
+            "n": 321,
+            "actual_total": 340893.0,
+            "predicted_total": 343354.76,
+            "wape": 0.079537,
+            "mae": 84.4661,
+            "normalised_bias": 0.007221
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-07",
+            "n": 321,
+            "actual_total": 378996.0,
+            "predicted_total": 375240.97,
+            "wape": 0.07129,
+            "mae": 84.1706,
+            "normalised_bias": -0.009908
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-08",
+            "n": 321,
+            "actual_total": 507387.0,
+            "predicted_total": 449225.6,
+            "wape": 0.129043,
+            "mae": 203.9706,
+            "normalised_bias": -0.114629
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-09",
+            "n": 321,
+            "actual_total": 674381.0,
+            "predicted_total": 558869.78,
+            "wape": 0.178518,
+            "mae": 375.044,
+            "normalised_bias": -0.171285
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-10",
+            "n": 321,
+            "actual_total": 331920.0,
+            "predicted_total": 291897.35,
+            "wape": 0.136542,
+            "mae": 141.1871,
+            "normalised_bias": -0.120579
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-11",
+            "n": 321,
+            "actual_total": 298796.0,
+            "predicted_total": 264462.07,
+            "wape": 0.128894,
+            "mae": 119.9781,
+            "normalised_bias": -0.114908
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-12",
+            "n": 321,
+            "actual_total": 290339.0,
+            "predicted_total": 282451.06,
+            "wape": 0.096179,
+            "mae": 86.992,
+            "normalised_bias": -0.027168
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-13",
+            "n": 321,
+            "actual_total": 296295.0,
+            "predicted_total": 267980.02,
+            "wape": 0.119772,
+            "mae": 110.5545,
+            "normalised_bias": -0.095563
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-14",
+            "n": 321,
+            "actual_total": 332673.0,
+            "predicted_total": 289570.34,
+            "wape": 0.145869,
+            "mae": 151.1739,
+            "normalised_bias": -0.129565
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-15",
+            "n": 321,
+            "actual_total": 454452.0,
+            "predicted_total": 363037.0,
+            "wape": 0.205031,
+            "mae": 290.2707,
+            "normalised_bias": -0.201154
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-16",
+            "n": 321,
+            "actual_total": 624651.0,
+            "predicted_total": 523819.29,
+            "wape": 0.177052,
+            "mae": 344.5355,
+            "normalised_bias": -0.161421
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-17",
+            "n": 321,
+            "actual_total": 303286.0,
+            "predicted_total": 276540.04,
+            "wape": 0.121386,
+            "mae": 114.6878,
+            "normalised_bias": -0.088187
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-18",
+            "n": 321,
+            "actual_total": 281566.0,
+            "predicted_total": 245989.63,
+            "wape": 0.151264,
+            "mae": 132.6812,
+            "normalised_bias": -0.126352
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-19",
+            "n": 321,
+            "actual_total": 272028.0,
+            "predicted_total": 238861.23,
+            "wape": 0.151903,
+            "mae": 128.7289,
+            "normalised_bias": -0.121924
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-20",
+            "n": 321,
+            "actual_total": 274659.0,
+            "predicted_total": 250189.85,
+            "wape": 0.130264,
+            "mae": 111.4589,
+            "normalised_bias": -0.089089
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-21",
+            "n": 321,
+            "actual_total": 299657.0,
+            "predicted_total": 269815.17,
+            "wape": 0.121727,
+            "mae": 113.6338,
+            "normalised_bias": -0.099587
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-22",
+            "n": 321,
+            "actual_total": 346331.0,
+            "predicted_total": 239919.07,
+            "wape": 0.311483,
+            "mae": 336.0631,
+            "normalised_bias": -0.307255
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-23",
+            "n": 321,
+            "actual_total": 575561.0,
+            "predicted_total": 568522.81,
+            "wape": 0.019219,
+            "mae": 34.4598,
+            "normalised_bias": -0.012228
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-24",
+            "n": 321,
+            "actual_total": 290798.0,
+            "predicted_total": 286980.28,
+            "wape": 0.033171,
+            "mae": 30.0504,
+            "normalised_bias": -0.013128
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-25",
+            "n": 321,
+            "actual_total": 262627.0,
+            "predicted_total": 264942.26,
+            "wape": 0.031145,
+            "mae": 25.4818,
+            "normalised_bias": 0.008816
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-26",
+            "n": 321,
+            "actual_total": 244023.0,
+            "predicted_total": 244744.32,
+            "wape": 0.048856,
+            "mae": 37.1399,
+            "normalised_bias": 0.002956
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-27",
+            "n": 321,
+            "actual_total": 241811.0,
+            "predicted_total": 239716.17,
+            "wape": 0.039417,
+            "mae": 29.6933,
+            "normalised_bias": -0.008663
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-28",
+            "n": 321,
+            "actual_total": 268295.0,
+            "predicted_total": 259203.78,
+            "wape": 0.066212,
+            "mae": 55.3408,
+            "normalised_bias": -0.033885
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-29",
+            "n": 321,
+            "actual_total": 405227.0,
+            "predicted_total": 372694.09,
+            "wape": 0.089998,
+            "mae": 113.6124,
+            "normalised_bias": -0.080283
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-30",
+            "n": 321,
+            "actual_total": 608875.0,
+            "predicted_total": 548096.01,
+            "wape": 0.109044,
+            "mae": 206.8363,
+            "normalised_bias": -0.099822
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-31",
+            "n": 321,
+            "actual_total": 281273.0,
+            "predicted_total": 266594.92,
+            "wape": 0.080827,
+            "mae": 70.8242,
+            "normalised_bias": -0.052184
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-01",
+            "n": 321,
+            "actual_total": 236490.0,
+            "predicted_total": 226312.68,
+            "wape": 0.074082,
+            "mae": 54.578,
+            "normalised_bias": -0.043035
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-02",
+            "n": 321,
+            "actual_total": 226541.0,
+            "predicted_total": 216980.8,
+            "wape": 0.069212,
+            "mae": 48.8452,
+            "normalised_bias": -0.042201
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-03",
+            "n": 321,
+            "actual_total": 235266.0,
+            "predicted_total": 215056.75,
+            "wape": 0.108521,
+            "mae": 79.5368,
+            "normalised_bias": -0.0859
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-04",
+            "n": 321,
+            "actual_total": 274481.0,
+            "predicted_total": 252310.53,
+            "wape": 0.101545,
+            "mae": 86.8296,
+            "normalised_bias": -0.080772
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-05",
+            "n": 321,
+            "actual_total": 414282.0,
+            "predicted_total": 350341.9,
+            "wape": 0.168008,
+            "mae": 216.8305,
+            "normalised_bias": -0.15434
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-06",
+            "n": 321,
+            "actual_total": 609846.0,
+            "predicted_total": 536540.29,
+            "wape": 0.148785,
+            "mae": 282.6672,
+            "normalised_bias": -0.120204
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-07",
+            "n": 321,
+            "actual_total": 271375.0,
+            "predicted_total": 249774.58,
+            "wape": 0.11353,
+            "mae": 95.9784,
+            "normalised_bias": -0.079596
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-08",
+            "n": 321,
+            "actual_total": 226377.0,
+            "predicted_total": 205819.93,
+            "wape": 0.121127,
+            "mae": 85.422,
+            "normalised_bias": -0.090809
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-09",
+            "n": 321,
+            "actual_total": 214711.0,
+            "predicted_total": 198584.99,
+            "wape": 0.09651,
+            "mae": 64.5535,
+            "normalised_bias": -0.075106
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-10",
+            "n": 321,
+            "actual_total": 225319.0,
+            "predicted_total": 208453.08,
+            "wape": 0.108193,
+            "mae": 75.9441,
+            "normalised_bias": -0.074854
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-11",
+            "n": 321,
+            "actual_total": 265622.0,
+            "predicted_total": 246587.48,
+            "wape": 0.125678,
+            "mae": 103.9961,
+            "normalised_bias": -0.07166
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-12",
+            "n": 321,
+            "actual_total": 379478.0,
+            "predicted_total": 335152.85,
+            "wape": 0.142899,
+            "mae": 168.9311,
+            "normalised_bias": -0.116806
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-13",
+            "n": 321,
+            "actual_total": 562777.0,
+            "predicted_total": 472997.15,
+            "wape": 0.176547,
+            "mae": 309.522,
+            "normalised_bias": -0.15953
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-14",
+            "n": 321,
+            "actual_total": 250618.0,
+            "predicted_total": 225723.28,
+            "wape": 0.121806,
+            "mae": 95.0989,
+            "normalised_bias": -0.099333
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-15",
+            "n": 321,
+            "actual_total": 213161.0,
+            "predicted_total": 201887.04,
+            "wape": 0.097807,
+            "mae": 64.949,
+            "normalised_bias": -0.052889
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-16",
+            "n": 321,
+            "actual_total": 208876.0,
+            "predicted_total": 196430.46,
+            "wape": 0.097088,
+            "mae": 63.1755,
+            "normalised_bias": -0.059583
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-17",
+            "n": 321,
+            "actual_total": 215054.0,
+            "predicted_total": 196248.58,
+            "wape": 0.125061,
+            "mae": 83.7849,
+            "normalised_bias": -0.087445
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-18",
+            "n": 321,
+            "actual_total": 248213.0,
+            "predicted_total": 220522.84,
+            "wape": 0.128434,
+            "mae": 99.3116,
+            "normalised_bias": -0.111558
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-19",
+            "n": 321,
+            "actual_total": 354309.0,
+            "predicted_total": 308198.65,
+            "wape": 0.160681,
+            "mae": 177.3542,
+            "normalised_bias": -0.130142
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-20",
+            "n": 321,
+            "actual_total": 552780.0,
+            "predicted_total": 447463.98,
+            "wape": 0.197811,
+            "mae": 340.642,
+            "normalised_bias": -0.190521
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-21",
+            "n": 321,
+            "actual_total": 310107.0,
+            "predicted_total": 249576.18,
+            "wape": 0.210245,
+            "mae": 203.1108,
+            "normalised_bias": -0.195193
+          }
+        ],
+        "shock_diagnostic": {
+          "excluded_fold": "2025-05-21",
+          "diagnostic_only": true,
+          "without_fold": {
+            "n": 38520,
+            "actual_total": 48224289.0,
+            "predicted_total": 45797541.85,
+            "wape": 0.119523,
+            "mae": 149.6341,
+            "normalised_bias": -0.050322
+          },
+          "war_dates_only": {
+            "n": 2568,
+            "actual_total": 5702139.0,
+            "predicted_total": 2929996.64,
+            "wape": 0.530256,
+            "mae": 1177.411,
+            "normalised_bias": -0.486158
+          }
+        }
+      },
+      "calibrated": {
+        "pooled": {
+          "n": 48150,
+          "actual_total": 64441140.0,
+          "predicted_total": 60346534.33,
+          "wape": 0.15143,
+          "mae": 202.6656,
+          "normalised_bias": -0.06354
+        },
+        "folds": {
+          "2024-11-21": {
+            "n": 9630,
+            "actual_total": 6787514.0,
+            "predicted_total": 6963843.65,
+            "wape": 0.129318,
+            "mae": 91.1471,
+            "normalised_bias": 0.025979
+          },
+          "2025-05-21": {
+            "n": 9630,
+            "actual_total": 16216851.0,
+            "predicted_total": 12757896.06,
+            "wape": 0.270664,
+            "mae": 455.7964,
+            "normalised_bias": -0.213294
+          },
+          "2025-08-21": {
+            "n": 9630,
+            "actual_total": 19510897.0,
+            "predicted_total": 19553747.52,
+            "wape": 0.125292,
+            "mae": 253.849,
+            "normalised_bias": 0.002196
+          },
+          "2025-09-22": {
+            "n": 9630,
+            "actual_total": 12251705.0,
+            "predicted_total": 11845826.9,
+            "wape": 0.093133,
+            "mae": 118.4874,
+            "normalised_bias": -0.033128
+          },
+          "2025-10-22": {
+            "n": 9630,
+            "actual_total": 9674173.0,
+            "predicted_total": 9225220.2,
+            "wape": 0.093619,
+            "mae": 94.048,
+            "normalised_bias": -0.046407
+          }
+        },
+        "interval": {
+          "method": "exact fold-cluster bootstrap",
+          "confidence": 0.95,
+          "lower": 0.098169,
+          "upper": 0.220288
+        },
+        "by_fold_horizon": [
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 1,
+            "n": 321,
+            "actual_total": 196369.0,
+            "predicted_total": 194966.32,
+            "wape": 0.023242,
+            "mae": 14.2178,
+            "normalised_bias": -0.007143
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 2,
+            "n": 321,
+            "actual_total": 173257.0,
+            "predicted_total": 171737.65,
+            "wape": 0.033006,
+            "mae": 17.8146,
+            "normalised_bias": -0.008769
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 3,
+            "n": 321,
+            "actual_total": 160332.0,
+            "predicted_total": 159595.38,
+            "wape": 0.034952,
+            "mae": 17.4575,
+            "normalised_bias": -0.004594
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 4,
+            "n": 321,
+            "actual_total": 160780.0,
+            "predicted_total": 158489.6,
+            "wape": 0.045393,
+            "mae": 22.7362,
+            "normalised_bias": -0.014246
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 5,
+            "n": 321,
+            "actual_total": 183708.0,
+            "predicted_total": 176775.84,
+            "wape": 0.0623,
+            "mae": 35.6543,
+            "normalised_bias": -0.037735
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 6,
+            "n": 321,
+            "actual_total": 261561.0,
+            "predicted_total": 261410.85,
+            "wape": 0.068104,
+            "mae": 55.493,
+            "normalised_bias": -0.000574
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 7,
+            "n": 321,
+            "actual_total": 393317.0,
+            "predicted_total": 387812.62,
+            "wape": 0.076323,
+            "mae": 93.5174,
+            "normalised_bias": -0.013995
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 8,
+            "n": 321,
+            "actual_total": 185239.0,
+            "predicted_total": 176029.77,
+            "wape": 0.084396,
+            "mae": 48.702,
+            "normalised_bias": -0.049715
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 9,
+            "n": 321,
+            "actual_total": 159136.0,
+            "predicted_total": 164249.87,
+            "wape": 0.072348,
+            "mae": 35.8666,
+            "normalised_bias": 0.032135
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 10,
+            "n": 321,
+            "actual_total": 153314.0,
+            "predicted_total": 160782.33,
+            "wape": 0.078579,
+            "mae": 37.5305,
+            "normalised_bias": 0.048713
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 11,
+            "n": 321,
+            "actual_total": 166416.0,
+            "predicted_total": 177421.22,
+            "wape": 0.086379,
+            "mae": 44.7815,
+            "normalised_bias": 0.066131
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 12,
+            "n": 321,
+            "actual_total": 213035.0,
+            "predicted_total": 221718.59,
+            "wape": 0.09612,
+            "mae": 63.7912,
+            "normalised_bias": 0.040761
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 13,
+            "n": 321,
+            "actual_total": 427488.0,
+            "predicted_total": 393205.9,
+            "wape": 0.112129,
+            "mae": 149.3269,
+            "normalised_bias": -0.080194
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 14,
+            "n": 321,
+            "actual_total": 701273.0,
+            "predicted_total": 592216.58,
+            "wape": 0.167049,
+            "mae": 364.9441,
+            "normalised_bias": -0.155512
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 15,
+            "n": 321,
+            "actual_total": 235175.0,
+            "predicted_total": 244604.65,
+            "wape": 0.089286,
+            "mae": 65.414,
+            "normalised_bias": 0.040096
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 16,
+            "n": 321,
+            "actual_total": 170295.0,
+            "predicted_total": 175472.64,
+            "wape": 0.09382,
+            "mae": 49.7728,
+            "normalised_bias": 0.030404
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 17,
+            "n": 321,
+            "actual_total": 159546.0,
+            "predicted_total": 163611.88,
+            "wape": 0.101249,
+            "mae": 50.3235,
+            "normalised_bias": 0.025484
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 18,
+            "n": 321,
+            "actual_total": 165207.0,
+            "predicted_total": 169154.07,
+            "wape": 0.125177,
+            "mae": 64.4238,
+            "normalised_bias": 0.023892
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 19,
+            "n": 321,
+            "actual_total": 191897.0,
+            "predicted_total": 188177.65,
+            "wape": 0.098075,
+            "mae": 58.6299,
+            "normalised_bias": -0.019382
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 20,
+            "n": 321,
+            "actual_total": 287163.0,
+            "predicted_total": 262193.58,
+            "wape": 0.12314,
+            "mae": 110.16,
+            "normalised_bias": -0.086952
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 21,
+            "n": 321,
+            "actual_total": 409571.0,
+            "predicted_total": 412235.9,
+            "wape": 0.113037,
+            "mae": 144.2263,
+            "normalised_bias": 0.006507
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 22,
+            "n": 321,
+            "actual_total": 185175.0,
+            "predicted_total": 195585.46,
+            "wape": 0.124973,
+            "mae": 72.0928,
+            "normalised_bias": 0.05622
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 23,
+            "n": 321,
+            "actual_total": 161509.0,
+            "predicted_total": 171682.04,
+            "wape": 0.113693,
+            "mae": 57.2038,
+            "normalised_bias": 0.062987
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 24,
+            "n": 321,
+            "actual_total": 157359.0,
+            "predicted_total": 177510.41,
+            "wape": 0.161182,
+            "mae": 79.0139,
+            "normalised_bias": 0.12806
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 25,
+            "n": 321,
+            "actual_total": 163478.0,
+            "predicted_total": 187798.95,
+            "wape": 0.171445,
+            "mae": 87.313,
+            "normalised_bias": 0.148772
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 26,
+            "n": 321,
+            "actual_total": 178806.0,
+            "predicted_total": 209789.57,
+            "wape": 0.197793,
+            "mae": 110.1764,
+            "normalised_bias": 0.17328
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 27,
+            "n": 321,
+            "actual_total": 212590.0,
+            "predicted_total": 263761.55,
+            "wape": 0.269783,
+            "mae": 178.6701,
+            "normalised_bias": 0.240705
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 28,
+            "n": 321,
+            "actual_total": 288252.0,
+            "predicted_total": 392480.43,
+            "wape": 0.379801,
+            "mae": 341.0546,
+            "normalised_bias": 0.361588
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 29,
+            "n": 321,
+            "actual_total": 144207.0,
+            "predicted_total": 174637.02,
+            "wape": 0.300593,
+            "mae": 135.0392,
+            "normalised_bias": 0.211016
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "horizon": 30,
+            "n": 321,
+            "actual_total": 142059.0,
+            "predicted_total": 178735.35,
+            "wape": 0.291637,
+            "mae": 129.0642,
+            "normalised_bias": 0.258177
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 1,
+            "n": 321,
+            "actual_total": 521037.0,
+            "predicted_total": 517984.19,
+            "wape": 0.02325,
+            "mae": 37.7393,
+            "normalised_bias": -0.005859
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 2,
+            "n": 321,
+            "actual_total": 282598.0,
+            "predicted_total": 284183.23,
+            "wape": 0.026427,
+            "mae": 23.2657,
+            "normalised_bias": 0.005609
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 3,
+            "n": 321,
+            "actual_total": 285205.0,
+            "predicted_total": 294592.78,
+            "wape": 0.045911,
+            "mae": 40.7914,
+            "normalised_bias": 0.032916
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 4,
+            "n": 321,
+            "actual_total": 281782.0,
+            "predicted_total": 280628.56,
+            "wape": 0.045223,
+            "mae": 39.6978,
+            "normalised_bias": -0.004093
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 5,
+            "n": 321,
+            "actual_total": 283431.0,
+            "predicted_total": 288334.79,
+            "wape": 0.047432,
+            "mae": 41.8808,
+            "normalised_bias": 0.017302
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 6,
+            "n": 321,
+            "actual_total": 295839.0,
+            "predicted_total": 286962.87,
+            "wape": 0.065189,
+            "mae": 60.0789,
+            "normalised_bias": -0.030003
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 7,
+            "n": 321,
+            "actual_total": 377355.0,
+            "predicted_total": 353182.21,
+            "wape": 0.081359,
+            "mae": 95.642,
+            "normalised_bias": -0.064058
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 8,
+            "n": 321,
+            "actual_total": 539992.0,
+            "predicted_total": 515186.8,
+            "wape": 0.087472,
+            "mae": 147.1476,
+            "normalised_bias": -0.045936
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 9,
+            "n": 321,
+            "actual_total": 298402.0,
+            "predicted_total": 283645.82,
+            "wape": 0.088457,
+            "mae": 82.2301,
+            "normalised_bias": -0.049451
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 10,
+            "n": 321,
+            "actual_total": 288679.0,
+            "predicted_total": 267260.86,
+            "wape": 0.103198,
+            "mae": 92.8071,
+            "normalised_bias": -0.074194
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 11,
+            "n": 321,
+            "actual_total": 292888.0,
+            "predicted_total": 269083.58,
+            "wape": 0.120683,
+            "mae": 110.1142,
+            "normalised_bias": -0.081275
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 12,
+            "n": 321,
+            "actual_total": 353268.0,
+            "predicted_total": 342179.08,
+            "wape": 0.096225,
+            "mae": 105.8977,
+            "normalised_bias": -0.03139
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 13,
+            "n": 321,
+            "actual_total": 694496.0,
+            "predicted_total": 796293.1,
+            "wape": 0.159234,
+            "mae": 344.5094,
+            "normalised_bias": 0.146577
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 14,
+            "n": 321,
+            "actual_total": 1602049.0,
+            "predicted_total": 1388781.69,
+            "wape": 0.164173,
+            "mae": 819.3554,
+            "normalised_bias": -0.133122
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 15,
+            "n": 321,
+            "actual_total": 1315153.0,
+            "predicted_total": 1229781.22,
+            "wape": 0.146547,
+            "mae": 600.4117,
+            "normalised_bias": -0.064914
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 16,
+            "n": 321,
+            "actual_total": 352814.0,
+            "predicted_total": 361292.86,
+            "wape": 0.121324,
+            "mae": 133.3484,
+            "normalised_bias": 0.024032
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 17,
+            "n": 321,
+            "actual_total": 286457.0,
+            "predicted_total": 275916.5,
+            "wape": 0.113087,
+            "mae": 100.9178,
+            "normalised_bias": -0.036796
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 18,
+            "n": 321,
+            "actual_total": 301507.0,
+            "predicted_total": 273370.33,
+            "wape": 0.154396,
+            "mae": 145.02,
+            "normalised_bias": -0.09332
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 19,
+            "n": 321,
+            "actual_total": 309776.0,
+            "predicted_total": 281060.17,
+            "wape": 0.154873,
+            "mae": 149.4573,
+            "normalised_bias": -0.092699
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 20,
+            "n": 321,
+            "actual_total": 325284.0,
+            "predicted_total": 308902.93,
+            "wape": 0.133729,
+            "mae": 135.5138,
+            "normalised_bias": -0.050359
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 21,
+            "n": 321,
+            "actual_total": 427774.0,
+            "predicted_total": 423957.35,
+            "wape": 0.120074,
+            "mae": 160.0136,
+            "normalised_bias": -0.008922
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 22,
+            "n": 321,
+            "actual_total": 798926.0,
+            "predicted_total": 634437.63,
+            "wape": 0.228844,
+            "mae": 569.5609,
+            "normalised_bias": -0.205887
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 23,
+            "n": 321,
+            "actual_total": 769451.0,
+            "predicted_total": 480823.39,
+            "wape": 0.389394,
+            "mae": 933.3945,
+            "normalised_bias": -0.375109
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 24,
+            "n": 321,
+            "actual_total": 377483.0,
+            "predicted_total": 314774.89,
+            "wape": 0.220193,
+            "mae": 258.9386,
+            "normalised_bias": -0.166122
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 25,
+            "n": 321,
+            "actual_total": 462135.0,
+            "predicted_total": 308643.53,
+            "wape": 0.381799,
+            "mae": 549.6662,
+            "normalised_bias": -0.332136
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 26,
+            "n": 321,
+            "actual_total": 629226.0,
+            "predicted_total": 296144.0,
+            "wape": 0.552655,
+            "mae": 1083.317,
+            "normalised_bias": -0.529352
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 27,
+            "n": 321,
+            "actual_total": 818233.0,
+            "predicted_total": 319264.77,
+            "wape": 0.636172,
+            "mae": 1621.6091,
+            "normalised_bias": -0.609812
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 28,
+            "n": 321,
+            "actual_total": 936100.0,
+            "predicted_total": 374559.56,
+            "wape": 0.629345,
+            "mae": 1835.2958,
+            "normalised_bias": -0.599872
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 29,
+            "n": 321,
+            "actual_total": 983653.0,
+            "predicted_total": 449340.31,
+            "wape": 0.595197,
+            "mae": 1823.8845,
+            "normalised_bias": -0.543192
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "horizon": 30,
+            "n": 321,
+            "actual_total": 725858.0,
+            "predicted_total": 257327.06,
+            "wape": 0.677675,
+            "mae": 1532.3866,
+            "normalised_bias": -0.645486
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 1,
+            "n": 321,
+            "actual_total": 706219.0,
+            "predicted_total": 694276.44,
+            "wape": 0.020594,
+            "mae": 45.3071,
+            "normalised_bias": -0.016911
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 2,
+            "n": 321,
+            "actual_total": 697176.0,
+            "predicted_total": 680799.04,
+            "wape": 0.043348,
+            "mae": 94.1466,
+            "normalised_bias": -0.02349
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 3,
+            "n": 321,
+            "actual_total": 402476.0,
+            "predicted_total": 399417.4,
+            "wape": 0.042711,
+            "mae": 53.5518,
+            "normalised_bias": -0.007599
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 4,
+            "n": 321,
+            "actual_total": 381465.0,
+            "predicted_total": 385287.37,
+            "wape": 0.042503,
+            "mae": 50.5093,
+            "normalised_bias": 0.01002
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 5,
+            "n": 321,
+            "actual_total": 393930.0,
+            "predicted_total": 411373.49,
+            "wape": 0.065009,
+            "mae": 79.7789,
+            "normalised_bias": 0.044281
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 6,
+            "n": 321,
+            "actual_total": 423972.0,
+            "predicted_total": 443983.68,
+            "wape": 0.079825,
+            "mae": 105.432,
+            "normalised_bias": 0.0472
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 7,
+            "n": 321,
+            "actual_total": 561492.0,
+            "predicted_total": 608066.75,
+            "wape": 0.094557,
+            "mae": 165.3988,
+            "normalised_bias": 0.082948
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 8,
+            "n": 321,
+            "actual_total": 422457.0,
+            "predicted_total": 462548.83,
+            "wape": 0.136296,
+            "mae": 179.3745,
+            "normalised_bias": 0.094902
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 9,
+            "n": 321,
+            "actual_total": 481446.0,
+            "predicted_total": 512572.89,
+            "wape": 0.098876,
+            "mae": 148.2976,
+            "normalised_bias": 0.064653
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 10,
+            "n": 321,
+            "actual_total": 505280.0,
+            "predicted_total": 510205.06,
+            "wape": 0.111304,
+            "mae": 175.2022,
+            "normalised_bias": 0.009747
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 11,
+            "n": 321,
+            "actual_total": 528846.0,
+            "predicted_total": 514547.3,
+            "wape": 0.080786,
+            "mae": 133.0951,
+            "normalised_bias": -0.027038
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 12,
+            "n": 321,
+            "actual_total": 551827.0,
+            "predicted_total": 543568.14,
+            "wape": 0.080696,
+            "mae": 138.723,
+            "normalised_bias": -0.014966
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 13,
+            "n": 321,
+            "actual_total": 595554.0,
+            "predicted_total": 650909.89,
+            "wape": 0.112814,
+            "mae": 209.3049,
+            "normalised_bias": 0.092949
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 14,
+            "n": 321,
+            "actual_total": 655880.0,
+            "predicted_total": 739614.38,
+            "wape": 0.141957,
+            "mae": 290.0527,
+            "normalised_bias": 0.127667
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 15,
+            "n": 321,
+            "actual_total": 451015.0,
+            "predicted_total": 505922.54,
+            "wape": 0.140355,
+            "mae": 197.2037,
+            "normalised_bias": 0.121742
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 16,
+            "n": 321,
+            "actual_total": 569444.0,
+            "predicted_total": 695553.05,
+            "wape": 0.231306,
+            "mae": 410.329,
+            "normalised_bias": 0.22146
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 17,
+            "n": 321,
+            "actual_total": 586790.0,
+            "predicted_total": 699240.8,
+            "wape": 0.216394,
+            "mae": 395.5691,
+            "normalised_bias": 0.191637
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 18,
+            "n": 321,
+            "actual_total": 677236.0,
+            "predicted_total": 746932.92,
+            "wape": 0.121892,
+            "mae": 257.1638,
+            "normalised_bias": 0.102914
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 19,
+            "n": 321,
+            "actual_total": 978181.0,
+            "predicted_total": 922341.14,
+            "wape": 0.107294,
+            "mae": 326.9557,
+            "normalised_bias": -0.057085
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 20,
+            "n": 321,
+            "actual_total": 1608206.0,
+            "predicted_total": 1331612.29,
+            "wape": 0.177561,
+            "mae": 889.5783,
+            "normalised_bias": -0.171989
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 21,
+            "n": 321,
+            "actual_total": 1462589.0,
+            "predicted_total": 1322093.21,
+            "wape": 0.13404,
+            "mae": 610.7331,
+            "normalised_bias": -0.09606
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 22,
+            "n": 321,
+            "actual_total": 687036.0,
+            "predicted_total": 706320.83,
+            "wape": 0.157667,
+            "mae": 337.4549,
+            "normalised_bias": 0.02807
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 23,
+            "n": 321,
+            "actual_total": 681503.0,
+            "predicted_total": 694371.3,
+            "wape": 0.131349,
+            "mae": 278.8614,
+            "normalised_bias": 0.018882
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 24,
+            "n": 321,
+            "actual_total": 687197.0,
+            "predicted_total": 687822.12,
+            "wape": 0.141875,
+            "mae": 303.7258,
+            "normalised_bias": 0.00091
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 25,
+            "n": 321,
+            "actual_total": 675540.0,
+            "predicted_total": 635070.64,
+            "wape": 0.14425,
+            "mae": 303.5722,
+            "normalised_bias": -0.059907
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 26,
+            "n": 321,
+            "actual_total": 684626.0,
+            "predicted_total": 640814.79,
+            "wape": 0.145107,
+            "mae": 309.483,
+            "normalised_bias": -0.063993
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 27,
+            "n": 321,
+            "actual_total": 733013.0,
+            "predicted_total": 671341.65,
+            "wape": 0.156137,
+            "mae": 356.5441,
+            "normalised_bias": -0.084134
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 28,
+            "n": 321,
+            "actual_total": 797532.0,
+            "predicted_total": 819763.04,
+            "wape": 0.148249,
+            "mae": 368.3291,
+            "normalised_bias": 0.027875
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 29,
+            "n": 321,
+            "actual_total": 484109.0,
+            "predicted_total": 479687.82,
+            "wape": 0.154467,
+            "mae": 232.9563,
+            "normalised_bias": -0.009133
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "horizon": 30,
+            "n": 321,
+            "actual_total": 438860.0,
+            "predicted_total": 437688.71,
+            "wape": 0.123493,
+            "mae": 168.8351,
+            "normalised_bias": -0.002669
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 1,
+            "n": 321,
+            "actual_total": 446045.0,
+            "predicted_total": 442421.53,
+            "wape": 0.022497,
+            "mae": 31.2613,
+            "normalised_bias": -0.008124
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 2,
+            "n": 321,
+            "actual_total": 539595.0,
+            "predicted_total": 531823.34,
+            "wape": 0.02327,
+            "mae": 39.1158,
+            "normalised_bias": -0.014403
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 3,
+            "n": 321,
+            "actual_total": 670231.0,
+            "predicted_total": 665441.02,
+            "wape": 0.033042,
+            "mae": 68.991,
+            "normalised_bias": -0.007147
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 4,
+            "n": 321,
+            "actual_total": 370348.0,
+            "predicted_total": 355928.53,
+            "wape": 0.056438,
+            "mae": 65.1147,
+            "normalised_bias": -0.038935
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 5,
+            "n": 321,
+            "actual_total": 431327.0,
+            "predicted_total": 447324.79,
+            "wape": 0.051558,
+            "mae": 69.2788,
+            "normalised_bias": 0.03709
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 6,
+            "n": 321,
+            "actual_total": 410058.0,
+            "predicted_total": 424638.52,
+            "wape": 0.056513,
+            "mae": 72.1915,
+            "normalised_bias": 0.035557
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 7,
+            "n": 321,
+            "actual_total": 400623.0,
+            "predicted_total": 411465.18,
+            "wape": 0.057695,
+            "mae": 72.0061,
+            "normalised_bias": 0.027063
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 8,
+            "n": 321,
+            "actual_total": 413017.0,
+            "predicted_total": 437819.57,
+            "wape": 0.083725,
+            "mae": 107.7248,
+            "normalised_bias": 0.060052
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 9,
+            "n": 321,
+            "actual_total": 524026.0,
+            "predicted_total": 537103.46,
+            "wape": 0.074055,
+            "mae": 120.8928,
+            "normalised_bias": 0.024956
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 10,
+            "n": 321,
+            "actual_total": 702142.0,
+            "predicted_total": 678270.26,
+            "wape": 0.071746,
+            "mae": 156.9344,
+            "normalised_bias": -0.033998
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 11,
+            "n": 321,
+            "actual_total": 351811.0,
+            "predicted_total": 340301.5,
+            "wape": 0.061046,
+            "mae": 66.9052,
+            "normalised_bias": -0.032715
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 12,
+            "n": 321,
+            "actual_total": 349183.0,
+            "predicted_total": 358258.37,
+            "wape": 0.069842,
+            "mae": 75.9738,
+            "normalised_bias": 0.02599
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 13,
+            "n": 321,
+            "actual_total": 334989.0,
+            "predicted_total": 368399.6,
+            "wape": 0.108672,
+            "mae": 113.4081,
+            "normalised_bias": 0.099736
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 14,
+            "n": 321,
+            "actual_total": 340893.0,
+            "predicted_total": 366343.22,
+            "wape": 0.101125,
+            "mae": 107.3918,
+            "normalised_bias": 0.074658
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 15,
+            "n": 321,
+            "actual_total": 378996.0,
+            "predicted_total": 389921.23,
+            "wape": 0.079843,
+            "mae": 94.2681,
+            "normalised_bias": 0.028827
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 16,
+            "n": 321,
+            "actual_total": 507387.0,
+            "predicted_total": 467689.15,
+            "wape": 0.110707,
+            "mae": 174.9888,
+            "normalised_bias": -0.07824
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 17,
+            "n": 321,
+            "actual_total": 674381.0,
+            "predicted_total": 583108.03,
+            "wape": 0.148839,
+            "mae": 312.6919,
+            "normalised_bias": -0.135343
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 18,
+            "n": 321,
+            "actual_total": 331920.0,
+            "predicted_total": 304387.14,
+            "wape": 0.108402,
+            "mae": 112.0897,
+            "normalised_bias": -0.08295
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 19,
+            "n": 321,
+            "actual_total": 298796.0,
+            "predicted_total": 275360.54,
+            "wape": 0.104088,
+            "mae": 96.8883,
+            "normalised_bias": -0.078433
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 20,
+            "n": 321,
+            "actual_total": 290339.0,
+            "predicted_total": 294425.37,
+            "wape": 0.094725,
+            "mae": 85.6775,
+            "normalised_bias": 0.014074
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 21,
+            "n": 321,
+            "actual_total": 296295.0,
+            "predicted_total": 279308.77,
+            "wape": 0.098119,
+            "mae": 90.5676,
+            "normalised_bias": -0.057329
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 22,
+            "n": 321,
+            "actual_total": 332673.0,
+            "predicted_total": 308467.33,
+            "wape": 0.116623,
+            "mae": 120.8643,
+            "normalised_bias": -0.072761
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 23,
+            "n": 321,
+            "actual_total": 454452.0,
+            "predicted_total": 387563.72,
+            "wape": 0.165594,
+            "mae": 234.4371,
+            "normalised_bias": -0.147184
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 24,
+            "n": 321,
+            "actual_total": 624651.0,
+            "predicted_total": 561139.56,
+            "wape": 0.141581,
+            "mae": 275.5098,
+            "normalised_bias": -0.101675
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 25,
+            "n": 321,
+            "actual_total": 303286.0,
+            "predicted_total": 295961.01,
+            "wape": 0.102336,
+            "mae": 96.6888,
+            "normalised_bias": -0.024152
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 26,
+            "n": 321,
+            "actual_total": 281566.0,
+            "predicted_total": 262886.8,
+            "wape": 0.115101,
+            "mae": 100.9609,
+            "normalised_bias": -0.06634
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 27,
+            "n": 321,
+            "actual_total": 272028.0,
+            "predicted_total": 255391.16,
+            "wape": 0.121605,
+            "mae": 103.0527,
+            "normalised_bias": -0.061159
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 28,
+            "n": 321,
+            "actual_total": 274659.0,
+            "predicted_total": 267737.28,
+            "wape": 0.109451,
+            "mae": 93.6501,
+            "normalised_bias": -0.025201
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 29,
+            "n": 321,
+            "actual_total": 299657.0,
+            "predicted_total": 289047.74,
+            "wape": 0.108012,
+            "mae": 100.8304,
+            "normalised_bias": -0.035405
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "horizon": 30,
+            "n": 321,
+            "actual_total": 346331.0,
+            "predicted_total": 257893.16,
+            "wape": 0.272743,
+            "mae": 294.2656,
+            "normalised_bias": -0.255356
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 1,
+            "n": 321,
+            "actual_total": 575561.0,
+            "predicted_total": 568522.81,
+            "wape": 0.019219,
+            "mae": 34.4598,
+            "normalised_bias": -0.012228
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 2,
+            "n": 321,
+            "actual_total": 290798.0,
+            "predicted_total": 286980.28,
+            "wape": 0.033171,
+            "mae": 30.0504,
+            "normalised_bias": -0.013128
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 3,
+            "n": 321,
+            "actual_total": 262627.0,
+            "predicted_total": 264942.26,
+            "wape": 0.031145,
+            "mae": 25.4818,
+            "normalised_bias": 0.008816
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 4,
+            "n": 321,
+            "actual_total": 244023.0,
+            "predicted_total": 244744.32,
+            "wape": 0.048856,
+            "mae": 37.1399,
+            "normalised_bias": 0.002956
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 5,
+            "n": 321,
+            "actual_total": 241811.0,
+            "predicted_total": 239716.17,
+            "wape": 0.039417,
+            "mae": 29.6933,
+            "normalised_bias": -0.008663
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 6,
+            "n": 321,
+            "actual_total": 268295.0,
+            "predicted_total": 259203.78,
+            "wape": 0.066212,
+            "mae": 55.3408,
+            "normalised_bias": -0.033885
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 7,
+            "n": 321,
+            "actual_total": 405227.0,
+            "predicted_total": 372694.09,
+            "wape": 0.089998,
+            "mae": 113.6124,
+            "normalised_bias": -0.080283
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 8,
+            "n": 321,
+            "actual_total": 608875.0,
+            "predicted_total": 578742.06,
+            "wape": 0.083408,
+            "mae": 158.2091,
+            "normalised_bias": -0.04949
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 9,
+            "n": 321,
+            "actual_total": 281273.0,
+            "predicted_total": 281681.56,
+            "wape": 0.075381,
+            "mae": 66.0516,
+            "normalised_bias": 0.001453
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 10,
+            "n": 321,
+            "actual_total": 236490.0,
+            "predicted_total": 238720.29,
+            "wape": 0.065494,
+            "mae": 48.2513,
+            "normalised_bias": 0.009431
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 11,
+            "n": 321,
+            "actual_total": 226541.0,
+            "predicted_total": 229225.92,
+            "wape": 0.071028,
+            "mae": 50.1269,
+            "normalised_bias": 0.011852
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 12,
+            "n": 321,
+            "actual_total": 235266.0,
+            "predicted_total": 227394.12,
+            "wape": 0.079344,
+            "mae": 58.1526,
+            "normalised_bias": -0.03346
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 13,
+            "n": 321,
+            "actual_total": 274481.0,
+            "predicted_total": 267558.81,
+            "wape": 0.076874,
+            "mae": 65.7334,
+            "normalised_bias": -0.025219
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 14,
+            "n": 321,
+            "actual_total": 414282.0,
+            "predicted_total": 372865.95,
+            "wape": 0.124528,
+            "mae": 160.7154,
+            "normalised_bias": -0.099971
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 15,
+            "n": 321,
+            "actual_total": 609846.0,
+            "predicted_total": 567219.87,
+            "wape": 0.123964,
+            "mae": 235.5114,
+            "normalised_bias": -0.069897
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 16,
+            "n": 321,
+            "actual_total": 271375.0,
+            "predicted_total": 263700.8,
+            "wape": 0.112084,
+            "mae": 94.7564,
+            "normalised_bias": -0.028279
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 17,
+            "n": 321,
+            "actual_total": 226377.0,
+            "predicted_total": 216956.79,
+            "wape": 0.107139,
+            "mae": 75.5569,
+            "normalised_bias": -0.041613
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 18,
+            "n": 321,
+            "actual_total": 214711.0,
+            "predicted_total": 209469.27,
+            "wape": 0.080983,
+            "mae": 54.1681,
+            "normalised_bias": -0.024413
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 19,
+            "n": 321,
+            "actual_total": 225319.0,
+            "predicted_total": 219959.45,
+            "wape": 0.096253,
+            "mae": 67.5625,
+            "normalised_bias": -0.023786
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 20,
+            "n": 321,
+            "actual_total": 265622.0,
+            "predicted_total": 260465.1,
+            "wape": 0.11695,
+            "mae": 96.7742,
+            "normalised_bias": -0.019414
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 21,
+            "n": 321,
+            "actual_total": 379478.0,
+            "predicted_total": 354897.6,
+            "wape": 0.118691,
+            "mae": 140.314,
+            "normalised_bias": -0.064774
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 22,
+            "n": 321,
+            "actual_total": 562777.0,
+            "predicted_total": 506869.72,
+            "wape": 0.143878,
+            "mae": 252.2475,
+            "normalised_bias": -0.099342
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 23,
+            "n": 321,
+            "actual_total": 250618.0,
+            "predicted_total": 241582.98,
+            "wape": 0.090589,
+            "mae": 70.7267,
+            "normalised_bias": -0.036051
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 24,
+            "n": 321,
+            "actual_total": 213161.0,
+            "predicted_total": 215940.8,
+            "wape": 0.088302,
+            "mae": 58.6372,
+            "normalised_bias": 0.013041
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 25,
+            "n": 321,
+            "actual_total": 208876.0,
+            "predicted_total": 210202.74,
+            "wape": 0.089201,
+            "mae": 58.0437,
+            "normalised_bias": 0.006352
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 26,
+            "n": 321,
+            "actual_total": 215054.0,
+            "predicted_total": 210016.07,
+            "wape": 0.097939,
+            "mae": 65.614,
+            "normalised_bias": -0.023426
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 27,
+            "n": 321,
+            "actual_total": 248213.0,
+            "predicted_total": 236030.51,
+            "wape": 0.08438,
+            "mae": 65.2471,
+            "normalised_bias": -0.049081
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 28,
+            "n": 321,
+            "actual_total": 354309.0,
+            "predicted_total": 330421.9,
+            "wape": 0.124581,
+            "mae": 137.5082,
+            "normalised_bias": -0.067419
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 29,
+            "n": 321,
+            "actual_total": 552780.0,
+            "predicted_total": 480435.26,
+            "wape": 0.14868,
+            "mae": 256.0347,
+            "normalised_bias": -0.130874
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "horizon": 30,
+            "n": 321,
+            "actual_total": 310107.0,
+            "predicted_total": 268058.91,
+            "wape": 0.165329,
+            "mae": 159.7184,
+            "normalised_bias": -0.135592
+          }
+        ],
+        "by_fold_date": [
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-22",
+            "n": 321,
+            "actual_total": 196369.0,
+            "predicted_total": 194966.32,
+            "wape": 0.023242,
+            "mae": 14.2178,
+            "normalised_bias": -0.007143
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-23",
+            "n": 321,
+            "actual_total": 173257.0,
+            "predicted_total": 171737.65,
+            "wape": 0.033006,
+            "mae": 17.8146,
+            "normalised_bias": -0.008769
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-24",
+            "n": 321,
+            "actual_total": 160332.0,
+            "predicted_total": 159595.38,
+            "wape": 0.034952,
+            "mae": 17.4575,
+            "normalised_bias": -0.004594
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-25",
+            "n": 321,
+            "actual_total": 160780.0,
+            "predicted_total": 158489.6,
+            "wape": 0.045393,
+            "mae": 22.7362,
+            "normalised_bias": -0.014246
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-26",
+            "n": 321,
+            "actual_total": 183708.0,
+            "predicted_total": 176775.84,
+            "wape": 0.0623,
+            "mae": 35.6543,
+            "normalised_bias": -0.037735
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-27",
+            "n": 321,
+            "actual_total": 261561.0,
+            "predicted_total": 261410.85,
+            "wape": 0.068104,
+            "mae": 55.493,
+            "normalised_bias": -0.000574
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-28",
+            "n": 321,
+            "actual_total": 393317.0,
+            "predicted_total": 387812.62,
+            "wape": 0.076323,
+            "mae": 93.5174,
+            "normalised_bias": -0.013995
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-29",
+            "n": 321,
+            "actual_total": 185239.0,
+            "predicted_total": 176029.77,
+            "wape": 0.084396,
+            "mae": 48.702,
+            "normalised_bias": -0.049715
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-11-30",
+            "n": 321,
+            "actual_total": 159136.0,
+            "predicted_total": 164249.87,
+            "wape": 0.072348,
+            "mae": 35.8666,
+            "normalised_bias": 0.032135
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-01",
+            "n": 321,
+            "actual_total": 153314.0,
+            "predicted_total": 160782.33,
+            "wape": 0.078579,
+            "mae": 37.5305,
+            "normalised_bias": 0.048713
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-02",
+            "n": 321,
+            "actual_total": 166416.0,
+            "predicted_total": 177421.22,
+            "wape": 0.086379,
+            "mae": 44.7815,
+            "normalised_bias": 0.066131
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-03",
+            "n": 321,
+            "actual_total": 213035.0,
+            "predicted_total": 221718.59,
+            "wape": 0.09612,
+            "mae": 63.7912,
+            "normalised_bias": 0.040761
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-04",
+            "n": 321,
+            "actual_total": 427488.0,
+            "predicted_total": 393205.9,
+            "wape": 0.112129,
+            "mae": 149.3269,
+            "normalised_bias": -0.080194
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-05",
+            "n": 321,
+            "actual_total": 701273.0,
+            "predicted_total": 592216.58,
+            "wape": 0.167049,
+            "mae": 364.9441,
+            "normalised_bias": -0.155512
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-06",
+            "n": 321,
+            "actual_total": 235175.0,
+            "predicted_total": 244604.65,
+            "wape": 0.089286,
+            "mae": 65.414,
+            "normalised_bias": 0.040096
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-07",
+            "n": 321,
+            "actual_total": 170295.0,
+            "predicted_total": 175472.64,
+            "wape": 0.09382,
+            "mae": 49.7728,
+            "normalised_bias": 0.030404
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-08",
+            "n": 321,
+            "actual_total": 159546.0,
+            "predicted_total": 163611.88,
+            "wape": 0.101249,
+            "mae": 50.3235,
+            "normalised_bias": 0.025484
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-09",
+            "n": 321,
+            "actual_total": 165207.0,
+            "predicted_total": 169154.07,
+            "wape": 0.125177,
+            "mae": 64.4238,
+            "normalised_bias": 0.023892
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-10",
+            "n": 321,
+            "actual_total": 191897.0,
+            "predicted_total": 188177.65,
+            "wape": 0.098075,
+            "mae": 58.6299,
+            "normalised_bias": -0.019382
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-11",
+            "n": 321,
+            "actual_total": 287163.0,
+            "predicted_total": 262193.58,
+            "wape": 0.12314,
+            "mae": 110.16,
+            "normalised_bias": -0.086952
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-12",
+            "n": 321,
+            "actual_total": 409571.0,
+            "predicted_total": 412235.9,
+            "wape": 0.113037,
+            "mae": 144.2263,
+            "normalised_bias": 0.006507
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-13",
+            "n": 321,
+            "actual_total": 185175.0,
+            "predicted_total": 195585.46,
+            "wape": 0.124973,
+            "mae": 72.0928,
+            "normalised_bias": 0.05622
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-14",
+            "n": 321,
+            "actual_total": 161509.0,
+            "predicted_total": 171682.04,
+            "wape": 0.113693,
+            "mae": 57.2038,
+            "normalised_bias": 0.062987
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-15",
+            "n": 321,
+            "actual_total": 157359.0,
+            "predicted_total": 177510.41,
+            "wape": 0.161182,
+            "mae": 79.0139,
+            "normalised_bias": 0.12806
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-16",
+            "n": 321,
+            "actual_total": 163478.0,
+            "predicted_total": 187798.95,
+            "wape": 0.171445,
+            "mae": 87.313,
+            "normalised_bias": 0.148772
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-17",
+            "n": 321,
+            "actual_total": 178806.0,
+            "predicted_total": 209789.57,
+            "wape": 0.197793,
+            "mae": 110.1764,
+            "normalised_bias": 0.17328
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-18",
+            "n": 321,
+            "actual_total": 212590.0,
+            "predicted_total": 263761.55,
+            "wape": 0.269783,
+            "mae": 178.6701,
+            "normalised_bias": 0.240705
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-19",
+            "n": 321,
+            "actual_total": 288252.0,
+            "predicted_total": 392480.43,
+            "wape": 0.379801,
+            "mae": 341.0546,
+            "normalised_bias": 0.361588
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-20",
+            "n": 321,
+            "actual_total": 144207.0,
+            "predicted_total": 174637.02,
+            "wape": 0.300593,
+            "mae": 135.0392,
+            "normalised_bias": 0.211016
+          },
+          {
+            "fold_cutoff": "2024-11-21",
+            "checkin": "2024-12-21",
+            "n": 321,
+            "actual_total": 142059.0,
+            "predicted_total": 178735.35,
+            "wape": 0.291637,
+            "mae": 129.0642,
+            "normalised_bias": 0.258177
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-22",
+            "n": 321,
+            "actual_total": 521037.0,
+            "predicted_total": 517984.19,
+            "wape": 0.02325,
+            "mae": 37.7393,
+            "normalised_bias": -0.005859
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-23",
+            "n": 321,
+            "actual_total": 282598.0,
+            "predicted_total": 284183.23,
+            "wape": 0.026427,
+            "mae": 23.2657,
+            "normalised_bias": 0.005609
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-24",
+            "n": 321,
+            "actual_total": 285205.0,
+            "predicted_total": 294592.78,
+            "wape": 0.045911,
+            "mae": 40.7914,
+            "normalised_bias": 0.032916
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-25",
+            "n": 321,
+            "actual_total": 281782.0,
+            "predicted_total": 280628.56,
+            "wape": 0.045223,
+            "mae": 39.6978,
+            "normalised_bias": -0.004093
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-26",
+            "n": 321,
+            "actual_total": 283431.0,
+            "predicted_total": 288334.79,
+            "wape": 0.047432,
+            "mae": 41.8808,
+            "normalised_bias": 0.017302
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-27",
+            "n": 321,
+            "actual_total": 295839.0,
+            "predicted_total": 286962.87,
+            "wape": 0.065189,
+            "mae": 60.0789,
+            "normalised_bias": -0.030003
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-28",
+            "n": 321,
+            "actual_total": 377355.0,
+            "predicted_total": 353182.21,
+            "wape": 0.081359,
+            "mae": 95.642,
+            "normalised_bias": -0.064058
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-29",
+            "n": 321,
+            "actual_total": 539992.0,
+            "predicted_total": 515186.8,
+            "wape": 0.087472,
+            "mae": 147.1476,
+            "normalised_bias": -0.045936
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-30",
+            "n": 321,
+            "actual_total": 298402.0,
+            "predicted_total": 283645.82,
+            "wape": 0.088457,
+            "mae": 82.2301,
+            "normalised_bias": -0.049451
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-05-31",
+            "n": 321,
+            "actual_total": 288679.0,
+            "predicted_total": 267260.86,
+            "wape": 0.103198,
+            "mae": 92.8071,
+            "normalised_bias": -0.074194
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-01",
+            "n": 321,
+            "actual_total": 292888.0,
+            "predicted_total": 269083.58,
+            "wape": 0.120683,
+            "mae": 110.1142,
+            "normalised_bias": -0.081275
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-02",
+            "n": 321,
+            "actual_total": 353268.0,
+            "predicted_total": 342179.08,
+            "wape": 0.096225,
+            "mae": 105.8977,
+            "normalised_bias": -0.03139
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-03",
+            "n": 321,
+            "actual_total": 694496.0,
+            "predicted_total": 796293.1,
+            "wape": 0.159234,
+            "mae": 344.5094,
+            "normalised_bias": 0.146577
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-04",
+            "n": 321,
+            "actual_total": 1602049.0,
+            "predicted_total": 1388781.69,
+            "wape": 0.164173,
+            "mae": 819.3554,
+            "normalised_bias": -0.133122
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-05",
+            "n": 321,
+            "actual_total": 1315153.0,
+            "predicted_total": 1229781.22,
+            "wape": 0.146547,
+            "mae": 600.4117,
+            "normalised_bias": -0.064914
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-06",
+            "n": 321,
+            "actual_total": 352814.0,
+            "predicted_total": 361292.86,
+            "wape": 0.121324,
+            "mae": 133.3484,
+            "normalised_bias": 0.024032
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-07",
+            "n": 321,
+            "actual_total": 286457.0,
+            "predicted_total": 275916.5,
+            "wape": 0.113087,
+            "mae": 100.9178,
+            "normalised_bias": -0.036796
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-08",
+            "n": 321,
+            "actual_total": 301507.0,
+            "predicted_total": 273370.33,
+            "wape": 0.154396,
+            "mae": 145.02,
+            "normalised_bias": -0.09332
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-09",
+            "n": 321,
+            "actual_total": 309776.0,
+            "predicted_total": 281060.17,
+            "wape": 0.154873,
+            "mae": 149.4573,
+            "normalised_bias": -0.092699
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-10",
+            "n": 321,
+            "actual_total": 325284.0,
+            "predicted_total": 308902.93,
+            "wape": 0.133729,
+            "mae": 135.5138,
+            "normalised_bias": -0.050359
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-11",
+            "n": 321,
+            "actual_total": 427774.0,
+            "predicted_total": 423957.35,
+            "wape": 0.120074,
+            "mae": 160.0136,
+            "normalised_bias": -0.008922
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-12",
+            "n": 321,
+            "actual_total": 798926.0,
+            "predicted_total": 634437.63,
+            "wape": 0.228844,
+            "mae": 569.5609,
+            "normalised_bias": -0.205887
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-13",
+            "n": 321,
+            "actual_total": 769451.0,
+            "predicted_total": 480823.39,
+            "wape": 0.389394,
+            "mae": 933.3945,
+            "normalised_bias": -0.375109
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-14",
+            "n": 321,
+            "actual_total": 377483.0,
+            "predicted_total": 314774.89,
+            "wape": 0.220193,
+            "mae": 258.9386,
+            "normalised_bias": -0.166122
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-15",
+            "n": 321,
+            "actual_total": 462135.0,
+            "predicted_total": 308643.53,
+            "wape": 0.381799,
+            "mae": 549.6662,
+            "normalised_bias": -0.332136
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-16",
+            "n": 321,
+            "actual_total": 629226.0,
+            "predicted_total": 296144.0,
+            "wape": 0.552655,
+            "mae": 1083.317,
+            "normalised_bias": -0.529352
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-17",
+            "n": 321,
+            "actual_total": 818233.0,
+            "predicted_total": 319264.77,
+            "wape": 0.636172,
+            "mae": 1621.6091,
+            "normalised_bias": -0.609812
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-18",
+            "n": 321,
+            "actual_total": 936100.0,
+            "predicted_total": 374559.56,
+            "wape": 0.629345,
+            "mae": 1835.2958,
+            "normalised_bias": -0.599872
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-19",
+            "n": 321,
+            "actual_total": 983653.0,
+            "predicted_total": 449340.31,
+            "wape": 0.595197,
+            "mae": 1823.8845,
+            "normalised_bias": -0.543192
+          },
+          {
+            "fold_cutoff": "2025-05-21",
+            "checkin": "2025-06-20",
+            "n": 321,
+            "actual_total": 725858.0,
+            "predicted_total": 257327.06,
+            "wape": 0.677675,
+            "mae": 1532.3866,
+            "normalised_bias": -0.645486
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-22",
+            "n": 321,
+            "actual_total": 706219.0,
+            "predicted_total": 694276.44,
+            "wape": 0.020594,
+            "mae": 45.3071,
+            "normalised_bias": -0.016911
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-23",
+            "n": 321,
+            "actual_total": 697176.0,
+            "predicted_total": 680799.04,
+            "wape": 0.043348,
+            "mae": 94.1466,
+            "normalised_bias": -0.02349
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-24",
+            "n": 321,
+            "actual_total": 402476.0,
+            "predicted_total": 399417.4,
+            "wape": 0.042711,
+            "mae": 53.5518,
+            "normalised_bias": -0.007599
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-25",
+            "n": 321,
+            "actual_total": 381465.0,
+            "predicted_total": 385287.37,
+            "wape": 0.042503,
+            "mae": 50.5093,
+            "normalised_bias": 0.01002
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-26",
+            "n": 321,
+            "actual_total": 393930.0,
+            "predicted_total": 411373.49,
+            "wape": 0.065009,
+            "mae": 79.7789,
+            "normalised_bias": 0.044281
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-27",
+            "n": 321,
+            "actual_total": 423972.0,
+            "predicted_total": 443983.68,
+            "wape": 0.079825,
+            "mae": 105.432,
+            "normalised_bias": 0.0472
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-28",
+            "n": 321,
+            "actual_total": 561492.0,
+            "predicted_total": 608066.75,
+            "wape": 0.094557,
+            "mae": 165.3988,
+            "normalised_bias": 0.082948
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-29",
+            "n": 321,
+            "actual_total": 422457.0,
+            "predicted_total": 462548.83,
+            "wape": 0.136296,
+            "mae": 179.3745,
+            "normalised_bias": 0.094902
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-30",
+            "n": 321,
+            "actual_total": 481446.0,
+            "predicted_total": 512572.89,
+            "wape": 0.098876,
+            "mae": 148.2976,
+            "normalised_bias": 0.064653
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-08-31",
+            "n": 321,
+            "actual_total": 505280.0,
+            "predicted_total": 510205.06,
+            "wape": 0.111304,
+            "mae": 175.2022,
+            "normalised_bias": 0.009747
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-01",
+            "n": 321,
+            "actual_total": 528846.0,
+            "predicted_total": 514547.3,
+            "wape": 0.080786,
+            "mae": 133.0951,
+            "normalised_bias": -0.027038
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-02",
+            "n": 321,
+            "actual_total": 551827.0,
+            "predicted_total": 543568.14,
+            "wape": 0.080696,
+            "mae": 138.723,
+            "normalised_bias": -0.014966
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-03",
+            "n": 321,
+            "actual_total": 595554.0,
+            "predicted_total": 650909.89,
+            "wape": 0.112814,
+            "mae": 209.3049,
+            "normalised_bias": 0.092949
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-04",
+            "n": 321,
+            "actual_total": 655880.0,
+            "predicted_total": 739614.38,
+            "wape": 0.141957,
+            "mae": 290.0527,
+            "normalised_bias": 0.127667
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-05",
+            "n": 321,
+            "actual_total": 451015.0,
+            "predicted_total": 505922.54,
+            "wape": 0.140355,
+            "mae": 197.2037,
+            "normalised_bias": 0.121742
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-06",
+            "n": 321,
+            "actual_total": 569444.0,
+            "predicted_total": 695553.05,
+            "wape": 0.231306,
+            "mae": 410.329,
+            "normalised_bias": 0.22146
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-07",
+            "n": 321,
+            "actual_total": 586790.0,
+            "predicted_total": 699240.8,
+            "wape": 0.216394,
+            "mae": 395.5691,
+            "normalised_bias": 0.191637
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-08",
+            "n": 321,
+            "actual_total": 677236.0,
+            "predicted_total": 746932.92,
+            "wape": 0.121892,
+            "mae": 257.1638,
+            "normalised_bias": 0.102914
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-09",
+            "n": 321,
+            "actual_total": 978181.0,
+            "predicted_total": 922341.14,
+            "wape": 0.107294,
+            "mae": 326.9557,
+            "normalised_bias": -0.057085
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-10",
+            "n": 321,
+            "actual_total": 1608206.0,
+            "predicted_total": 1331612.29,
+            "wape": 0.177561,
+            "mae": 889.5783,
+            "normalised_bias": -0.171989
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-11",
+            "n": 321,
+            "actual_total": 1462589.0,
+            "predicted_total": 1322093.21,
+            "wape": 0.13404,
+            "mae": 610.7331,
+            "normalised_bias": -0.09606
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-12",
+            "n": 321,
+            "actual_total": 687036.0,
+            "predicted_total": 706320.83,
+            "wape": 0.157667,
+            "mae": 337.4549,
+            "normalised_bias": 0.02807
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-13",
+            "n": 321,
+            "actual_total": 681503.0,
+            "predicted_total": 694371.3,
+            "wape": 0.131349,
+            "mae": 278.8614,
+            "normalised_bias": 0.018882
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-14",
+            "n": 321,
+            "actual_total": 687197.0,
+            "predicted_total": 687822.12,
+            "wape": 0.141875,
+            "mae": 303.7258,
+            "normalised_bias": 0.00091
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-15",
+            "n": 321,
+            "actual_total": 675540.0,
+            "predicted_total": 635070.64,
+            "wape": 0.14425,
+            "mae": 303.5722,
+            "normalised_bias": -0.059907
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-16",
+            "n": 321,
+            "actual_total": 684626.0,
+            "predicted_total": 640814.79,
+            "wape": 0.145107,
+            "mae": 309.483,
+            "normalised_bias": -0.063993
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-17",
+            "n": 321,
+            "actual_total": 733013.0,
+            "predicted_total": 671341.65,
+            "wape": 0.156137,
+            "mae": 356.5441,
+            "normalised_bias": -0.084134
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-18",
+            "n": 321,
+            "actual_total": 797532.0,
+            "predicted_total": 819763.04,
+            "wape": 0.148249,
+            "mae": 368.3291,
+            "normalised_bias": 0.027875
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-19",
+            "n": 321,
+            "actual_total": 484109.0,
+            "predicted_total": 479687.82,
+            "wape": 0.154467,
+            "mae": 232.9563,
+            "normalised_bias": -0.009133
+          },
+          {
+            "fold_cutoff": "2025-08-21",
+            "checkin": "2025-09-20",
+            "n": 321,
+            "actual_total": 438860.0,
+            "predicted_total": 437688.71,
+            "wape": 0.123493,
+            "mae": 168.8351,
+            "normalised_bias": -0.002669
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-09-23",
+            "n": 321,
+            "actual_total": 446045.0,
+            "predicted_total": 442421.53,
+            "wape": 0.022497,
+            "mae": 31.2613,
+            "normalised_bias": -0.008124
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-09-24",
+            "n": 321,
+            "actual_total": 539595.0,
+            "predicted_total": 531823.34,
+            "wape": 0.02327,
+            "mae": 39.1158,
+            "normalised_bias": -0.014403
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-09-25",
+            "n": 321,
+            "actual_total": 670231.0,
+            "predicted_total": 665441.02,
+            "wape": 0.033042,
+            "mae": 68.991,
+            "normalised_bias": -0.007147
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-09-26",
+            "n": 321,
+            "actual_total": 370348.0,
+            "predicted_total": 355928.53,
+            "wape": 0.056438,
+            "mae": 65.1147,
+            "normalised_bias": -0.038935
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-09-27",
+            "n": 321,
+            "actual_total": 431327.0,
+            "predicted_total": 447324.79,
+            "wape": 0.051558,
+            "mae": 69.2788,
+            "normalised_bias": 0.03709
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-09-28",
+            "n": 321,
+            "actual_total": 410058.0,
+            "predicted_total": 424638.52,
+            "wape": 0.056513,
+            "mae": 72.1915,
+            "normalised_bias": 0.035557
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-09-29",
+            "n": 321,
+            "actual_total": 400623.0,
+            "predicted_total": 411465.18,
+            "wape": 0.057695,
+            "mae": 72.0061,
+            "normalised_bias": 0.027063
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-09-30",
+            "n": 321,
+            "actual_total": 413017.0,
+            "predicted_total": 437819.57,
+            "wape": 0.083725,
+            "mae": 107.7248,
+            "normalised_bias": 0.060052
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-01",
+            "n": 321,
+            "actual_total": 524026.0,
+            "predicted_total": 537103.46,
+            "wape": 0.074055,
+            "mae": 120.8928,
+            "normalised_bias": 0.024956
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-02",
+            "n": 321,
+            "actual_total": 702142.0,
+            "predicted_total": 678270.26,
+            "wape": 0.071746,
+            "mae": 156.9344,
+            "normalised_bias": -0.033998
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-03",
+            "n": 321,
+            "actual_total": 351811.0,
+            "predicted_total": 340301.5,
+            "wape": 0.061046,
+            "mae": 66.9052,
+            "normalised_bias": -0.032715
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-04",
+            "n": 321,
+            "actual_total": 349183.0,
+            "predicted_total": 358258.37,
+            "wape": 0.069842,
+            "mae": 75.9738,
+            "normalised_bias": 0.02599
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-05",
+            "n": 321,
+            "actual_total": 334989.0,
+            "predicted_total": 368399.6,
+            "wape": 0.108672,
+            "mae": 113.4081,
+            "normalised_bias": 0.099736
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-06",
+            "n": 321,
+            "actual_total": 340893.0,
+            "predicted_total": 366343.22,
+            "wape": 0.101125,
+            "mae": 107.3918,
+            "normalised_bias": 0.074658
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-07",
+            "n": 321,
+            "actual_total": 378996.0,
+            "predicted_total": 389921.23,
+            "wape": 0.079843,
+            "mae": 94.2681,
+            "normalised_bias": 0.028827
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-08",
+            "n": 321,
+            "actual_total": 507387.0,
+            "predicted_total": 467689.15,
+            "wape": 0.110707,
+            "mae": 174.9888,
+            "normalised_bias": -0.07824
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-09",
+            "n": 321,
+            "actual_total": 674381.0,
+            "predicted_total": 583108.03,
+            "wape": 0.148839,
+            "mae": 312.6919,
+            "normalised_bias": -0.135343
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-10",
+            "n": 321,
+            "actual_total": 331920.0,
+            "predicted_total": 304387.14,
+            "wape": 0.108402,
+            "mae": 112.0897,
+            "normalised_bias": -0.08295
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-11",
+            "n": 321,
+            "actual_total": 298796.0,
+            "predicted_total": 275360.54,
+            "wape": 0.104088,
+            "mae": 96.8883,
+            "normalised_bias": -0.078433
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-12",
+            "n": 321,
+            "actual_total": 290339.0,
+            "predicted_total": 294425.37,
+            "wape": 0.094725,
+            "mae": 85.6775,
+            "normalised_bias": 0.014074
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-13",
+            "n": 321,
+            "actual_total": 296295.0,
+            "predicted_total": 279308.77,
+            "wape": 0.098119,
+            "mae": 90.5676,
+            "normalised_bias": -0.057329
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-14",
+            "n": 321,
+            "actual_total": 332673.0,
+            "predicted_total": 308467.33,
+            "wape": 0.116623,
+            "mae": 120.8643,
+            "normalised_bias": -0.072761
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-15",
+            "n": 321,
+            "actual_total": 454452.0,
+            "predicted_total": 387563.72,
+            "wape": 0.165594,
+            "mae": 234.4371,
+            "normalised_bias": -0.147184
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-16",
+            "n": 321,
+            "actual_total": 624651.0,
+            "predicted_total": 561139.56,
+            "wape": 0.141581,
+            "mae": 275.5098,
+            "normalised_bias": -0.101675
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-17",
+            "n": 321,
+            "actual_total": 303286.0,
+            "predicted_total": 295961.01,
+            "wape": 0.102336,
+            "mae": 96.6888,
+            "normalised_bias": -0.024152
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-18",
+            "n": 321,
+            "actual_total": 281566.0,
+            "predicted_total": 262886.8,
+            "wape": 0.115101,
+            "mae": 100.9609,
+            "normalised_bias": -0.06634
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-19",
+            "n": 321,
+            "actual_total": 272028.0,
+            "predicted_total": 255391.16,
+            "wape": 0.121605,
+            "mae": 103.0527,
+            "normalised_bias": -0.061159
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-20",
+            "n": 321,
+            "actual_total": 274659.0,
+            "predicted_total": 267737.28,
+            "wape": 0.109451,
+            "mae": 93.6501,
+            "normalised_bias": -0.025201
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-21",
+            "n": 321,
+            "actual_total": 299657.0,
+            "predicted_total": 289047.74,
+            "wape": 0.108012,
+            "mae": 100.8304,
+            "normalised_bias": -0.035405
+          },
+          {
+            "fold_cutoff": "2025-09-22",
+            "checkin": "2025-10-22",
+            "n": 321,
+            "actual_total": 346331.0,
+            "predicted_total": 257893.16,
+            "wape": 0.272743,
+            "mae": 294.2656,
+            "normalised_bias": -0.255356
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-23",
+            "n": 321,
+            "actual_total": 575561.0,
+            "predicted_total": 568522.81,
+            "wape": 0.019219,
+            "mae": 34.4598,
+            "normalised_bias": -0.012228
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-24",
+            "n": 321,
+            "actual_total": 290798.0,
+            "predicted_total": 286980.28,
+            "wape": 0.033171,
+            "mae": 30.0504,
+            "normalised_bias": -0.013128
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-25",
+            "n": 321,
+            "actual_total": 262627.0,
+            "predicted_total": 264942.26,
+            "wape": 0.031145,
+            "mae": 25.4818,
+            "normalised_bias": 0.008816
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-26",
+            "n": 321,
+            "actual_total": 244023.0,
+            "predicted_total": 244744.32,
+            "wape": 0.048856,
+            "mae": 37.1399,
+            "normalised_bias": 0.002956
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-27",
+            "n": 321,
+            "actual_total": 241811.0,
+            "predicted_total": 239716.17,
+            "wape": 0.039417,
+            "mae": 29.6933,
+            "normalised_bias": -0.008663
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-28",
+            "n": 321,
+            "actual_total": 268295.0,
+            "predicted_total": 259203.78,
+            "wape": 0.066212,
+            "mae": 55.3408,
+            "normalised_bias": -0.033885
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-29",
+            "n": 321,
+            "actual_total": 405227.0,
+            "predicted_total": 372694.09,
+            "wape": 0.089998,
+            "mae": 113.6124,
+            "normalised_bias": -0.080283
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-30",
+            "n": 321,
+            "actual_total": 608875.0,
+            "predicted_total": 578742.06,
+            "wape": 0.083408,
+            "mae": 158.2091,
+            "normalised_bias": -0.04949
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-10-31",
+            "n": 321,
+            "actual_total": 281273.0,
+            "predicted_total": 281681.56,
+            "wape": 0.075381,
+            "mae": 66.0516,
+            "normalised_bias": 0.001453
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-01",
+            "n": 321,
+            "actual_total": 236490.0,
+            "predicted_total": 238720.29,
+            "wape": 0.065494,
+            "mae": 48.2513,
+            "normalised_bias": 0.009431
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-02",
+            "n": 321,
+            "actual_total": 226541.0,
+            "predicted_total": 229225.92,
+            "wape": 0.071028,
+            "mae": 50.1269,
+            "normalised_bias": 0.011852
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-03",
+            "n": 321,
+            "actual_total": 235266.0,
+            "predicted_total": 227394.12,
+            "wape": 0.079344,
+            "mae": 58.1526,
+            "normalised_bias": -0.03346
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-04",
+            "n": 321,
+            "actual_total": 274481.0,
+            "predicted_total": 267558.81,
+            "wape": 0.076874,
+            "mae": 65.7334,
+            "normalised_bias": -0.025219
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-05",
+            "n": 321,
+            "actual_total": 414282.0,
+            "predicted_total": 372865.95,
+            "wape": 0.124528,
+            "mae": 160.7154,
+            "normalised_bias": -0.099971
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-06",
+            "n": 321,
+            "actual_total": 609846.0,
+            "predicted_total": 567219.87,
+            "wape": 0.123964,
+            "mae": 235.5114,
+            "normalised_bias": -0.069897
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-07",
+            "n": 321,
+            "actual_total": 271375.0,
+            "predicted_total": 263700.8,
+            "wape": 0.112084,
+            "mae": 94.7564,
+            "normalised_bias": -0.028279
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-08",
+            "n": 321,
+            "actual_total": 226377.0,
+            "predicted_total": 216956.79,
+            "wape": 0.107139,
+            "mae": 75.5569,
+            "normalised_bias": -0.041613
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-09",
+            "n": 321,
+            "actual_total": 214711.0,
+            "predicted_total": 209469.27,
+            "wape": 0.080983,
+            "mae": 54.1681,
+            "normalised_bias": -0.024413
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-10",
+            "n": 321,
+            "actual_total": 225319.0,
+            "predicted_total": 219959.45,
+            "wape": 0.096253,
+            "mae": 67.5625,
+            "normalised_bias": -0.023786
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-11",
+            "n": 321,
+            "actual_total": 265622.0,
+            "predicted_total": 260465.1,
+            "wape": 0.11695,
+            "mae": 96.7742,
+            "normalised_bias": -0.019414
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-12",
+            "n": 321,
+            "actual_total": 379478.0,
+            "predicted_total": 354897.6,
+            "wape": 0.118691,
+            "mae": 140.314,
+            "normalised_bias": -0.064774
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-13",
+            "n": 321,
+            "actual_total": 562777.0,
+            "predicted_total": 506869.72,
+            "wape": 0.143878,
+            "mae": 252.2475,
+            "normalised_bias": -0.099342
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-14",
+            "n": 321,
+            "actual_total": 250618.0,
+            "predicted_total": 241582.98,
+            "wape": 0.090589,
+            "mae": 70.7267,
+            "normalised_bias": -0.036051
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-15",
+            "n": 321,
+            "actual_total": 213161.0,
+            "predicted_total": 215940.8,
+            "wape": 0.088302,
+            "mae": 58.6372,
+            "normalised_bias": 0.013041
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-16",
+            "n": 321,
+            "actual_total": 208876.0,
+            "predicted_total": 210202.74,
+            "wape": 0.089201,
+            "mae": 58.0437,
+            "normalised_bias": 0.006352
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-17",
+            "n": 321,
+            "actual_total": 215054.0,
+            "predicted_total": 210016.07,
+            "wape": 0.097939,
+            "mae": 65.614,
+            "normalised_bias": -0.023426
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-18",
+            "n": 321,
+            "actual_total": 248213.0,
+            "predicted_total": 236030.51,
+            "wape": 0.08438,
+            "mae": 65.2471,
+            "normalised_bias": -0.049081
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-19",
+            "n": 321,
+            "actual_total": 354309.0,
+            "predicted_total": 330421.9,
+            "wape": 0.124581,
+            "mae": 137.5082,
+            "normalised_bias": -0.067419
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-20",
+            "n": 321,
+            "actual_total": 552780.0,
+            "predicted_total": 480435.26,
+            "wape": 0.14868,
+            "mae": 256.0347,
+            "normalised_bias": -0.130874
+          },
+          {
+            "fold_cutoff": "2025-10-22",
+            "checkin": "2025-11-21",
+            "n": 321,
+            "actual_total": 310107.0,
+            "predicted_total": 268058.91,
+            "wape": 0.165329,
+            "mae": 159.7184,
+            "normalised_bias": -0.135592
+          }
+        ],
+        "shock_diagnostic": {
+          "excluded_fold": "2025-05-21",
+          "diagnostic_only": true,
+          "without_fold": {
+            "n": 38520,
+            "actual_total": 48224289.0,
+            "predicted_total": 47588638.26,
+            "wape": 0.111335,
+            "mae": 139.3829,
+            "normalised_bias": -0.013181
+          },
+          "war_dates_only": {
+            "n": 2568,
+            "actual_total": 5702139.0,
+            "predicted_total": 2800877.5,
+            "wape": 0.542596,
+            "mae": 1204.8115,
+            "normalised_bias": -0.508802
+          }
+        }
+      }
+    }
+  }
+}

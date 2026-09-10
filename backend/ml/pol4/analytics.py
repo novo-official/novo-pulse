@@ -125,7 +125,7 @@ def province_summary(predictions: pd.DataFrame, data: Pol4Data) -> list[dict[str
     """The forecast rolled up to the seven provinces.
 
     Rounded to integers *before* aggregating, exactly as `build_submission`
-    does, so the province chart and results.csv report the same national total.
+    does, so the province chart and results.csv report the same in-panel total.
     Summing the unrounded predictions instead drifts by tens of searches - small,
     but enough that a judge adding up the provinces would not get the KPI.
     """

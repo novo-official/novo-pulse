@@ -204,6 +204,7 @@ export interface DashboardDay extends DayPoint {
 }
 
 export interface Dashboard {
+  shock: { all_folds_wape: number; without_fold_wape: number | null; error_share: number | null };
   selected_model: ModelVariant;
   models: DashboardModel[];
   cutoff: string;
@@ -246,4 +247,36 @@ export interface Dashboard {
     baseline_wape: number;
   }[];
   stability: Stability['aggregate'] & Record<string, unknown>;
+}
+
+export interface JuryEvidence {
+  uncertainty: null | { nominal_coverage: number; folds: { cutoff: string; eligible_rows: number; observed_coverage: number | null; mean_width: number | null }[] };
+  event_study: null | { summary: { clock: string; period: string; days: number; weekday_adjusted_ratio: number; matched_jalali_year_ratio: number }[] };
+  generated_at: string;
+  cutoff: string;
+  mode: string;
+  target_window: string[];
+  scope: { cities: number; provinces: string[]; dates: number; target: string };
+  performance: {
+    champion: { wape: number }; baseline: { wape: number }; relative_improvement: number;
+    confidence_interval: { lower: number; upper: number }; prequential_wape: number;
+    folds: { cutoff: string; champion: number; baseline: number; shock_overlap: boolean }[];
+  };
+  shock: { all_folds_wape: number; without_fold_wape: number | null; error_share: number | null; source: string };
+  raw_shock: { all_folds_wape: number; without_fold_wape: number | null };
+  clustering: null | { selected_arm: string; warning: string; levels: {
+    mean_groups: number; clustered_wape: number; control_wape: number;
+    mechanical_gain: number; modelling_gain: number;
+  }[] };
+  experiments: null | { status: string; limitations: string[]; arms: Record<string, {
+    raw: { pooled: { wape: number }; interval: { lower?: number; upper?: number } };
+    calibrated: { pooled: { wape: number } };
+  }> };
+  submission: { rows: number; finite: boolean; nonnegative: boolean; observed_floor: boolean; duplicate_keys: number; sha256: string };
+  trainset_recovery: null | { rows: number; file_hash_matches: Record<string, boolean> };
+  decisions: { city_code: number; city: string; province: string; predicted_demand: number;
+    observed_share: number; forecast_share: number; pickup_ratio: number | null;
+    peak_checkin: string; action: string; owner: string; evidence_status: string; required_before_spend: string }[];
+  limits: string[];
+  sources: Record<string, string>;
 }

@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "checks": {
+    "locked_environment": true,
+    "submission": {
+      "rows": 9630,
+      "sha256": "a0b31f3feb659b8c1838384a31db31c68d62de51ca7227d70ba3f0223528be75"
+    },
+    "recovered_trainset": true,
+    "champion_reload": {
+      "features": 66,
+      "rows": 2655312
+    },
+    "city_challenger_reload": {
+      "features": 69,
+      "rows": 2655312
+    },
+    "cluster_challenger_reload": {
+      "features": 69,
+      "rows": 901648
+    },
+    "cluster_selection": "city; blend rejected; each model has its own checksummed assignment",
+    "fresh_evidence": true
+  },
+  "failures": {}
+}

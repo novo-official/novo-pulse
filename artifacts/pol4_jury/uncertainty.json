@@ -1,0 +1,70 @@
+{
+  "status": "experimental challenger diagnostic",
+  "nominal_coverage": 0.8,
+  "source": "city_calibrated.parquet",
+  "source_sha256": "603a0df981cc5e17327acd509f4f1dc2faa63020fd0825e752e5e02c4062a58c",
+  "folds": [
+    {
+      "cutoff": "2024-11-21",
+      "eligible_rows": 0,
+      "total_rows": 9630,
+      "observed_coverage": null,
+      "mean_width": null,
+      "history_folds": []
+    },
+    {
+      "cutoff": "2025-05-21",
+      "eligible_rows": 9630,
+      "total_rows": 9630,
+      "observed_coverage": 0.7023883696780893,
+      "mean_width": 1280.4407716958628,
+      "history_folds": [
+        "2024-11-21"
+      ]
+    },
+    {
+      "cutoff": "2025-08-21",
+      "eligible_rows": 9630,
+      "total_rows": 9630,
+      "observed_coverage": 0.8442367601246106,
+      "mean_width": 2766.9473611820445,
+      "history_folds": [
+        "2024-11-21",
+        "2025-05-21"
+      ]
+    },
+    {
+      "cutoff": "2025-09-22",
+      "eligible_rows": 9630,
+      "total_rows": 9630,
+      "observed_coverage": 0.8475597092419522,
+      "mean_width": 1299.288682453109,
+      "history_folds": [
+        "2024-11-21",
+        "2025-05-21",
+        "2025-08-21"
+      ]
+    },
+    {
+      "cutoff": "2025-10-22",
+      "eligible_rows": 9630,
+      "total_rows": 9630,
+      "observed_coverage": 0.8146417445482866,
+      "mean_width": 1044.5986655237211,
+      "history_folds": [
+        "2024-11-21",
+        "2025-05-21",
+        "2025-08-21",
+        "2025-09-22"
+      ]
+    }
+  ],
+  "target_export": "city_challenger_intervals.csv",
+  "target_sha256": "fc7cad0303622b9b0f5c05eb84bea4a79b86fc0e3c1e9652bab2b070cf06248b",
+  "bundle_digest": "db09a476ccaeaa2ea30f2ed4689f542356d86de2fbbbcd8784d9a68ef01fa066",
+  "limitations": [
+    "No bands on the first fold: no earlier out-of-fold errors",
+    "Dependent rows and regime shifts: no coverage guarantee",
+    "Not deployed on the submitted model"
+  ]
+}

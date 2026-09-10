@@ -45,6 +45,8 @@ urlpatterns = [
     # Read-only, served from the artefacts `python -m ml.pol4.pipeline` writes.
     # Nothing here opens search_data.csv or fits a model.
     path("pol4/overview/", pol4_views.overview, name="pol4-overview"),
+    path("pol4/jury/", pol4_views.jury, name="pol4-jury"),
+    path("pol4/decision-queue.csv", pol4_views.decision_download, name="pol4-decision-download"),
     path("pol4/dashboard/", pol4_views.dashboard, name="pol4-dashboard"),
     path("pol4/forecast/", pol4_views.forecast, name="pol4-forecast"),
     path("pol4/heatmap/", pol4_views.heatmap, name="pol4-heatmap"),

@@ -68,6 +68,14 @@ GROUP_ORDER = (
 #: attributable to the partition rather than to the feature set.
 CLUSTER_GROUP_ORDER = GROUP_ORDER + (GROUP_CLUSTER,)
 
+COMPACT_FEATURES = (
+    "observed_total", "days_to_checkin", "pickup_1d", "pickup_3d", "pickup_7d", "pickup_14d",
+    "pickup_velocity_7d", "pickup_acceleration_7d", "pickup_3d_over_7d", "active_search_days",
+    "days_since_last_search", "expected_completion_fraction", "pickup_baseline_remaining",
+    "pickup_surprise", "checkin_weekday", "is_weekend", "jalali_month", "jalali_day",
+    "city_code", "province_code", "city_share_of_market", "province_observed_total",
+)
+
 CATEGORICAL = ("city_code", "province_code")
 
 #: Columns `aggregate.py` writes onto the virtual-city table.
@@ -335,6 +343,8 @@ class FeatureBuilder:
         config = config or Pol4Config()
         cutoff = pd.Timestamp(cutoff)
         tensor = PairTensor.build(events, keys)
+        if config.city_history_mode not in {"fold", "origin"}:
+            raise ValueError("city_history_mode must be fold or origin")
         province_of = data.province_of
         market, market_rows = tensor.group_by(None)
         province, province_rows = tensor.group_by(keys[CITY].map(province_of))
@@ -355,6 +365,9 @@ class FeatureBuilder:
         self, horizon: int, groups: tuple[str, ...], baseline: Any | None = None
     ) -> pd.DataFrame:
         """Every requested feature group, for every pair, at one horizon."""
+        if "compact" in groups:
+            expanded = CLUSTER_GROUP_ORDER if GROUP_CLUSTER in groups else GROUP_ORDER
+            return self.at_horizon(horizon, expanded, baseline)[feature_names(groups)]
         keys = self.tensor.keys
         cities = keys[CITY].to_numpy()
         checkins = pd.DatetimeIndex(keys[CHECKIN])
@@ -394,7 +407,13 @@ class FeatureBuilder:
             merged = self.data.cities.set_index(CITY).reindex(cities)
             columns["lat"] = merged["lat"].to_numpy()
             columns["long"] = merged["long"].to_numpy()
-            columns.update(self.city_history.block(cities, checkins.dayofweek.to_numpy()))
+            if self.config.city_history_mode == "origin":
+                from .origin_history import OriginHistory
+                if not hasattr(self, "_origin_history"):
+                    self._origin_history = OriginHistory(self.data, self.cutoff, self.config)
+                columns.update(self._origin_history.block(cities, checkins, horizon, self.cutoff))
+            else:
+                columns.update(self.city_history.block(cities, checkins.dayofweek.to_numpy()))
         if GROUP_MARKET in groups:
             block = _pickup_block(self.market, horizon, prefix="market_")
             block.update(_velocity_block(self.market, horizon, block, prefix="market_"))
@@ -430,6 +449,8 @@ class FeatureBuilder:
 
 def feature_names(groups: tuple[str, ...]) -> list[str]:
     """The columns `at_horizon` will produce for a set of groups (for tests)."""
+    if "compact" in groups:
+        return list(COMPACT_FEATURES) + (list(CLUSTER_FEATURES) if GROUP_CLUSTER in groups else [])
     names = ["observed_total", "days_to_checkin"]
     if GROUP_PICKUP in groups:
         names += [f"pickup_{w}d" for w in (1, 3, 7, 14)]

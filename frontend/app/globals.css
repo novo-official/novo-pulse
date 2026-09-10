@@ -144,6 +144,55 @@
   .decision-footer span { margin-inline-start: auto; font-family: ui-monospace, monospace; }
 
   .dark .pol4-card, .dark .model-switcher, .dark .decision-summary, .dark .decision-toolbar { box-shadow: 0 24px 60px -40px rgb(0 0 0 / .8), inset 0 1px 0 rgb(255 255 255 / .035); }
+
+  /* Minimal presentation dashboard. Scoped so /jury remains byte-for-byte and
+     visually independent from the main route. */
+  .presentation-page { width: min(1460px, 100%); margin: 0 auto; padding: 24px clamp(14px, 3vw, 42px) 56px; }
+  .presentation-loading { width: min(1120px, calc(100% - 32px)); margin: 12vh auto; overflow: hidden; border: 1px solid rgb(var(--line)); border-radius: 22px; background: rgb(var(--surface)); }
+  .presentation-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 8px 2px 20px; border-bottom: 1px solid rgb(var(--line)); }
+  .presentation-header span { display: block; color: #2a78d6; font-family: ui-monospace, monospace; font-size: 10px; font-weight: 850; letter-spacing: .16em; direction: ltr; text-align: right; }
+  .presentation-header h1 { margin: 5px 0 0; font-size: clamp(23px, 3vw, 35px); font-weight: 900; letter-spacing: -.045em; line-height: 1.25; }
+  .presentation-header p { margin: 0 0 4px; color: rgb(var(--muted)); font-size: 11px; font-weight: 700; white-space: nowrap; }
+
+  .presentation-filters { position: sticky; z-index: 30; top: 10px; display: flex; align-items: end; gap: 10px; overflow-x: auto; width: max-content; max-width: 100%; margin: 16px auto 22px; padding: 8px; border: 1px solid rgb(var(--line)); border-radius: 17px; background: rgb(var(--surface) / .9); box-shadow: 0 18px 44px -29px rgb(15 23 42 / .5); backdrop-filter: blur(18px); scrollbar-width: none; }
+  .presentation-filters::-webkit-scrollbar { display: none; }
+  .presentation-filters fieldset { min-width: max-content; margin: 0; padding: 0; border: 0; }
+  .presentation-filters legend, .presentation-filters label > span { display: block; margin: 0 6px 4px; color: rgb(var(--muted)); font-size: 8px; font-weight: 850; letter-spacing: .02em; }
+  .presentation-filters label { flex: 0 0 auto; }
+  .presentation-filters select { min-width: 150px; height: 42px; border: 1px solid rgb(var(--line)); border-radius: 11px; color: rgb(var(--ink)); background: rgb(var(--surface)); padding: 0 12px; font-size: 11px; font-weight: 750; direction: ltr; }
+  .presentation-segment { display: flex; height: 42px; padding: 3px; border: 1px solid rgb(var(--line)); border-radius: 11px; background: rgb(var(--ink) / .025); direction: ltr; }
+  .presentation-segment button { display: flex; min-width: 48px; align-items: center; justify-content: center; gap: 7px; border: 0; border-radius: 8px; color: rgb(var(--muted)); background: transparent; padding: 0 10px; font-size: 10px; font-weight: 850; transition: color .16s ease, background .16s ease, box-shadow .16s ease; }
+  .presentation-segment button small { color: inherit; font-size: 8px; font-weight: 700; white-space: nowrap; }
+  .presentation-segment button:hover { color: rgb(var(--ink)); background: rgb(var(--ink) / .045); }
+  .presentation-segment button.is-active { color: #fff; background: #2a78d6; box-shadow: 0 8px 18px -10px rgb(42 120 214 / .9); }
+  .presentation-selected { display: flex; height: 42px; align-items: center; gap: 10px; flex: 0 0 auto; border: 1px solid rgb(235 104 52 / .28); border-radius: 11px; color: #d95926; background: rgb(235 104 52 / .08); padding: 0 13px; font-size: 10px; font-weight: 850; }
+  .presentation-selected b { font-size: 15px; font-weight: 500; }
+
+  .presentation-charts { display: grid; gap: 16px; }
+  .presentation-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+  .presentation-page .pol4-card { border-radius: 19px; background: rgb(var(--surface) / .96); box-shadow: 0 24px 60px -48px rgb(15 23 42 / .58), inset 0 1px 0 rgb(255 255 255 / .34); }
+  .presentation-page .pol4-card__head { min-height: 88px; padding: 20px 22px 12px; }
+  .presentation-page .pol4-card__title { font-size: 15px; letter-spacing: -.025em; }
+  .presentation-page .pol4-card__hint { max-width: 750px; font-size: 10px; line-height: 1.8; }
+  .presentation-page .pol4-card__unit { min-height: 30px; padding: 0 10px; border: 1px solid rgb(var(--line) / .7); background: rgb(var(--ink) / .025); }
+  .presentation-page .pol4-card__body { padding: 2px 14px 8px; }
+  .presentation-page .pol4-card__source { opacity: .72; padding: 9px 22px 12px; }
+  .presentation-page .pol4-legend { padding: 0 22px 7px; font-size: 9px; }
+  .presentation-page .recharts-bar-rectangle, .presentation-page .recharts-scatter-symbol { cursor: pointer; }
+
+  .presentation-heatmap { height: 100%; overflow: auto; padding: 5px 8px 12px; scrollbar-width: thin; }
+  .presentation-heatmap__grid { display: grid; width: max-content; gap: 4px; align-items: center; padding-bottom: 2px; }
+  .presentation-heatmap__row { display: contents; }
+  .presentation-heatmap__corner, .presentation-heatmap__date { position: sticky; z-index: 3; top: 0; min-height: 38px; color: rgb(var(--muted)); background: rgb(var(--surface)); font-size: 8px; }
+  .presentation-heatmap__corner { inset-inline-start: 0; display: flex; z-index: 5; align-items: center; padding-left: 9px; direction: rtl; font-weight: 800; }
+  .presentation-heatmap__date { display: grid; place-items: center; overflow: hidden; padding: 3px 0; writing-mode: vertical-rl; }
+  .presentation-heatmap__city { position: sticky; z-index: 2; left: 0; overflow: hidden; height: 27px; border: 1px solid transparent; border-radius: 7px; color: rgb(var(--ink)); background: rgb(var(--surface)); padding: 0 9px; font-size: 9px; font-weight: 760; text-align: left; text-overflow: ellipsis; white-space: nowrap; transition: color .15s ease, background .15s ease, border-color .15s ease; }
+  .presentation-heatmap__city:hover, .presentation-heatmap__city.is-selected { border-color: rgb(235 104 52 / .34); color: #d95926; background: rgb(235 104 52 / .08); }
+  .presentation-heatmap__cell { width: 28px; height: 27px; border: 1px solid transparent; border-radius: 6px; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .08); transition: transform .14s ease, border-color .14s ease, filter .14s ease; }
+  .presentation-heatmap__cell:hover { z-index: 4; border-color: rgb(var(--ink) / .52); filter: saturate(1.18); transform: scale(1.24); }
+  .presentation-heatmap__cell.is-selected { border-color: #eb6834; box-shadow: inset 0 0 0 1px #eb6834, 0 0 0 1px rgb(var(--surface)); }
+
+  .dark .presentation-page .pol4-card, .dark .presentation-filters { box-shadow: 0 25px 65px -43px rgb(0 0 0 / .85), inset 0 1px 0 rgb(255 255 255 / .035); }
 }
 
 @media (max-width: 1050px) {
@@ -168,6 +217,91 @@
   .pol4-card__meta { justify-content: space-between; }
 }
 
+@media (max-width: 980px) {
+  .presentation-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 680px) {
+  .presentation-page { padding: 12px 9px 36px; }
+  .presentation-header { align-items: flex-start; padding: 8px 4px 15px; }
+  .presentation-header p { display: none; }
+  .presentation-header h1 { font-size: 23px; }
+  .presentation-filters { position: static; justify-content: center; flex-wrap: wrap; overflow: visible; width: 100%; margin: 10px 0 14px; border-radius: 14px; }
+  .presentation-filters select { min-width: 138px; }
+  .presentation-segment button small { display: none; }
+  .presentation-page .pol4-card__head { min-height: 0; align-items: stretch; padding: 16px 15px 10px; }
+  .presentation-page .pol4-card__meta { justify-content: flex-start; }
+  .presentation-page .pol4-card__body { padding-inline: 5px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+/* Judge-facing evidence and decision workflow. */
+.jury-page { max-width: 1360px; margin: auto; padding: 24px 36px 70px; line-height: 1.6; }
+.jury-nav, .jury-nav > div, .jury-nav a, .jury-download, .jury-controls { display: flex; align-items: center; gap: 12px; }
+.jury-nav { justify-content: space-between; padding-bottom: 24px; border-bottom: 1px solid rgb(var(--line)); font-size: 12px; }
+.jury-nav > span { letter-spacing: .12em; font-weight: 700; }
+.jury-nav button, .jury-controls select, .jury-inputs input { padding: 8px 12px; border: 1px solid rgb(var(--line)); border-radius: 8px; background: rgb(var(--surface)); color: rgb(var(--ink)); }
+.jury-hero { display: grid; grid-template-columns: 1fr 310px; gap: 50px; align-items: center; padding: 70px 0 55px; }
+.jury-eyebrow, .jury-section-heading > span { text-transform: uppercase; letter-spacing: .12em; font-size: 11px; font-weight: 700; color: rgb(var(--muted)); }
+.jury-hero h1 { font-size: clamp(34px, 4.3vw, 64px); line-height: 1.13; letter-spacing: -.04em; font-weight: 750; margin: 18px 0; }
+.jury-hero em { color: #2a78d6; font-style: normal; }
+.jury-intro { max-width: 600px; font-size: 17px; color: rgb(var(--muted)); }
+.jury-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 24px; }
+.jury-tags span { font-size: 11px; border: 1px solid rgb(var(--line)); border-radius: 20px; padding: 5px 12px; }
+.jury-proof { padding: 28px; border-radius: 18px; color: #fff; background: #16395c; display: flex; flex-direction: column; box-shadow: 0 14px 40px #16395c22; }
+.jury-proof > span { font-size: 12px; margin: 18px 0 4px; color: #bdd9f3; }
+.jury-proof > strong { font-size: 56px; line-height: 1.2; font-weight: 700; }
+.jury-proof small { margin: 20px 0; font-size: 11px; color: #b8e8d9; }
+.jury-proof code { font-size: 10px; color: #bdd9f3; }
+.jury-section { border-top: 1px solid rgb(var(--line)); padding: 34px 0; }
+.jury-section-heading h2 { font-size: clamp(22px, 2.4vw, 30px); font-weight: 650; margin: 6px 0 18px; letter-spacing: -.025em; }
+.jury-section > p { max-width: 960px; color: rgb(var(--muted)); margin-bottom: 20px; }
+.jury-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 24px 0; }
+.jury-metrics article { background: rgb(var(--surface)); padding: 20px; border: 1px solid rgb(var(--line)); border-radius: 12px; }
+.jury-metrics span, .jury-metrics small { display: block; font-size: 11px; color: rgb(var(--muted)); }
+.jury-metrics strong { display: block; font-size: 32px; margin: 8px 0; font-weight: 700; }
+.jury-metrics strong.jury-range { font-size: 24px; }
+.jury-callout { padding: 18px 22px; border-left: 3px solid #d97706; background: rgb(217 119 6 / .08); border-radius: 0 10px 10px 0; font-size: 13px; }
+.jury-callout p { margin: 7px 0; }
+.jury-callout a { display: inline-flex; align-items: center; color: #2a78d6; }
+.jury-chart { min-width: 0; padding: 26px 0 8px; font-size: 11px; }
+.jury-caption { color: rgb(var(--muted)); font-size: 12px; }
+.jury-details { margin: 20px 0; padding: 16px; border: 1px solid rgb(var(--line)); border-radius: 10px; font-size: 13px; }
+.jury-details summary { cursor: pointer; font-weight: 600; }
+.jury-details code { display: block; word-break: break-all; font-size: 10px; }
+.jury-details p { margin: 12px 0; }
+.jury-controls { justify-content: space-between; margin: 24px 0; flex-wrap: wrap; font-size: 13px; }
+.jury-controls select { margin-left: 12px; }
+.jury-download { color: #2a78d6; font-weight: 600; }
+.jury-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 300px; align-items: start; gap: 24px; }
+.jury-table-wrap { overflow-x: auto; }
+.jury-page table { width: 100%; text-align: left; border-collapse: collapse; font-size: 12px; }
+.jury-page caption { text-align: left; color: rgb(var(--muted)); margin: 8px 0; }
+.jury-page th { white-space: nowrap; font-size: 10px; text-transform: uppercase; color: rgb(var(--muted)); font-weight: 500; padding: 12px; border-bottom: 1px solid rgb(var(--line)); }
+.jury-page td { padding: 11px 12px; border-bottom: 1px solid rgb(var(--line)); font-variant-numeric: tabular-nums; }
+.jury-page td small { display: block; font-size: 10px; color: rgb(var(--muted)); }
+.jury-page td button { color: #2a78d6; text-decoration: underline; text-underline-offset: 3px; font-weight: 650; }
+.jury-page .is-selected td { background: rgb(var(--brand-soft)); }
+.jury-action { background: rgb(var(--surface)); border: 1px solid rgb(var(--line)); border-top: 3px solid #2a78d6; border-radius: 12px; padding: 22px; }
+.jury-action h3 { font-size: 25px; font-weight: 650; margin: 10px 0; }
+.jury-action p, .jury-action dd { font-size: 12px; }
+.jury-action dt { color: rgb(var(--muted)); font-size: 10px; text-transform: uppercase; margin: 18px 0 4px; }
+.jury-pilot { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; margin: 20px 0 32px; }
+.jury-pilot article { border-left: 2px solid #2a78d6; padding: 0 18px; }
+.jury-pilot p { font-size: 13px; color: rgb(var(--muted)); margin-top: 10px; }
+.jury-calculator { background: rgb(var(--surface)); border: 1px solid rgb(var(--line)); border-radius: 12px; padding: 24px; }
+.jury-calculator h3 { font-weight: 650; font-size: 18px; }
+.jury-calculator p, .jury-calculator small { font-size: 12px; color: rgb(var(--muted)); }
+.jury-inputs { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin: 22px 0; }
+.jury-inputs label { font-size: 11px; }
+.jury-inputs input { display: block; width: 100%; margin-top: 7px; }
+.jury-calculator output { display: block; font-size: 18px; font-weight: 650; margin-bottom: 8px; }
+.jury-limits { list-style: disc; padding-left: 20px; font-size: 13px; margin-bottom: 22px; }
+.jury-limits li { margin-bottom: 10px; }
+.jury-page a:focus-visible, .jury-page button:focus-visible, .jury-page input:focus-visible, .jury-page select:focus-visible { outline: 3px solid #2a78d6; outline-offset: 3px; }
+@media (max-width: 900px) { .jury-metrics, .jury-inputs { grid-template-columns: repeat(2,1fr); } .jury-workspace { grid-template-columns: 1fr; } .jury-hero { grid-template-columns: 1fr 250px; gap: 24px; } }
+@media (max-width: 600px) { .jury-page { padding: 16px; } .jury-nav > span { display: none; } .jury-hero, .jury-pilot { grid-template-columns: 1fr; } .jury-hero { padding-top: 35px; } .jury-metrics article { padding: 14px; } .jury-metrics strong, .jury-metrics strong.jury-range { font-size: 23px; } .jury-controls select { max-width: 190px; } }
+@media print { .jury-nav, .jury-controls, .jury-inputs, .jury-download { display: none; } .jury-page { max-width: none; padding: 0; color: #111; background: white; } .jury-section, .jury-hero { break-inside: avoid; } .jury-proof { box-shadow: none; } .jury-chart { break-inside: avoid; } }

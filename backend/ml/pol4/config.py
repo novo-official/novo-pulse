@@ -97,6 +97,9 @@ class Pol4Config:
     # -- features / models ---------------------------------------------------
     #: Trailing window for the per-city demand statistics.
     city_history_days: int = 752
+    #: Legacy bundles retain fold-frozen history; the audit challenger uses
+    #: completed check-ins at each row's own origin instead.
+    city_history_mode: str = "fold"
     #: Horizons sampled when building training rows. The dense D-22..D-30
     #: experiment increased runtime by 48%, worsened pooled WAPE, and did not
     #: improve bias, so the evidence-backed stratified set remains selected.
@@ -116,7 +119,7 @@ class Pol4Config:
     demand_bucket_quantiles: tuple[float, ...] = (0.0, 0.5, 0.75, 0.9, 0.99, 1.0)
 
     # -- clustering ----------------------------------------------------------
-    #: A city holding at least this share of national demand is never merged.
+    #: A city holding at least this share of in-panel demand is never merged.
     #: Pooling a hub cancels large errors and flatters WAPE without being
     #: justifiable as sparsity handling, which is exactly what the brief's
     #: "excessive aggregation is penalised" line is aimed at. 0.1% of a
@@ -138,6 +141,7 @@ class Pol4Config:
     #: of historical demand: a city with this much history takes half its own
     #: prediction and half its cluster's.
     blend_shrinkage_grid: tuple[float, ...] = (0.0, 1e3, 1e4, 1e5, 1e6, 1e7)
+    blend_min_relative_gain: float = 0.01
 
     seed: int = 42
 

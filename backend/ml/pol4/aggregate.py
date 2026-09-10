@@ -25,7 +25,7 @@ only aggregatable if it is linear in the log, and most of them are not:
                                      fall on different days pool to a smoother
                                      series, while a shared event (Nowruz) pools
                                      to a sharper one
-    market_*                         unchanged; already national
+    market_*                         unchanged; already in-panel
     province_*                       unchanged; clusters never cross a province
     lat / long                       volume-weighted centroid of the members
 

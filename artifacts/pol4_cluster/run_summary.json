@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-10T15:59:38.114122+00:00",
+  "generated_at": "2026-09-10T18:10:21.394672+00:00",
   "cutoff": "2025-11-21",
   "target_window": [
     "2025-11-22",
@@ -3140,52 +3140,10 @@
       }
     ]
   },
-  "blend_selection": {
-    "cut_height": 0.864659,
-    "shrinkage": 10000.0,
-    "n_groups": 321,
-    "pooled": {
-      "n": 28890,
-      "actual_total": 35972584.0,
-      "predicted_total": 34132616.21,
-      "wape": 0.120096,
-      "mae": 149.5383,
-      "normalised_bias": -0.051149
-    },
-    "folds": {
-      "2024-11-21": {
-        "n": 9630,
-        "actual_total": 6787514.0,
-        "predicted_total": 6832672.77,
-        "wape": 0.125873,
-        "mae": 88.7187,
-        "normalised_bias": 0.006653
-      },
-      "2025-08-21": {
-        "n": 9630,
-        "actual_total": 19510897.0,
-        "predicted_total": 18607215.85,
-        "wape": 0.118966,
-        "mae": 241.0307,
-        "normalised_bias": -0.046317
-      },
-      "2025-10-22": {
-        "n": 9630,
-        "actual_total": 9674173.0,
-        "predicted_total": 8692727.59,
-        "wape": 0.118323,
-        "mae": 118.8654,
-        "normalised_bias": -0.10145
-      }
-    },
-    "sparse": {
-      "n": 19230,
-      "actual_total": 956731.0,
-      "predicted_total": 874978.48,
-      "wape": 0.236335,
-      "mae": 11.7582,
-      "normalised_bias": -0.08545
-    }
+  "blend_selection": null,
+  "blend_policy": {
+    "min_relative_gain": 0.01,
+    "status": "rejected"
   },
   "assignment": {
     "cutoff": "2025-11-21",
@@ -3203,7 +3161,7 @@
   },
   "clustered_cut_height": 1.970305,
   "trainset": {
-    "path": "/Users/kardo/Documents/GitHub/novo-pulse/artifacts/pol4_cluster/trainset",
+    "path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4_cluster/trainset",
     "rows": 901648,
     "features": 69,
     "panel_rows": 109,
@@ -3219,9 +3177,9 @@
     "rows_predicting_zero": 3023
   },
   "city_model_bundle": {
-    "path": "/Users/kardo/Documents/GitHub/novo-pulse/artifacts/pol4_cluster/model_bundle_city",
+    "path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4_cluster/model_bundle_city",
     "model": "lightgbm",
-    "bundle_digest": "ab41e7326203cdd805766afe38f771884b1fe29332985c3fa04a51e063708ee4",
+    "bundle_digest": "db09a476ccaeaa2ea30f2ed4689f542356d86de2fbbbcd8784d9a68ef01fa066",
     "boosters": [
       "lightgbm_h1_14.txt",
       "lightgbm_h15_30.txt"
@@ -3229,7 +3187,7 @@
     "panel_rows": 321,
     "training_rows": 2655312,
     "load_parity_verified": true,
-    "requires": "clusters.csv - the bundle reads a panel of virtual cities",
+    "requires": "model_bundle_city/clusters.csv - checksummed assignment for this arm",
     "top_features": [
       {
         "feature": "city_hist_mean",
@@ -3293,9 +3251,9 @@
     "rows_predicting_zero": 565
   },
   "clustered_model_bundle": {
-    "path": "/Users/kardo/Documents/GitHub/novo-pulse/artifacts/pol4_cluster/model_bundle_clustered",
+    "path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4_cluster/model_bundle_clustered",
     "model": "lightgbm",
-    "bundle_digest": "6ac780dce368ac0b81e44e47e0b3186bbd8366765285366d29b804c240499ad0",
+    "bundle_digest": "84ea9c2c5bcf4016aea36fc984fffe0c8594c1c921f0c27984537fba999416da",
     "boosters": [
       "lightgbm_h1_14.txt",
       "lightgbm_h15_30.txt"
@@ -3303,7 +3261,7 @@
     "panel_rows": 109,
     "training_rows": 901648,
     "load_parity_verified": true,
-    "requires": "clusters.csv - the bundle reads a panel of virtual cities",
+    "requires": "model_bundle_clustered/clusters.csv - checksummed assignment for this arm",
     "top_features": [
       {
         "feature": "city_code",
@@ -3357,25 +3315,17 @@
       }
     ]
   },
-  "blended_submission": {
-    "valid": true,
-    "rows": 9630,
-    "cluster_codes": 321,
-    "cities_covered": 321,
-    "dates": 30,
-    "total_predicted_demand": 7998216,
-    "rows_predicting_zero": 2830
-  },
   "selected_arm": {
-    "arm": "blended",
-    "path": "/Users/kardo/Documents/GitHub/novo-pulse/artifacts/pol4_cluster/results_selected.csv",
-    "source": "/Users/kardo/Documents/GitHub/novo-pulse/artifacts/pol4_cluster/results_blended.csv",
+    "arm": "city",
+    "path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4_cluster/results_selected.csv",
+    "source": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4_cluster/results_city.csv",
     "rows": 9630,
     "arms_written": {
-      "city": "/Users/kardo/Documents/GitHub/novo-pulse/artifacts/pol4_cluster/results_city.csv",
-      "clustered": "/Users/kardo/Documents/GitHub/novo-pulse/artifacts/pol4_cluster/results_clustered.csv",
-      "blended": "/Users/kardo/Documents/GitHub/novo-pulse/artifacts/pol4_cluster/results_blended.csv"
-    }
+      "city": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4_cluster/results_city.csv",
+      "clustered": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4_cluster/results_clustered.csv"
+    },
+    "sha256": "78d8849f0649d9fed333ad9594b7af25ad726763086942a6dd094a30dd65c813",
+    "bundle_digest": "db09a476ccaeaa2ea30f2ed4689f542356d86de2fbbbcd8784d9a68ef01fa066"
   },
-  "runtime_seconds": 151.6
+  "runtime_seconds": 148.4
 }

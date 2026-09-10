@@ -1,0 +1,38 @@
+{
+  "seconds": 107.55636032499751,
+  "training_rows": 2330460,
+  "history_mode": "origin",
+  "spec": {
+    "model": "lightgbm",
+    "horizon_bands": [
+      [
+        1,
+        14
+      ],
+      [
+        15,
+        30
+      ]
+    ],
+    "feature_groups": [
+      "base",
+      "pickup",
+      "velocity",
+      "activity",
+      "curve",
+      "calendar",
+      "city",
+      "market",
+      "province"
+    ],
+    "n_features": 66,
+    "log1p_target": true,
+    "params": {
+      "n_estimators": 600,
+      "n_jobs": 4
+    },
+    "calibration_method": "none",
+    "blend_weight_on_model": 1.0
+  },
+  "predictions_sha256": "837d8ceb7d99d602880df8b71303fcbd2b272db802da15c7c7277f81d3de94c8"
+}

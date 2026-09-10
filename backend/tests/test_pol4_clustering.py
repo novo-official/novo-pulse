@@ -505,6 +505,14 @@ def test_the_clustered_arm_ships_a_reloadable_lightgbm_bundle(pol4, plan, merged
         restored.predict(config.target_dates(), panel_data),
         result.bundle.predict(config.target_dates(), panel_data),
     )
+    # An assignment is part of the model, not an unchecked neighboring CSV.
+    assignment_path = tmp_path / "bundle" / "clusters.csv"
+    saved_assignment = pd.read_csv(assignment_path)
+    assert saved_assignment["cluster_code"].nunique() == merged.n_groups
+    saved_assignment.loc[0, "cluster_code"] = -999
+    saved_assignment.to_csv(assignment_path, index=False)
+    with pytest.raises(ValueError, match="checksum mismatch"):
+        FittedChampion.load(tmp_path / "bundle")
 
 
 def test_the_sweep_does_not_retain_a_bundle_per_level(pol4, plan):

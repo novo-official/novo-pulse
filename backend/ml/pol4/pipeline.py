@@ -43,7 +43,7 @@ from .baseline import PickupBaseline
 from .calibration import Calibrator
 from .champion import ChampionSpec, FittedChampion
 from .config import Pol4Config
-from .artifacts import build_input_manifest, write_json_atomic
+from .artifacts import build_input_manifest, write_json_atomic, write_parquet_atomic, sha256_file
 from .dataset import (
     build_training_frame,
     load_materialized_training_frame,
@@ -319,6 +319,7 @@ def run(
                 "cutoff": pd.Timestamp(config.cutoff).isoformat(),
                 "train_window_days": config.train_window_days,
                 "city_history_days": config.city_history_days,
+                "city_history_mode": config.city_history_mode,
                 "max_train_rows": config.max_train_rows,
                 "horizons": list(config.train_horizons),
                 "feature_groups": list(spec.groups),
@@ -783,6 +784,20 @@ def _write_phase2_backtest(
         },
         "validation_audit": validation_audit,
     }
+    # Persist row evidence and within-fold breakdowns, so a later audit can
+    # inspect an event window without refitting the model.
+    from .backtest import score
+    for label, result in (("champion", champion), ("champion_raw", raw_champion), ("baseline", baseline)):
+        if result is None or result.predictions.empty:
+            continue
+        path = config.artifacts_dir / f"oof_{label}.parquet"
+        write_parquet_atomic(result.predictions, path)
+        payload[label]["oof"] = {"file": path.name, "sha256": sha256_file(path)}
+        for key in ("horizon", CHECKIN):
+            payload[label][f"by_fold_{key}"] = [
+                {"fold_cutoff": str(fold), "key": str(value), **score(rows.actual, rows.prediction)}
+                for (fold, value), rows in result.predictions.groupby(["fold_cutoff", key])
+            ]
     (config.artifacts_dir / "backtest_metrics_phase2.json").write_text(
         json.dumps(_json_ready(payload), indent=2, ensure_ascii=False), encoding="utf-8"
     )

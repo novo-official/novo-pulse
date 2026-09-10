@@ -75,6 +75,23 @@ def clear_cache() -> None:
         _CACHE.clear()
 
 
+def jury_evidence() -> dict[str, Any]:
+    """Do not display a derived packet after any of its source files changes."""
+    from ml.pol4.artifacts import sha256_file
+    try:
+        evidence = _json("jury_evidence.json")
+        for relative, expected in evidence["sources"].items():
+            source = (artifacts_dir() / relative).resolve()
+            # Generated packets may reference sibling experiment directories.
+            if not source.is_relative_to(artifacts_dir().parent.resolve()):
+                raise ValueError("evidence source is outside the artifacts directory")
+            if not source.is_file() or sha256_file(source) != expected:
+                raise ArtifactMissing("Jury evidence is stale. Run make pol4-jury.")
+        return evidence
+    except (ValueError, KeyError, TypeError) as exc:
+        raise ArtifactMissing("Jury evidence is invalid. Run make pol4-jury.") from exc
+
+
 def _parquet(name: str) -> pd.DataFrame:
     return _load(name, pd.read_parquet)
 
@@ -671,6 +688,7 @@ def dashboard(model: str | None = None) -> dict[str, Any]:
     peak = daily.loc[daily["predicted_demand"].idxmax()]
     trough = daily.loc[daily["predicted_demand"].idxmin()]
     selected_model = next(item for item in models if item["key"] == selected)
+    from ml.pol4.jury import shock_sensitivity
     thresholds = {
         "demand_median": float(cities["predicted_demand"].median()),
         "pickup_median": float(cities["pickup_ratio"].dropna().median()),
@@ -679,6 +697,7 @@ def dashboard(model: str | None = None) -> dict[str, Any]:
 
     return {
         "selected_model": selected,
+        "shock": shock_sensitivity(selected_scores["folds"]),
         "models": models,
         "cutoff": summary["cutoff"],
         "target_window": summary["target_window"],

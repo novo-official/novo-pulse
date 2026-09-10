@@ -41,7 +41,7 @@ recomputed from the pooled series:
 |---|---|
 | `observed_total`, `pickup_*d`, velocity, acceleration | read off the pooled `(pair × days_to_checkin)` tensor — sum of sums, never a mean of member values |
 | `city_hist_std/p75/p90`, `city_volatility`, `city_weekend_ratio`, `max_daily_search` | recomputed from the cluster's own daily total. A cluster of five bursty cities can pool *smoother* (bursts land on different days) or *burstier* (Nowruz hits all of them at once); neither is the average of the members |
-| `market_*` | untouched — already national |
+| `market_*` | untouched — already in-panel |
 | `province_*` | untouched — clusters never cross a province, so province totals are bit-identical at every level (`test_market_and_province_blocks_are_untouched_by_clustering`) |
 | `lat` / `long` | volume-weighted centroid of the members (the brief's population weighting is unavailable; search volume is the closest proxy the data contains) |
 | `city_code` | becomes `cluster_code` = the smallest member's city code |
@@ -67,7 +67,7 @@ family of partitions.
 
 Two guards:
 
-* **Hubs are protected.** A city holding ≥ 0.1 % of national demand (66 of 321)
+* **Hubs are protected.** A city holding ≥ 0.1 % of in-panel demand (66 of 321)
   is never merged. Pooling a hub cancels large errors and flatters WAPE without
   being justifiable as sparsity handling — precisely what "excessive aggregation
   is penalised" is aimed at.
@@ -177,8 +177,8 @@ the bug fixed the effect is what it should be: only ever the effect on the
 cities the partition actually pools.
 
 The blend is scored at **full city grain — 321 rows, no aggregation penalty at
-all**, so it only has to be better, not better by a margin that pays for
-conceded rows.
+all**. Following the jury audit, it must improve WAPE by **more than 1% relative**
+to qualify. This practical margin is not a statistical significance test.
 
 | | WAPE | 2024-11-21 | 2025-08-21 | 2025-10-22 |
 |---|---:|---:|---:|---:|
@@ -186,9 +186,11 @@ conceded rows.
 | **+ shrinkage** (`h=0.86`, `k=10⁴`) | **0.120096** | 0.125852 | 0.118966 | 0.118323 |
 
 Better on **3 of 3 folds**, by 0.06 % relative. Consistent, free, and far too
-small to call a result. It is written as `results_blended.csv` and selected as
-the shipped arm on the stated rule, but the honest summary is *no meaningful
-difference*.
+small to call a result. The historical `results_blended.csv` is retained as an
+experiment. **It is rejected by the current margin rule**; `results_selected.csv`
+now copies the city arm. The city and clustered source bundles have been rebuilt
+and verified through reload parity. A future eligible blend persists its own
+source bundle and `blend_clusters.csv`.
 
 ---
 

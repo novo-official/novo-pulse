@@ -15,6 +15,8 @@ MANAGE := $(PY) backend/manage.py
 PROFILE ?= demo
 HORIZON ?= 90
 METRIC  ?= wape
+JURY_RUN_DIR ?= artifacts/pol4_jury_reproduction
+HISTORY_RUN_DIR ?= artifacts/pol4_history66_reproduction
 
 .DEFAULT_GOAL := help
 .PHONY: help venv install install-optional migrate train dev \
@@ -75,6 +77,35 @@ pol4-predict-calibrated: ## Pol 4: predict with guarded calibration
 
 test-pol4: ## Run only the Pol 4 test suite
 	$(PY) -m pytest backend/tests -q -k pol4
+
+.PHONY: install-locked pol4-jury pol4-jury-experiments pol4-recover-trainset pol4-uncertainty test-jury-ui pol4-pitch pol4-event-study pol4-history-ablation
+install-locked: venv ## Install the validated Linux/Python environment snapshot
+	$(PIP) install -r requirements.lock
+
+pol4-jury: ## Generate verified evidence and the destination review queue
+	PYTHONPATH=backend $(PY) -m ml.pol4.jury
+
+pol4-jury-experiments: ## Run six audit challengers on the same five city-level folds
+	PYTHONPATH=backend $(PY) -m ml.pol4.jury_experiments --output $(JURY_RUN_DIR)
+
+pol4-recover-trainset: ## Rebuild the champion trainset and compare original hashes
+	$(PY) scripts/recover_pol4_trainset.py
+
+pol4-uncertainty: ## Evaluate experimental residual bands on completed challenger OOF folds
+	PYTHONPATH=backend $(PY) -m ml.pol4.uncertainty
+
+pol4-history-ablation: ## Direct 66-feature history audit on the original five cutoffs
+	PYTHONPATH=backend $(PY) -m ml.pol4.jury_experiments --arms champion66 --output $(HISTORY_RUN_DIR)/champion
+	PYTHONPATH=backend $(PY) -m ml.pol4.jury_experiments --arms origin66 --output $(HISTORY_RUN_DIR)/origin
+
+pol4-event-study: ## Descriptive shock-window and seasonality diagnostic
+	$(PY) scripts/pol4_event_study.py
+
+pol4-pitch: pol4-jury ## Generate the offline seven-minute pitch with Q&A appendix
+	$(PY) scripts/build_pol4_pitch.py
+
+test-jury-ui: ## Browser checks for the dashboard and evidence room (servers running)
+	cd frontend && node e2e/jury.mjs
 
 # ------------------------------------------------------------- database
 migrate: ## Apply database migrations

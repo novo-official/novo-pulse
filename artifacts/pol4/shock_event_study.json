@@ -1,0 +1,82 @@
+{
+  "event": {
+    "start": "2025-06-13",
+    "end": "2025-06-24",
+    "fold": "2025-05-21",
+    "label": "June 2025 Iran–Israel war",
+    "source": "https://dppa.un.org/en/node/101504",
+    "interpretation": "Temporal association; causal attribution is not established. Exclusion is diagnostic only."
+  },
+  "windows": {
+    "pre": [
+      "2025-05-14",
+      "2025-06-12"
+    ],
+    "during": [
+      "2025-06-13",
+      "2025-06-24"
+    ],
+    "post": [
+      "2025-06-25",
+      "2025-07-24"
+    ]
+  },
+  "summary": [
+    {
+      "clock": "checkin",
+      "period": "during",
+      "days": 12,
+      "daily_mean": 643154.9166666666,
+      "weekday_adjusted_ratio": 1.7109035382809912,
+      "matched_jalali_year_ratio": 2.2999731794029734
+    },
+    {
+      "clock": "checkin",
+      "period": "post",
+      "days": 30,
+      "daily_mean": 305194.13333333336,
+      "weekday_adjusted_ratio": 0.6959602440650879,
+      "matched_jalali_year_ratio": 1.1102662555999434
+    },
+    {
+      "clock": "checkin",
+      "period": "pre",
+      "days": 30,
+      "daily_mean": 438522.36666666664,
+      "weekday_adjusted_ratio": 1.0,
+      "matched_jalali_year_ratio": 1.332870018722044
+    },
+    {
+      "clock": "log_date",
+      "period": "during",
+      "days": 12,
+      "daily_mean": 571417.3333333334,
+      "weekday_adjusted_ratio": 1.251416624961953,
+      "matched_jalali_year_ratio": 2.104685336557424
+    },
+    {
+      "clock": "log_date",
+      "period": "post",
+      "days": 30,
+      "daily_mean": 285165.9666666667,
+      "weekday_adjusted_ratio": 0.6344724446939655,
+      "matched_jalali_year_ratio": 1.0448932685624126
+    },
+    {
+      "clock": "log_date",
+      "period": "pre",
+      "days": 30,
+      "daily_mean": 449453.6666666667,
+      "weekday_adjusted_ratio": 1.0,
+      "matched_jalali_year_ratio": 1.3879853444107733
+    }
+  ],
+  "input_sha256": "101d310dd844ec0370a9f1d5ded7ffdce379893602ad6c904ede8c2497b44b1a",
+  "daily_sha256": "b560696ee1651324c6f3325de1143be43b54db3b7e94e6cbe524eae28d1e2e8d",
+  "limitations": [
+    "Descriptive window and weekday comparisons, not causal identification",
+    "Prior-year Jalali matching does not control lunar holidays or secular growth",
+    "No clean untreated group for a broad regional shock",
+    "Diagnostic only; never a known-future model feature"
+  ]
+}

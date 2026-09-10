@@ -33,6 +33,25 @@ def _guard(builder):
 
 
 @api_view(["GET"])
+def jury(request):
+    return _guard(services.jury_evidence)
+
+
+@api_view(["GET"])
+def decision_download(request):
+    """Export the exact review queue displayed in the judge view."""
+    import pandas as pd
+    try:
+        payload = services.jury_evidence()
+    except services.ArtifactMissing as exc:
+        return no_data(str(exc), detail_fa=NOT_GENERATED_FA)
+    response = HttpResponse(pd.DataFrame(payload['decisions']).to_csv(index=False),
+                            content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="novo-pulse-decision-queue.csv"'
+    return response
+
+
+@api_view(["GET"])
 def overview(request):
     """KPI block, national daily series, top cities, provinces, pickup leaders."""
     return _guard(lambda: services.overview(request.GET.get("model")))

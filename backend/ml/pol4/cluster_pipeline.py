@@ -166,17 +166,18 @@ def select_level(
     }
 
 
-def select_blend(blends: list[dict[str, Any]], *, unclustered_wape: float) -> dict[str, Any] | None:
-    """The best shrinkage blend, if any beats the unclustered panel outright.
-
-    A blend is scored at full city grain, so it concedes no rows at all: it only
-    has to be better, not better by a margin that pays for aggregation.
-    """
-    scored = [b for b in blends if b["shrinkage"] > 0]
+def select_blend(blends: list[dict[str, Any]], *, unclustered_wape: float,
+                 min_relative_gain: float = 0.01) -> dict[str, Any] | None:
+    """Require a predeclared practical margin; this is not a significance test."""
+    if not 0 <= min_relative_gain < 1:
+        raise ValueError("min_relative_gain must be in [0, 1)")
+    if not np.isfinite(unclustered_wape) or unclustered_wape <= 0:
+        return None
+    scored = [b for b in blends if b["shrinkage"] > 0 and np.isfinite(b["pooled"]["wape"])]
     if not scored:
         return None
     best = min(scored, key=lambda b: b["pooled"]["wape"])
-    if best["pooled"]["wape"] >= unclustered_wape:
+    if best["pooled"]["wape"] >= unclustered_wape * (1 - min_relative_gain):
         return None
     return best
 
@@ -325,6 +326,16 @@ def save_arm(
     if result.bundle is None:
         raise ValueError("this arm was fitted without keep_models=True")
     manifest = result.bundle.save(directory, input_digest=input_digest)
+    # Each model owns its assignment. The experiment's top-level clusters.csv
+    # belongs to the clustered arm and must never be used to reload the city arm.
+    import hashlib
+    from .artifacts import sha256_file
+    write_clusters_csv(result.assignment, data, directory / "clusters.csv")
+    manifest["files"]["clusters.csv"] = sha256_file(directory / "clusters.csv")
+    manifest["bundle_digest"] = hashlib.sha256(
+        "\n".join(f"{name}:{manifest['files'][name]}" for name in sorted(manifest["files"])).encode()
+    ).hexdigest()
+    write_json_atomic(manifest, directory / "manifest.json")
 
     panel_data = aggregate_data(data, result.assignment)
     restored = FittedChampion.load(directory)
@@ -342,7 +353,7 @@ def save_arm(
         "panel_rows": int(len(panel_data.cities)),
         "training_rows": result.training_rows,
         "load_parity_verified": True,
-        "requires": "clusters.csv - the bundle reads a panel of virtual cities",
+        "requires": f"{directory.name}/clusters.csv - checksummed assignment for this arm",
         "top_features": importance.head(10).to_dict(orient="records"),
     }
 
@@ -426,7 +437,8 @@ def run(
             levels, min_gain=min_gain, criterion=criterion
         )
         blend_choice = select_blend(
-            sweep["blends"], unclustered_wape=selection["unclustered_wape"]
+            sweep["blends"], unclustered_wape=selection["unclustered_wape"],
+            min_relative_gain=config.blend_min_relative_gain,
         )
         chosen_height = float(selected.cut_height)
         # The best clustered candidate is always built, even when the rule
@@ -438,7 +450,9 @@ def run(
             default=None,
         )
         clustered_height = (
-            float(cut_height)
+            chosen_height
+            if chosen_height > 0
+            else float(cut_height)
             if cut_height is not None
             else float(best_clustered.cut_height)
             if best_clustered is not None
@@ -468,6 +482,8 @@ def run(
         )
     summary["selection"] = _json_ready(selection)
     summary["blend_selection"] = _json_ready(blend_choice)
+    summary["blend_policy"] = {"min_relative_gain": config.blend_min_relative_gain,
+                               "status": "eligible" if blend_choice else "rejected"}
     selected_is_identity = chosen_height <= 0.0
 
     # -- 2. the assignment at the competition cutoff ------------------------
@@ -576,8 +592,15 @@ def run(
                 spec,
                 config,
                 target_dates=target_dates,
+                keep_models=True,
             )
         )
+        write_clusters_csv(blend_assignment, data, artifacts_dir / "blend_clusters.csv")
+        summary["blend_source_bundle"] = save_arm(
+            blend_source, data, artifacts_dir / "model_bundle_blend_source",
+            input_digest=input_manifest["input_digest"], target_dates=target_dates,
+        )
+        summary["blend_source_bundle"]["requires"] = "blend_clusters.csv"
         blended = blend_panels(
             city_result, blend_source, shrinkage=float(blend_choice["shrinkage"])
         )

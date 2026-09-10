@@ -53,6 +53,10 @@ models/local_*/
 # Training datasets are local-only and must never be committed.
 artifacts/pol4/trainset/
 artifacts/pol4_cluster/trainset/
+# These small states are necessary to reload the tracked native boosters.
+!artifacts/pol4_cluster/model_bundle_city/*.joblib
+!artifacts/pol4_cluster/model_bundle_clustered/*.joblib
+!artifacts/pol4_cluster/model_bundle_blend_source/*.joblib
 
 # OS
 .DS_Store
