@@ -115,6 +115,30 @@ class Pol4Config:
     #: Quantile edges for the demand-bucket error breakdown.
     demand_bucket_quantiles: tuple[float, ...] = (0.0, 0.5, 0.75, 0.9, 0.99, 1.0)
 
+    # -- clustering ----------------------------------------------------------
+    #: A city holding at least this share of national demand is never merged.
+    #: Pooling a hub cancels large errors and flatters WAPE without being
+    #: justifiable as sparsity handling, which is exactly what the brief's
+    #: "excessive aggregation is penalised" line is aimed at. 0.1% of a
+    #: 284M-search market is ~284k searches; 60-odd cities clear it.
+    cluster_eligible_share: float = 0.001
+    #: Weight on the two geography columns inside the standardised profile,
+    #: relative to the shape blocks. 1.0 keeps geography one block among six.
+    cluster_geo_weight: float = 1.0
+    #: How many dendrogram cut heights the aggregation sweep scores. The level
+    #: is chosen from the resulting accuracy-versus-aggregation curve, not set.
+    cluster_sweep_levels: int = 6
+    #: Cutoffs for the clustering decision. The threshold is a hyper-parameter
+    #: chosen on validation performance, so one 30-day window would risk picking
+    #: whatever suited that slice; these are three windows in different seasons.
+    cluster_backtest_cutoffs: list[str] = field(
+        default_factory=lambda: ["2024-11-21", "2025-08-21", "2025-10-22"]
+    )
+    #: Shrinkage constants swept for the per-city / per-cluster blend, in units
+    #: of historical demand: a city with this much history takes half its own
+    #: prediction and half its cluster's.
+    blend_shrinkage_grid: tuple[float, ...] = (0.0, 1e3, 1e4, 1e5, 1e6, 1e7)
+
     seed: int = 42
 
     @property
