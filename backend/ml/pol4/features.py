@@ -43,6 +43,11 @@ GROUP_CALENDAR = "calendar"
 GROUP_CITY = "city"
 GROUP_MARKET = "market"
 GROUP_PROVINCE = "province"
+#: Virtual-city shape. Only meaningful once a panel row can hold more than
+#: one city, so it lives outside GROUP_ORDER and the ablation ladder that
+#: selected the champion - adding it there would silently change the model
+#: every saved bundle was fitted with.
+GROUP_CLUSTER = "cluster"
 
 GROUP_ORDER = (
     GROUP_BASE,
@@ -56,7 +61,21 @@ GROUP_ORDER = (
     GROUP_PROVINCE,
 )
 
+#: The clustered arm's feature set: the champion's 66, unchanged and in the same
+#: order, plus the three columns that describe the row's own composition. A
+#: singleton row carries n=1, its own volume and a share of 1.0, so both arms
+#: are trained on an identical schema and any WAPE difference between them is
+#: attributable to the partition rather than to the feature set.
+CLUSTER_GROUP_ORDER = GROUP_ORDER + (GROUP_CLUSTER,)
+
 CATEGORICAL = ("city_code", "province_code")
+
+#: Columns `aggregate.py` writes onto the virtual-city table.
+CLUSTER_FEATURES = (
+    "n_cities_in_cluster",
+    "cluster_min_member_volume",
+    "cluster_max_member_share",
+)
 
 
 @dataclass
@@ -392,6 +411,17 @@ class FeatureBuilder:
             columns["city_share_of_province"] = observed / (
                 columns["province_observed_total"] + EPS
             )
+        if GROUP_CLUSTER in groups:
+            table = self.data.cities.set_index(CITY)
+            missing = [name for name in CLUSTER_FEATURES if name not in table.columns]
+            if missing:
+                raise ValueError(
+                    "the cluster feature group needs a panel built by "
+                    f"aggregate.aggregate_data; missing column(s): {missing}"
+                )
+            block = table.reindex(cities)
+            for name in CLUSTER_FEATURES:
+                columns[name] = block[name].to_numpy(dtype=np.float64)
 
         # Keys are deliberately NOT attached here: `city_code` is also a
         # feature, and the caller owns the mapping from row to pair.
@@ -460,4 +490,6 @@ def feature_names(groups: tuple[str, ...]) -> list[str]:
         names += [f"province_pickup_velocity_{w}d" for w in (3, 7, 14)]
         names += [f"province_pickup_acceleration_{w}d" for w in (3, 7)]
         names += ["city_share_of_province"]
+    if GROUP_CLUSTER in groups:
+        names += list(CLUSTER_FEATURES)
     return names

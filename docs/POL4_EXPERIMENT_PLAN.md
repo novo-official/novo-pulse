@@ -111,10 +111,15 @@ rewards. The platform's L2-on-log1p targeted a conditional mean and then
 under-shot on inverse transform. Same transform, opposite outcome, because the
 objective and the target changed.
 
-**E7 (clustering) was not run and is not needed.** The global model already
-carries `city_code` as a categorical, which shares information across cities
-with no aggregation penalty. Clustering would have to beat 0.1618 by enough to
-pay the brief's penalty; nothing in these results suggests it would.
+**E7 (clustering) has since been run in full — see `POL4_CLUSTERING.md`.** The
+prediction held, and now has evidence behind it rather than an argument. The
+aggregation level was swept over six dendrogram cut heights across three
+windows, rebuilding the panel and retraining at each. Clustering to 110 rows
+looks like a 2.05% relative gain; scoring the *city model's own predictions*
+on those same 110 rows already recovers 90% of it, because merging rows lets
+offsetting errors cancel before the absolute value is taken. The part that had
+to be earned by fitting on the pooled series is **0.2% relative**, and it is
+negative at every other level. Submission stays unclustered.
 
 **Horizon splitting (the plan's "one model or several?" question) was decided on
 the seasonal analogue, not on pooled WAPE alone.** Every split beats the single
@@ -239,7 +244,13 @@ are pure loss under WAPE.
 Also enforce `predicted ≥ 0` and integrality.
 **Expected:** small but free; also a credibility point in the report. **Size:** XS.
 
-### E7 — City sharing / clustering
+### E7 — City sharing / clustering  ·  **RUN 2026-09-10 → rejected on evidence**
+> Outcome: `docs/POL4_CLUSTERING.md`, `artifacts/pol4_cluster/`. Variant (c) was
+> built as a data-aggregation step so that (a) and (c) share one pipeline, swept
+> over six levels x three windows, and scored at the submission grain. Modelling
+> gain 0.2% relative at its best level, negative elsewhere. Decision rule below
+> was not met; `cluster_code = city_code` stands.
+
 **Question:** does explicit clustering beat a single global model with `city_code` as a
 categorical feature?
 **Why it must be tested, not assumed:** the brief penalises aggregation, so clustering must
@@ -281,7 +292,7 @@ noisy.
 |---|---|
 | Deep learning (NHITS / NBEATSx / Chronos) | 163k tabular rows with a 60-day window. No evidence a sequence model helps; large time cost; the repo's own tree models already train in 47 s. Revisit only if E4 plateaus with days to spare. |
 | Hyper-parameter search (Optuna) | Last thing, if at all. Formulation is worth ~29% relative WAPE; hyper-parameters are worth low single digits. |
-| Clustering as a headline feature | Penalised by the brief, and the global-model-plus-categorical already shares information for free. |
+| Clustering as a headline feature | Penalised by the brief, and the global-model-plus-categorical already shares information for free. **Measured 2026-09-10** rather than assumed: `docs/POL4_CLUSTERING.md`. |
 | Any user / property / price / capacity modelling | The data does not contain it. See `POL4_PRODUCT_REVIEW.md`. |
 
 ---
@@ -321,7 +332,7 @@ noisy.
 - [ ] No duplicates, no NaN, no ±inf, no negatives, `predicted ≥ observed_so_far`.
 - [ ] Sanity: national total in the same order of magnitude as the pickup-projected
       **7,948,595** (Azar 1403 actual over the analogous window was 6,787,514).
-- [ ] `clusters.csv` **not** emitted (no clustering used).
+- [ ] `clusters.csv` **not** emitted (no clustering used — E7 measured and rejected).
 
 ---
 

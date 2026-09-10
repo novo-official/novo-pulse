@@ -33,10 +33,20 @@ no way to express a forecast that is already half-observed.
     experiments the ablation harness that decided all of the above
     stability   D-30 -> D-1 forecast snapshots
     submission  the 9,630-row grid, results.csv, and a loud validator
+
+The clustered arm sits alongside it and reuses all of the above:
+
+    clustering  train-only demand-shape dendrograms; membership only
+    aggregate   a mapping -> a Pol4Data of virtual cities, so every module
+                above runs on a clustered panel without being modified
+    cluster_experiment  the aggregation level as a swept parameter
+    cluster_pipeline    sweep, select, and write a clustered submission
 """
+from .aggregate import aggregate_data
 from .baseline import PickupBaseline
 from .calibration import Calibrator
 from .champion import ChampionSpec, FittedChampion
+from .clustering import ClusterAssignment, ClusterPlan, identity_assignment
 from .config import Pol4Config
 from .loader import Pol4Data, load_pol4
 from .pickup import PickupCurves
@@ -45,13 +55,17 @@ from .submission import SubmissionError, build_submission, validate_submission
 __all__ = [
     "Calibrator",
     "ChampionSpec",
+    "ClusterAssignment",
+    "ClusterPlan",
     "FittedChampion",
     "Pol4Config",
     "Pol4Data",
     "PickupBaseline",
     "PickupCurves",
     "SubmissionError",
+    "aggregate_data",
     "build_submission",
+    "identity_assignment",
     "load_pol4",
     "validate_submission",
 ]

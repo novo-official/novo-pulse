@@ -21,6 +21,7 @@ METRIC  ?= wape
         backend frontend frontend-install test test-backend test-frontend lint report \
         clean download-models docker-up docker-down check profile validate audit e2e \
         pol4 pol4-baseline pol4-ablation pol4-submission pol4-predict \
+        pol4-cluster pol4-cluster-quick \
         pol4-predict-raw pol4-predict-calibrated test-pol4
 
 help: ## Show this help
@@ -57,6 +58,12 @@ pol4-ablation: ## Pol 4: rerun the full feature ladder and rewrite experiments.c
 
 pol4-submission: ## Pol 4: skip the backtest, just regenerate results.csv
 	PYTHONPATH=backend $(PY) -m ml.pol4.pipeline --skip-backtest --skip-stability
+
+pol4-cluster: ## Pol 4: sweep the aggregation level, then write a clustered submission
+	PYTHONPATH=backend $(PY) -m ml.pol4.cluster_pipeline --levels 6
+
+pol4-cluster-quick: ## Pol 4: the same sweep on one window, for a smoke test
+	PYTHONPATH=backend $(PY) -m ml.pol4.cluster_pipeline --levels 3 --cutoffs 2025-10-22 --trees 200
 
 pol4-predict: pol4-predict-calibrated ## Pol 4: predict with the selected calibrated variant
 

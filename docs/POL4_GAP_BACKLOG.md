@@ -62,7 +62,7 @@ against the baseline.
 | E-04 | WAPE by demand bucket / high-demand slice | ❌ | ✅ | `backtest_metrics_phase2.json` → `high_demand`, `by_demand_bucket` |
 | ST-01 | Forecast stability D-30 → D-1 | ❌ | ✅ | `ml/pol4/stability.py`, `artifacts/pol4/stability.parquet` |
 | T-01 | `pickup_surprise` / velocity / acceleration | ❌ | ✅ | `ml/pol4/features.py` |
-| E7 | Clustering | — | ✅ still **not used** | global model + `city_code` categorical shares information with no aggregation penalty |
+| E7 | Clustering | — | ✅ built, swept, **rejected on evidence** | modelling gain 0.2% relative at its best level (110 rows); 90% of the apparent 2.05% is metric mechanics — `docs/POL4_CLUSTERING.md`, `artifacts/pol4_cluster/` |
 | E9 | Ensemble | — | ✅ tested, **rejected** | leave-one-fold-out alpha = 1.0 on 4 of 5 folds; blend 0.1623 vs model 0.1618 |
 | — | Feature ablation | ❌ | ✅ | nine-stage ladder, `artifacts/pol4/experiments.csv` |
 
@@ -126,7 +126,7 @@ across folds (0.82 to 1.15) — a regime effect, not a fixed offset.
 | ST-01 | Stability | Snapshot machinery D-30 → D-1 | ❌ | absent | — | — | Mentor's named differentiator | Build snapshots + revision metrics | P2 |
 | T-01 | Trends | `pickup_ratio` = recent ÷ expected | ❌ | absent | — | — | Emerging-demand chart impossible | Compute from the curves | P2 |
 | T-02 | Trends | Anomaly detection is genuine | ✅ | robust MAD, phase-aware peaks | `ml/anomaly/detector.py` | — | — | Keep; relabel toward pickup | — |
-| C-01 | Clustering | City sharing via global model + city categorical | ✅ | `ent_entity`, `ent_destination` categoricals | `ml/features/engineering.py` `_encode_static` | — | Correct choice — no aggregation penalty | Keep; **do not cluster** unless it measurably wins | — |
+| C-01 | Clustering | City sharing via global model + city categorical | ✅ | `ent_entity`, `ent_destination` categoricals | `ml/features/engineering.py` `_encode_static` | — | Correct choice — no aggregation penalty | Kept; clustering was measured (`ml/pol4/clustering.py`, `aggregate.py`) and did not win | — |
 | D-01 | Data | 321 cities / 3,298,564 rows / no dupes / no impossible dates | ✅ | verified against the archive | — | — | — | — | — |
 | D-02 | Data | Pol 4 ingestible without manual work | 🔴 | I had to pre-aggregate by hand | `ml/data/adapter.py` | Adapter cannot collapse a log-level file into a check-in target | Violates "runs without modification" | Add a Pol 4 loader | P1 |
 | D-03 | Data | Missing row = zero **so far**, not final zero | ⚠️ | `_regular_grid` fills gaps with 0 | `adapter.py:487-529` | Correct for history, wrong if applied to Azar | Would zero out 4,282 target pairs | Never grid-fill the target window | **P0** |

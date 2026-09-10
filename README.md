@@ -363,6 +363,17 @@ Artefacts land in `artifacts/pol4/`:
 | `experiment_summary.json` | the same with per-fold detail and the rejections |
 | `feature_importance.json` | the champion's gain importance, all 66 features |
 | `stability.parquet` | D-30 → D-1 forecast snapshots for a historical window |
+
+The clustering experiment writes to `artifacts/pol4_cluster/` instead, so it
+cannot overwrite a file the submission depends on:
+
+| File | What it is |
+|---|---|
+| `cluster_sweep.csv` | the accuracy-versus-aggregation curve: WAPE per level, per fold, with the mechanical/modelling split |
+| `blend_sweep.csv` | six cut heights x six shrinkage constants, scored at city grain |
+| `clusters.csv` | `city_code -> cluster_code` membership at the best clustered level |
+| `trainset/` | the aggregated dataset: 901,648 rows x 69 features over 109 virtual cities (local-only) |
+| `results_city.csv` / `results_clustered.csv` / `results_blended.csv` | the three arms, each validated |
 | `pickup_curves.parquet` | the fitted completion curves (global, province, city) |
 | `input_manifest.json` | paths, schemas and SHA-256 hashes for the four raw inputs |
 | `trainset/` | reusable features, target and audit metadata as checksummed Parquet |
@@ -487,7 +498,7 @@ Recording what did not work matters as much as what did.
 | Scaling the *total* rather than the remainder | 0.2200 → 0.2426 | **rejected** |
 | CatBoost (MAE) on the same features | 0.1835, and slower | **rejected** |
 | Model / baseline ensemble | 0.1623 vs 0.1618 alone | **rejected** |
-| Clustering | not run — no aggregation penalty to pay | **not needed** |
+| Clustering (aggregation level swept, 3 windows) | best level 0.1177 vs 0.1202, but 90% of that is the metric being kinder to coarser rows; modelling gain 0.2% relative | **rejected on evidence** |
 
 Calibration removes bias (-0.150 → -0.120) and does not improve WAPE. The
 reason is that under a sum-of-absolute-errors metric on a heavy-tailed target
@@ -581,10 +592,18 @@ re-runs the whole pipeline, and requires every prediction to be unchanged.
 
 ### What this deliberately does not do
 
-No clustering (`cluster_code = city_code` - the brief penalises aggregation and
-a global model with `city_code` as a categorical already shares information for
-free), no deep learning, no frontend changes yet. Each would have to beat 0.1618
-on these five folds to earn its place.
+No clustering in the submission (`cluster_code = city_code`). That is now a
+measured decision, not an argument: `make pol4-cluster` builds clustering as a
+data-aggregation step - sparse cities collapse into virtual cities that the
+*unmodified* feature and training pipeline consumes - and sweeps the aggregation
+level over six dendrogram cut heights across three windows. Pooling to 110 rows
+looks 2.05% better; scoring the city model's own predictions on those same 110
+rows recovers 90% of it, because merging rows lets offsetting errors cancel.
+Full write-up and the accuracy-versus-aggregation curve:
+[`docs/POL4_CLUSTERING.md`](docs/POL4_CLUSTERING.md).
+
+No deep learning, no frontend changes yet. Each would have to beat 0.1618 on
+these five folds to earn its place.
 
 ---
 

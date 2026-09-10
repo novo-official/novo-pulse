@@ -52,6 +52,7 @@ models/local_*/
 !artifacts/pol4/**
 # Training datasets are local-only and must never be committed.
 artifacts/pol4/trainset/
+artifacts/pol4_cluster/trainset/
 
 # OS
 .DS_Store
