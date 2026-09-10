@@ -28,6 +28,21 @@ _CACHE: dict[str, tuple[float, Any]] = {}
 
 CONFIG = Pol4Config()
 
+MODEL_VARIANTS = {
+    "raw": {
+        "file": "results_raw_named.csv",
+        "score_key": "champion_raw",
+        "label": "Raw LightGBM",
+        "calibration": "none",
+    },
+    "calibrated": {
+        "file": "results_calibrated_named.csv",
+        "score_key": "champion",
+        "label": "Calibrated LightGBM",
+        "calibration": "guarded_bias_horizon",
+    },
+}
+
 
 class ArtifactMissing(FileNotFoundError):
     """An artefact the dashboard needs has not been generated yet."""
@@ -73,9 +88,24 @@ def _csv(name: str) -> pd.DataFrame:
 
 
 # ------------------------------------------------------------------ readers
-def forecast() -> pd.DataFrame:
+def normalise_model(model: str | None = None) -> str:
+    selected = (model or "calibrated").strip().lower()
+    if selected not in MODEL_VARIANTS:
+        raise LookupError(
+            f"Unknown model '{model}'. Choose one of: {', '.join(MODEL_VARIANTS)}"
+        )
+    return selected
+
+
+def forecast(model: str | None = None) -> pd.DataFrame:
     """The submission, with names: one row per (city, Azar check-in)."""
-    frame = _csv("results_named.csv").copy()
+    selected = normalise_model(model)
+    file_name = MODEL_VARIANTS[selected]["file"]
+    # Older pipeline runs only wrote results_named.csv. Keep the calibrated
+    # endpoint backwards compatible, but never silently substitute it for raw.
+    if selected == "calibrated" and not (artifacts_dir() / file_name).exists():
+        file_name = "results_named.csv"
+    frame = _csv(file_name).copy()
     frame["checkin"] = pd.to_datetime(frame["checkin"])
     return frame
 
@@ -153,9 +183,9 @@ class CityRef:
     province: str
 
 
-def city_index() -> pd.DataFrame:
+def city_index(model: str | None = None) -> pd.DataFrame:
     """Every city with its forecast totals - the selector's data source."""
-    frame = forecast()
+    frame = forecast(model)
     grouped = frame.groupby(["city_code", "city", "province"], as_index=False).agg(
         predicted_demand=("predicted_demand", "sum"),
         observed_so_far=("observed_so_far", "sum"),
@@ -166,13 +196,13 @@ def city_index() -> pd.DataFrame:
     return grouped.sort_values("predicted_demand", ascending=False, ignore_index=True)
 
 
-def resolve_city(identifier: str | int) -> CityRef:
+def resolve_city(identifier: str | int, model: str | None = None) -> CityRef:
     """Accept a city_code or a name, and return the canonical reference.
 
     The competition identifier is the code; the name is a display convenience,
     so both resolve here rather than the UI having to know which it holds.
     """
-    index = city_index()
+    index = city_index(model)
     text = str(identifier).strip()
     match = index[index["city_code"].astype(str) == text]
     if match.empty:
@@ -183,9 +213,9 @@ def resolve_city(identifier: str | int) -> CityRef:
     return CityRef(int(row["city_code"]), str(row["city"]), str(row["province"]))
 
 
-def national_series() -> list[dict[str, Any]]:
+def national_series(model: str | None = None) -> list[dict[str, Any]]:
     """Total demand per Azar check-in date, split observed vs remaining."""
-    frame = forecast()
+    frame = forecast(model)
     daily = frame.groupby("checkin", as_index=False).agg(
         predicted_demand=("predicted_demand", "sum"),
         observed_so_far=("observed_so_far", "sum"),
@@ -195,13 +225,14 @@ def national_series() -> list[dict[str, Any]]:
     return records(daily)
 
 
-def overview() -> dict[str, Any]:
+def overview(model: str | None = None) -> dict[str, Any]:
     """The KPI block and the headline series, all from generated artefacts."""
-    frame = forecast()
-    series = national_series()
-    cities = city_index()
+    selected = normalise_model(model)
+    frame = forecast(selected)
+    series = national_series(selected)
+    cities = city_index(selected)
     summary = run_summary()
-    scores = backtest()["champion"]
+    scores = backtest()[MODEL_VARIANTS[selected]["score_key"]]
 
     peak = max(series, key=lambda row: row["predicted_demand"])
     top_city = cities.iloc[0]
@@ -232,7 +263,7 @@ def overview() -> dict[str, Any]:
         },
         "series": series,
         "top_cities": records(cities.head(20).round(3)),
-        "provinces": provinces(),
+        "provinces": _province_breakdown(frame),
         "momentum": _momentum_leaders(),
     }
 
@@ -245,10 +276,10 @@ def _momentum_leaders(limit: int = 10) -> list[dict[str, Any]]:
     return records(frame.sort_values("pickup_ratio", ascending=False).head(limit).round(3))
 
 
-def heatmap(top_n: int = 20) -> dict[str, Any]:
+def heatmap(top_n: int = 20, model: str | None = None) -> dict[str, Any]:
     """City x date matrix for the top `top_n` cities by predicted demand."""
-    frame = forecast()
-    cities = city_index().head(top_n)["city_code"].tolist()
+    frame = forecast(model)
+    cities = city_index(model).head(top_n)["city_code"].tolist()
     subset = frame[frame["city_code"].isin(cities)]
     pivot = subset.pivot_table(
         index=["city_code", "city", "province"],
@@ -276,9 +307,11 @@ def heatmap(top_n: int = 20) -> dict[str, Any]:
     }
 
 
-def city_detail(identifier: str | int, history_days: int = 90) -> dict[str, Any]:
-    ref = resolve_city(identifier)
-    frame = forecast()
+def city_detail(
+    identifier: str | int, history_days: int = 90, model: str | None = None
+) -> dict[str, Any]:
+    ref = resolve_city(identifier, model)
+    frame = forecast(model)
     rows = frame[frame["city_code"] == ref.city_code].sort_values("checkin")
 
     series = rows[
@@ -320,15 +353,17 @@ def city_detail(identifier: str | int, history_days: int = 90) -> dict[str, Any]
     }
 
 
-def city_pickup(identifier: str | int, checkin: str | None = None) -> dict[str, Any]:
+def city_pickup(
+    identifier: str | int, checkin: str | None = None, model: str | None = None
+) -> dict[str, Any]:
     """The pickup chart: what has arrived so far against what usually would.
 
     `expected_cumulative` is this city's own historical completion curve scaled
     to the predicted final demand - the shape history says the accumulation
     normally takes, not a second forecast.
     """
-    ref = resolve_city(identifier)
-    frame = forecast()
+    ref = resolve_city(identifier, model)
+    frame = forecast(model)
     rows = frame[frame["city_code"] == ref.city_code]
     if rows.empty:
         raise LookupError(f"No forecast for city {ref.city_code}")
@@ -489,4 +524,187 @@ def model_performance() -> dict[str, Any]:
         "feature_importance": feature_importance()[:20],
         "experiments": experiments()["experiments"],
         "config": scores["config"],
+    }
+
+
+def _province_breakdown(frame: pd.DataFrame) -> list[dict[str, Any]]:
+    grouped = frame.groupby("province", as_index=False).agg(
+        predicted_demand=("predicted_demand", "sum"),
+        observed_so_far=("observed_so_far", "sum"),
+        predicted_remaining=("predicted_remaining", "sum"),
+        cities=("city_code", "nunique"),
+    )
+    total = max(float(grouped["predicted_demand"].sum()), 1.0)
+    grouped["share"] = grouped["predicted_demand"] / total
+    return records(grouped.sort_values("predicted_demand", ascending=False).round(4))
+
+
+def dashboard(model: str | None = None) -> dict[str, Any]:
+    """One payload for the decision dashboard.
+
+    Forecast-dependent charts all read the selected model variant. Historical
+    pickup and stability artefacts are deliberately model-independent and are
+    labelled as such by the client. Keeping the joins here makes the browser a
+    presentation layer rather than a second analytics implementation.
+    """
+    selected = normalise_model(model)
+    frame = forecast(selected)
+    score_book = backtest()
+    selected_scores = score_book[MODEL_VARIANTS[selected]["score_key"]]
+    baseline_scores = score_book["baseline"]
+    summary = run_summary()
+
+    daily = frame.groupby("checkin", as_index=False).agg(
+        predicted_demand=("predicted_demand", "sum"),
+        observed_so_far=("observed_so_far", "sum"),
+        predicted_remaining=("predicted_remaining", "sum"),
+    )
+    daily_mean = float(daily["predicted_demand"].mean())
+    lower, upper = daily["predicted_demand"].quantile([0.2, 0.8]).tolist()
+    daily["deviation_from_mean"] = (
+        daily["predicted_demand"] / max(daily_mean, 1.0) - 1
+    )
+    daily["demand_band"] = np.where(
+        daily["predicted_demand"] >= upper,
+        "high",
+        np.where(daily["predicted_demand"] <= lower, "low", "normal"),
+    )
+    daily["checkin"] = _iso(daily["checkin"])
+
+    cities = city_index(selected).copy()
+    total_demand = max(float(cities["predicted_demand"].sum()), 1.0)
+    cities["share"] = cities["predicted_demand"] / total_demand
+    cities["cumulative_share"] = cities["share"].cumsum()
+    cities["observed_share"] = cities["observed_so_far"] / cities[
+        "predicted_demand"
+    ].clip(lower=1)
+    cities["remaining_share"] = cities["predicted_remaining"] / cities[
+        "predicted_demand"
+    ].clip(lower=1)
+
+    history = city_history()
+    history_stats = history.groupby("city_code", as_index=False).agg(
+        historical_mean=("demand", "mean"),
+        historical_std=("demand", "std"),
+    )
+    history_stats["historical_cv"] = history_stats["historical_std"] / history_stats[
+        "historical_mean"
+    ].clip(lower=1)
+    cities = cities.merge(
+        history_stats[["city_code", "historical_mean", "historical_cv"]],
+        on="city_code",
+        how="left",
+    )
+
+    raw_daily = forecast("raw").groupby("checkin", as_index=False)[
+        "predicted_demand"
+    ].sum()
+    calibrated_daily = forecast("calibrated").groupby("checkin", as_index=False)[
+        "predicted_demand"
+    ].sum()
+    comparison_daily = raw_daily.merge(
+        calibrated_daily,
+        on="checkin",
+        suffixes=("_raw", "_calibrated"),
+    )
+    comparison_daily["delta"] = (
+        comparison_daily["predicted_demand_calibrated"]
+        - comparison_daily["predicted_demand_raw"]
+    )
+    comparison_daily["checkin"] = _iso(comparison_daily["checkin"])
+
+    raw_scores = score_book["champion_raw"]["pooled"]
+    calibrated_scores = score_book["champion"]["pooled"]
+    models = [
+        {
+            "key": key,
+            "label": variant["label"],
+            "calibration": variant["calibration"],
+            "wape": float(
+                raw_scores["wape"] if key == "raw" else calibrated_scores["wape"]
+            ),
+            "normalised_bias": float(
+                raw_scores["normalised_bias"]
+                if key == "raw"
+                else calibrated_scores["normalised_bias"]
+            ),
+            "forecast_total": int(forecast(key)["predicted_demand"].sum()),
+        }
+        for key, variant in MODEL_VARIANTS.items()
+    ]
+
+    horizon_bins = [0, 3, 7, 14, 21, 30]
+    horizon_labels = ["1-3", "4-7", "8-14", "15-21", "22-30"]
+    target = frame.copy()
+    target["horizon"] = (
+        target["checkin"] - pd.Timestamp(summary["cutoff"])
+    ).dt.days
+    target["bucket"] = pd.cut(
+        target["horizon"], bins=horizon_bins, labels=horizon_labels, include_lowest=True
+    )
+    observed_by_horizon = target.groupby("bucket", observed=False).agg(
+        observed=("observed_so_far", "sum"), total=("predicted_demand", "sum")
+    )
+    observed_shares = {
+        str(key): float(row["observed"] / max(row["total"], 1))
+        for key, row in observed_by_horizon.iterrows()
+    }
+    lead_time = [
+        {**row, "observed_share": observed_shares.get(str(row["key"]), 0.0)}
+        for row in selected_scores["by_horizon_bucket"]
+    ]
+
+    folds = [
+        {
+            "cutoff": cutoff,
+            "model_wape": values["wape"],
+            "model_bias": values["normalised_bias"],
+            "baseline_wape": baseline_scores["folds"][cutoff]["wape"],
+        }
+        for cutoff, values in selected_scores["folds"].items()
+    ]
+    high_demand = [
+        {"key": key, **value}
+        for key, value in selected_scores["high_demand"].items()
+    ]
+
+    peak = daily.loc[daily["predicted_demand"].idxmax()]
+    trough = daily.loc[daily["predicted_demand"].idxmin()]
+    selected_model = next(item for item in models if item["key"] == selected)
+    thresholds = {
+        "demand_median": float(cities["predicted_demand"].median()),
+        "pickup_median": float(cities["pickup_ratio"].dropna().median()),
+        "remaining_share_median": float(cities["remaining_share"].median()),
+    }
+
+    return {
+        "selected_model": selected,
+        "models": models,
+        "cutoff": summary["cutoff"],
+        "target_window": summary["target_window"],
+        "summary": {
+            **selected_model,
+            "observed_so_far": int(frame["observed_so_far"].sum()),
+            "predicted_remaining": int(frame["predicted_remaining"].sum()),
+            "baseline_wape": float(baseline_scores["pooled"]["wape"]),
+            "peak_date": peak["checkin"],
+            "peak_demand": int(peak["predicted_demand"]),
+            "peak_deviation": float(peak["deviation_from_mean"]),
+            "low_date": trough["checkin"],
+            "low_demand": int(trough["predicted_demand"]),
+            "low_deviation": float(trough["deviation_from_mean"]),
+            "cities": int(frame["city_code"].nunique()),
+            "dates": int(frame["checkin"].nunique()),
+        },
+        "national_series": records(daily.round(4)),
+        "model_comparison": records(comparison_daily.round(4)),
+        "cities": records(cities.round(4)),
+        "provinces": _province_breakdown(frame),
+        "heatmap": heatmap(321, selected),
+        "thresholds": thresholds,
+        "lead_time": lead_time,
+        "demand_buckets": selected_scores["by_demand_bucket"],
+        "high_demand": high_demand,
+        "folds": folds,
+        "stability": summary.get("stability", {}),
     }

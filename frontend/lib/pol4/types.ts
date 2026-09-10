@@ -177,3 +177,73 @@ export interface ReportPreview {
   columns: string[];
   preview: Record<string, unknown>[];
 }
+
+export type ModelVariant = 'raw' | 'calibrated';
+
+export interface DashboardModel {
+  key: ModelVariant;
+  label: string;
+  calibration: string;
+  wape: number;
+  normalised_bias: number;
+  forecast_total: number;
+}
+
+export interface DashboardCity extends CityRow {
+  share: number;
+  cumulative_share: number;
+  observed_share: number;
+  remaining_share: number;
+  historical_mean: number | null;
+  historical_cv: number | null;
+}
+
+export interface DashboardDay extends DayPoint {
+  deviation_from_mean: number;
+  demand_band: 'high' | 'normal' | 'low';
+}
+
+export interface Dashboard {
+  selected_model: ModelVariant;
+  models: DashboardModel[];
+  cutoff: string;
+  target_window: [string, string];
+  summary: DashboardModel & {
+    observed_so_far: number;
+    predicted_remaining: number;
+    baseline_wape: number;
+    peak_date: string;
+    peak_demand: number;
+    peak_deviation: number;
+    low_date: string;
+    low_demand: number;
+    low_deviation: number;
+    cities: number;
+    dates: number;
+  };
+  national_series: DashboardDay[];
+  model_comparison: {
+    checkin: string;
+    predicted_demand_raw: number;
+    predicted_demand_calibrated: number;
+    delta: number;
+  }[];
+  cities: DashboardCity[];
+  provinces: ProvinceRow[];
+  heatmap: Heatmap;
+  thresholds: {
+    demand_median: number;
+    pickup_median: number;
+    remaining_share_median: number;
+  };
+  lead_time: (Segment & { observed_share: number })[];
+  demand_buckets: Segment[];
+  high_demand: Segment[];
+  folds: {
+    cutoff: string;
+    model_wape: number;
+    model_bias: number;
+    baseline_wape: number;
+  }[];
+  stability: Stability['aggregate'] & Record<string, unknown>;
+}

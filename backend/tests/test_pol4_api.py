@@ -80,6 +80,25 @@ def test_overview_reports_a_real_peak_date(client, results):
     assert kpis["peak_demand"] == int(by_date.max())
 
 
+def test_dashboard_switches_the_forecast_and_the_validation_metrics(client):
+    raw = client.get(reverse("pol4-dashboard"), {"model": "raw"}).json()["data"]
+    calibrated = client.get(
+        reverse("pol4-dashboard"), {"model": "calibrated"}
+    ).json()["data"]
+
+    assert raw["selected_model"] == "raw"
+    assert calibrated["selected_model"] == "calibrated"
+    assert raw["summary"]["forecast_total"] != calibrated["summary"]["forecast_total"]
+    assert raw["summary"]["wape"] != calibrated["summary"]["wape"]
+    assert len(raw["national_series"]) == len(calibrated["national_series"]) == 30
+    assert len(raw["heatmap"]["rows"]) == 321
+
+
+def test_dashboard_rejects_an_unknown_model(client):
+    response = client.get(reverse("pol4-dashboard"), {"model": "invented"})
+    assert response.status_code == 404
+
+
 # ------------------------------------------------------------------ cities
 def test_every_city_is_listed_with_a_name(client):
     cities = client.get(reverse("pol4-cities")).json()["data"]["cities"]

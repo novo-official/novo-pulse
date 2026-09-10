@@ -4,6 +4,7 @@ import { getEnvelope } from '@/lib/api/client';
 import type {
   CityDetail,
   CityRow,
+  Dashboard,
   Heatmap,
   ModelPerformance,
   Overview,
@@ -11,11 +12,14 @@ import type {
   ReportKind,
   ReportPreview,
   Stability,
+  ModelVariant,
 } from './types';
 
 const BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000/api/v1';
 
 export const pol4 = {
+  dashboard: (model: ModelVariant) =>
+    getEnvelope<Dashboard>('/pol4/dashboard/', { model }),
   overview: () => getEnvelope<Overview>('/pol4/overview/'),
 
   heatmap: (topN: number) => getEnvelope<Heatmap>('/pol4/heatmap/', { top_n: topN }),

@@ -35,13 +35,15 @@ def _guard(builder):
 @api_view(["GET"])
 def overview(request):
     """KPI block, national daily series, top cities, provinces, pickup leaders."""
-    return _guard(services.overview)
+    return _guard(lambda: services.overview(request.GET.get("model")))
 
 
 @api_view(["GET"])
 def forecast(request):
     """The national daily series on its own, for the headline chart."""
-    return _guard(lambda: {"series": services.national_series()})
+    return _guard(
+        lambda: {"series": services.national_series(request.GET.get("model"))}
+    )
 
 
 @api_view(["GET"])
@@ -50,24 +52,42 @@ def heatmap(request):
         top_n = max(1, min(int(request.GET.get("top_n", 20)), 100))
     except ValueError:
         return error("top_n must be an integer", 400)
-    return _guard(lambda: services.heatmap(top_n))
+    return _guard(lambda: services.heatmap(top_n, request.GET.get("model")))
 
 
 @api_view(["GET"])
 def city_list(request):
     """Every city with its totals - the selector's source, names included."""
-    return _guard(lambda: {"cities": services.records(services.city_index().round(3))})
+    return _guard(
+        lambda: {
+            "cities": services.records(
+                services.city_index(request.GET.get("model")).round(3)
+            )
+        }
+    )
 
 
 @api_view(["GET"])
 def city_detail(request, city_code: str):
-    return _guard(lambda: services.city_detail(city_code))
+    return _guard(
+        lambda: services.city_detail(city_code, model=request.GET.get("model"))
+    )
 
 
 @api_view(["GET"])
 def city_pickup(request, city_code: str):
     checkin = request.GET.get("checkin")
-    return _guard(lambda: services.city_pickup(city_code, checkin))
+    return _guard(
+        lambda: services.city_pickup(
+            city_code, checkin, model=request.GET.get("model")
+        )
+    )
+
+
+@api_view(["GET"])
+def dashboard(request):
+    """All model-switchable chart data for the single-page decision dashboard."""
+    return _guard(lambda: services.dashboard(request.GET.get("model")))
 
 
 @api_view(["GET"])
