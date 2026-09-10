@@ -37,8 +37,10 @@ import pandas as pd
 
 from . import analytics as analytics_module
 from . import stability as stability_module
+from .audit import audit_inference_features, build_full_audit_markdown, write_full_audit
 from .backtest import run_backtest
 from .baseline import PickupBaseline
+from .calibration import Calibrator
 from .champion import ChampionSpec, FittedChampion
 from .config import Pol4Config
 from .artifacts import build_input_manifest, write_json_atomic
@@ -52,6 +54,8 @@ from .experiments import (
     ExperimentSpec,
     baseline_predictor,
     calibrated_predictor,
+    cross_fit_calibration,
+    fit_oof_calibrator,
     gbdt_predictor,
     run_suite,
     staged_groups,
@@ -64,6 +68,7 @@ from .submission import (
     validate_submission,
     write_submission,
 )
+from .validation import build_validation_audit
 
 log = logging.getLogger(__name__)
 
@@ -154,6 +159,11 @@ def run(
     ]
     curves.to_parquet(config.artifacts_dir / "pickup_curves.parquet", index=False)
     summary["baseline"] = baseline.summary()
+    champion_calibrator = Calibrator(method="none", alpha_global=1.0)
+    raw_champion_predictions = pd.DataFrame()
+    phase2_payload: dict[str, Any] = {}
+    feature_audit: dict[str, Any] = {}
+    model_comparison: dict[str, Any] = {}
 
     # -- 3. backtest --------------------------------------------------------
     if skip_backtest:
@@ -179,8 +189,73 @@ def run(
             len(config.backtest_cutoffs),
         )
         results = run_suite(data, config, specs)
+        raw_champion = next(r for r in results if r.stage == "champion_raw")
+        calibration_trials = []
+        for method in ("horizon_shrunk", spec.calibration, "bias_horizon_shrunk"):
+            candidate, fitted_calibrator = cross_fit_calibration(
+                raw_champion, config, method=method
+            )
+            fold_safe = all(
+                candidate.folds[label]["wape"]
+                <= raw_champion.folds[label]["wape"] + 0.01
+                for label in raw_champion.folds
+            )
+            safe = (
+                candidate.pooled["wape"] <= raw_champion.pooled["wape"]
+                and abs(candidate.pooled["normalised_bias"])
+                < abs(raw_champion.pooled["normalised_bias"])
+                and fold_safe
+            )
+            candidate.stage = "calibration_candidate"
+            candidate.meta["safe"] = safe
+            calibration_trials.append((candidate, fitted_calibrator, safe))
+
+        eligible = [trial for trial in calibration_trials if trial[2]]
+        selected_trial = (
+            min(eligible, key=lambda trial: abs(trial[0].pooled["normalised_bias"]))
+            if eligible
+            else None
+        )
+        calibration_accepted = selected_trial is not None
+        results.extend(trial[0] for trial in calibration_trials)
+        if calibration_accepted:
+            selected_candidate, champion_calibrator, _ = selected_trial
+            selected_candidate.stage = "champion"
+        else:
+            results.append(
+                replace(
+                    raw_champion,
+                    name=f"CHAMPION selected raw {spec.kind}",
+                    stage="champion",
+                    meta={
+                        **raw_champion.meta,
+                        "calibration": "none",
+                        "calibration_rejected": spec.calibration,
+                    },
+                )
+            )
+        best_bias_candidate = min(
+            (trial[0] for trial in calibration_trials),
+            key=lambda candidate: abs(candidate.pooled["normalised_bias"]),
+        )
+        selected_champion = next(r for r in results if r.stage == "champion")
+        baseline_result = next(r for r in results if r.name.startswith("E0"))
+        validation_audit = build_validation_audit(
+            raw_champion,
+            selected_champion,
+            [trial[0] for trial in calibration_trials],
+            baseline_result,
+            config,
+        )
+        write_json_atomic(
+            _json_ready(validation_audit), config.artifacts_dir / "validation_audit.json"
+        )
+        raw_champion_predictions = raw_champion.predictions
         experiments = _write_experiments(results, config)
-        payload = _write_phase2_backtest(results, config, data)
+        payload = _write_phase2_backtest(
+            results, config, data, validation_audit=validation_audit
+        )
+        phase2_payload = payload
 
         champion_scores = payload["champion"]
         summary["backtest"] = {
@@ -192,6 +267,24 @@ def run(
                 1 - champion_scores["pooled"]["wape"] / payload["baseline"]["pooled"]["wape"], 4
             ),
             "experiments": experiments["n_experiments"],
+            "calibration_accepted": calibration_accepted,
+            "calibration_method": champion_calibrator.method,
+            "raw_wape": raw_champion.pooled["wape"],
+            "raw_normalised_bias": raw_champion.pooled["normalised_bias"],
+            "calibrated_candidate_wape": best_bias_candidate.pooled["wape"],
+            "calibrated_candidate_normalised_bias": best_bias_candidate.pooled[
+                "normalised_bias"
+            ],
+            "calibration_candidates": [
+                {
+                    "method": trial[0].meta["calibration"],
+                    "wape": trial[0].pooled["wape"],
+                    "normalised_bias": trial[0].pooled["normalised_bias"],
+                    "safe": trial[2],
+                }
+                for trial in calibration_trials
+            ],
+            "validation_audit": validation_audit,
         }
 
     # -- 4. stability -------------------------------------------------------
@@ -199,7 +292,13 @@ def run(
         summary["stability"] = {"skipped": True}
     else:
         log.info("measuring forecast stability across the D-30 -> D-1 ladder")
-        summary["stability"] = _write_stability(data, spec, config)
+        summary["stability"] = _write_stability(
+            data,
+            spec,
+            config,
+            raw_champion_predictions,
+            champion_calibrator.method,
+        )
 
     # -- 5. final inference at the competition cutoff -----------------------
     target_dates = config.target_dates()
@@ -218,6 +317,9 @@ def run(
             expected_contract = {
                 "seed": config.seed,
                 "cutoff": pd.Timestamp(config.cutoff).isoformat(),
+                "train_window_days": config.train_window_days,
+                "city_history_days": config.city_history_days,
+                "max_train_rows": config.max_train_rows,
                 "horizons": list(config.train_horizons),
                 "feature_groups": list(spec.groups),
             }
@@ -250,20 +352,54 @@ def run(
             config,
             baseline=baseline,
             train=train,
+            calibrator=champion_calibrator,
         )
-        before_serialisation = fitted.predict(target_dates, data)
+        raw_fitted = replace(
+            fitted,
+            spec=replace(fitted.spec, calibration="none"),
+            calibrator=Calibrator(method="none", alpha_global=1.0),
+        )
+        variants = {
+            "raw": raw_fitted,
+            "calibrated": fitted,
+        }
+        variant_predictions: dict[str, pd.DataFrame] = {}
+        variant_manifests: dict[str, dict[str, Any]] = {}
+        variant_directories: dict[str, Path] = {}
+        for variant, fitted_variant in variants.items():
+            before_serialisation = fitted_variant.predict(target_dates, data)
+            variant_dir = config.artifacts_dir / "model_variants" / variant
+            manifest = fitted_variant.save(
+                variant_dir, input_digest=input_manifest["input_digest"]
+            )
+            restored = FittedChampion.load(variant_dir)
+            after_serialisation = restored.predict(target_dates, data)
+            pd.testing.assert_frame_equal(
+                before_serialisation,
+                after_serialisation,
+                check_exact=False,
+                rtol=1e-12,
+                atol=1e-12,
+            )
+            variant_predictions[variant] = after_serialisation
+            variant_manifests[variant] = manifest
+            variant_directories[variant] = variant_dir
+
+        # Keep the original path as a backwards-compatible alias for the
+        # selected calibrated model. Explicit comparisons use model_variants/.
         model_dir = config.artifacts_dir / "model_bundle"
-        model_manifest = fitted.save(
-            model_dir, input_digest=input_manifest["input_digest"]
-        )
-        restored = FittedChampion.load(model_dir)
-        predictions = restored.predict(target_dates, data)
+        model_manifest = fitted.save(model_dir, input_digest=input_manifest["input_digest"])
+        legacy_restored = FittedChampion.load(model_dir)
+        predictions = variant_predictions["calibrated"]
         pd.testing.assert_frame_equal(
-            before_serialisation,
             predictions,
+            legacy_restored.predict(target_dates, data),
             check_exact=False,
             rtol=1e-12,
             atol=1e-12,
+        )
+        feature_audit = audit_inference_features(
+            data, baseline, config, spec.groups
         )
         importance = fitted.importance()
         importance.to_json(
@@ -271,6 +407,7 @@ def run(
         )
         summary["champion"] = {
             **spec.describe(),
+            "calibration": fitted.calibrator.as_dict(),
             "training_rows": fitted.training_rows,
             "trainset": {
                 "path": str(train_dir),
@@ -286,6 +423,16 @@ def run(
                 "files": model_manifest["files"],
                 "load_parity_verified": True,
             },
+            "model_variants": {
+                variant: {
+                    "path": str(variant_directories[variant]),
+                    "bundle_digest": variant_manifests[variant]["bundle_digest"],
+                    "calibration": variants[variant].calibrator.method,
+                    "load_parity_verified": True,
+                }
+                for variant in variants
+            },
+            "real_grid_feature_audit": feature_audit,
             "top_features": importance.head(15).to_dict(orient="records"),
         }
 
@@ -299,6 +446,80 @@ def run(
     named_path = write_submission(
         build_named_submission(predictions, data), config.artifacts_dir / "results_named.csv"
     )
+
+    if model != "baseline":
+        variant_submissions = {
+            variant: build_submission(frame)
+            for variant, frame in variant_predictions.items()
+        }
+        variant_paths: dict[str, Path] = {}
+        for variant, frame in variant_submissions.items():
+            validate_submission(frame, data.city_codes, config, raise_on_error=True)
+            variant_paths[variant] = write_submission(
+                frame, config.artifacts_dir / f"results_{variant}.csv"
+            )
+            write_submission(
+                build_named_submission(variant_predictions[variant], data),
+                config.artifacts_dir / f"results_{variant}_named.csv",
+            )
+
+        comparison_frame = variant_submissions["raw"].rename(
+            columns={"predicted_demand": "raw_predicted_demand"}
+        )
+        comparison_frame["calibrated_predicted_demand"] = variant_submissions[
+            "calibrated"
+        ]["predicted_demand"]
+        comparison_frame["calibration_delta"] = (
+            comparison_frame["calibrated_predicted_demand"]
+            - comparison_frame["raw_predicted_demand"]
+        )
+        comparison_path = config.artifacts_dir / "model_comparison.csv"
+        comparison_frame.to_csv(comparison_path, index=False)
+
+        raw_total = int(variant_submissions["raw"]["predicted_demand"].sum())
+        calibrated_total = int(
+            variant_submissions["calibrated"]["predicted_demand"].sum()
+        )
+        model_comparison = {
+            "raw": {
+                "name": "raw_two_band_lightgbm",
+                "calibration": "none",
+                "backtest_wape": summary["backtest"].get("raw_wape"),
+                "normalised_bias": summary["backtest"].get("raw_normalised_bias"),
+                "forecast_total": raw_total,
+                "results_path": str(variant_paths["raw"]),
+                "bundle_path": str(variant_directories["raw"]),
+                "bundle_digest": variant_manifests["raw"]["bundle_digest"],
+            },
+            "calibrated": {
+                "name": "guarded_calibrated_two_band_lightgbm",
+                "calibration": fitted.calibrator.method,
+                "backtest_wape": summary["backtest"].get("pooled_wape"),
+                "normalised_bias": summary["backtest"].get("pooled_normalised_bias"),
+                "forecast_total": calibrated_total,
+                "results_path": str(variant_paths["calibrated"]),
+                "bundle_path": str(variant_directories["calibrated"]),
+                "bundle_digest": variant_manifests["calibrated"]["bundle_digest"],
+            },
+            "delta": {
+                "forecast_total": calibrated_total - raw_total,
+                "percent": (
+                    100.0 * (calibrated_total - raw_total) / raw_total
+                    if raw_total
+                    else None
+                ),
+                "changed_rows": int((comparison_frame["calibration_delta"] != 0).sum()),
+            },
+            "comparison_path": str(comparison_path),
+            "horizon_backtest": phase2_payload.get("champion", {}).get(
+                "by_horizon_bucket", []
+            ),
+        }
+        write_json_atomic(
+            _json_ready(model_comparison),
+            config.artifacts_dir / "model_comparison_summary.json",
+        )
+        summary["model_variants"] = model_comparison
 
     summary["submission"] = report.as_dict()
     summary["submission"]["path"] = str(results_path)
@@ -377,6 +598,8 @@ def run(
         "limitations": [
             "demand means observed search volume, not bookings or causal travel intent",
             "the model is validated on historical temporal folds from the supplied dataset",
+            "the model specification was preselected; validation_audit.json reports this "
+            "selection limitation and a conservative prequential estimate",
             "city_code is the competition city identifier; no statistical city clustering is used",
         ],
         "commands": {
@@ -387,6 +610,19 @@ def run(
     }
     model_card_path = write_json_atomic(model_card, config.artifacts_dir / "model_card.json")
     summary["model_card"] = str(model_card_path)
+
+    if model != "baseline":
+        audit_markdown = build_full_audit_markdown(
+            summary,
+            input_manifest,
+            train_manifest,
+            feature_audit,
+            model_comparison,
+        )
+        audit_path = write_full_audit(
+            audit_markdown, config.artifacts_dir / "FULL_AUDIT.md"
+        )
+        summary["full_audit"] = str(audit_path)
 
     summary["elapsed_seconds"] = round(time.perf_counter() - started, 2)
 
@@ -429,8 +665,8 @@ def _experiment_specs(config: Pol4Config, spec: ChampionSpec, ablation: bool) ->
             )
     specs.append(
         ExperimentSpec(
-            f"CHAMPION {spec.kind}",
-            "champion",
+            f"CHAMPION raw {spec.kind}",
+            "champion_raw",
             gbdt_predictor(
                 spec.kind,
                 spec.groups,
@@ -439,6 +675,7 @@ def _experiment_specs(config: Pol4Config, spec: ChampionSpec, ablation: bool) ->
                 calibration="none",
                 blend=None if spec.blend >= 1.0 else spec.blend,
                 bands=spec.bands,
+                measure_training=True,
             ),
             {"model": spec.kind, "groups": spec.groups},
         )
@@ -468,6 +705,12 @@ def _write_experiments(results: list[ExperimentResult], config: Pol4Config) -> d
                 "folds": r.folds,
                 "horizon_bucket": r.horizon,
                 "runtime_seconds": round(r.runtime_seconds, 1),
+                "training": r.training or None,
+                "validation_minus_train_wape": (
+                    round(r.pooled["wape"] - r.training["wape"], 6)
+                    if r.training
+                    else None
+                ),
                 "meta": {k: list(v) if isinstance(v, tuple) else v for k, v in r.meta.items()},
             }
             for r in results
@@ -493,9 +736,14 @@ def _name_segments(detail: dict[str, Any], data) -> dict[str, Any]:
 
 
 def _write_phase2_backtest(
-    results: list[ExperimentResult], config: Pol4Config, data
+    results: list[ExperimentResult],
+    config: Pol4Config,
+    data,
+    *,
+    validation_audit: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     champion = next(r for r in results if r.stage == "champion")
+    raw_champion = next((r for r in results if r.stage == "champion_raw"), None)
     baseline = next(r for r in results if r.name.startswith("E0"))
     payload = {
         "config": {
@@ -503,6 +751,7 @@ def _write_phase2_backtest(
             "target_days": config.target_days,
             "train_horizons": list(config.train_horizons),
             "train_window_days": config.train_window_days,
+            "city_history_days": config.city_history_days,
             "max_train_rows": config.max_train_rows,
         },
         "champion": {
@@ -511,12 +760,28 @@ def _write_phase2_backtest(
             "folds": champion.folds,
             **_name_segments(champion.detail, data),
         },
+        "champion_raw": {
+            "name": raw_champion.name,
+            "pooled": raw_champion.pooled,
+            "training": raw_champion.training or None,
+            "training_folds": raw_champion.training_folds,
+            "validation_minus_train_wape": (
+                round(raw_champion.pooled["wape"] - raw_champion.training["wape"], 6)
+                if raw_champion.training
+                else None
+            ),
+            "folds": raw_champion.folds,
+            **_name_segments(raw_champion.detail, data),
+        }
+        if raw_champion is not None
+        else None,
         "baseline": {
             "name": baseline.name,
             "pooled": baseline.pooled,
             "folds": baseline.folds,
             **_name_segments(baseline.detail, data),
         },
+        "validation_audit": validation_audit,
     }
     (config.artifacts_dir / "backtest_metrics_phase2.json").write_text(
         json.dumps(_json_ready(payload), indent=2, ensure_ascii=False), encoding="utf-8"
@@ -525,7 +790,11 @@ def _write_phase2_backtest(
 
 
 def _write_stability(
-    data, spec: ChampionSpec, config: Pol4Config
+    data,
+    spec: ChampionSpec,
+    config: Pol4Config,
+    raw_oof_predictions: pd.DataFrame,
+    calibration_method: str,
 ) -> dict[str, Any]:
     """Snapshot the champion across the D-30 -> D-1 ladder on a historical window."""
     target_start = config.cutoff - pd.Timedelta(days=config.stability_window_days - 1)
@@ -533,11 +802,21 @@ def _write_stability(
     model, baseline = stability_module.fit_snapshot_model(
         data, anchor, spec.groups, spec.kind, spec.params, spec.log1p, config
     )
+    calibrator = (
+        fit_oof_calibrator(
+            raw_oof_predictions,
+            config,
+            method=calibration_method,
+            outcomes_available_by=anchor,
+        )
+        if not raw_oof_predictions.empty
+        else Calibrator(method="none", alpha_global=1.0)
+    )
     report = stability_module.analyse(
         data,
         target_start,
         config.stability_window_days,
-        stability_module.model_snapshot(model, spec.groups, baseline),
+        stability_module.model_snapshot(model, spec.groups, baseline, calibrator),
         config,
     )
     report.snapshots.to_parquet(config.artifacts_dir / "stability.parquet", index=False)
@@ -569,7 +848,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="what to predict when a pair has no observed searches at the cutoff",
     )
     parser.add_argument("--min-city-support", type=int, default=defaults.min_city_support)
-    parser.add_argument("--max-train-rows", type=int, default=defaults.max_train_rows)
+    parser.add_argument(
+        "--train-window-days",
+        type=int,
+        default=defaults.train_window_days,
+        help="number of check-in days included in training",
+    )
+    parser.add_argument(
+        "--max-train-rows",
+        type=int,
+        default=defaults.max_train_rows,
+        help="optional training-row cap (default: unlimited)",
+    )
     parser.add_argument("--seed", type=int, default=defaults.seed)
     parser.add_argument("--skip-backtest", action="store_true", help="final inference only")
     parser.add_argument("--skip-stability", action="store_true")
@@ -595,6 +885,7 @@ def main(argv: list[str] | None = None) -> int:
         artifacts_dir=args.artifacts_dir,
         zero_observation_policy=args.zero_policy,
         min_city_support=args.min_city_support,
+        train_window_days=args.train_window_days,
         max_train_rows=args.max_train_rows,
         seed=args.seed,
     )
@@ -620,6 +911,46 @@ def main(argv: list[str] | None = None) -> int:
         if "baseline_wape" in backtest:
             print(f"  pickup baseline WAPE  {backtest['baseline_wape']:.4f}"
                   f"   (improvement {backtest['relative_improvement']:.1%})")
+        if "calibration_accepted" in backtest:
+            print(
+                f"  raw champion           WAPE {backtest['raw_wape']:.4f}"
+                f" / bias {backtest['raw_normalised_bias']:+.4f}"
+            )
+            for candidate in backtest["calibration_candidates"]:
+                print(
+                    f"  calibration {candidate['method']:<22}"
+                    f" WAPE {candidate['wape']:.4f}"
+                    f" / bias {candidate['normalised_bias']:+.4f}"
+                    f" / safe {'YES' if candidate['safe'] else 'NO'}"
+                )
+            print(
+                "  calibration accepted  "
+                + (
+                    backtest["calibration_method"]
+                    if backtest["calibration_accepted"]
+                    else "NO (raw champion kept)"
+                )
+            )
+            audit = backtest.get("validation_audit", {})
+            prequential = audit.get("prequential_selection", {}).get("pooled", {})
+            holdout = audit.get("last_fold_holdout", {})
+            overfit = audit.get("overfit_diagnostics", {})
+            if prequential:
+                print(
+                    f"  honest prequential     WAPE {prequential['wape']:.4f}"
+                    f" / bias {prequential['normalised_bias']:+.4f}"
+                )
+            if holdout:
+                print(
+                    f"  last-fold holdout      WAPE {holdout['wape']:.4f}"
+                    f" ({holdout['selected_from_prior_folds']})"
+                )
+            if overfit.get("validation_minus_train_wape") is not None:
+                print(
+                    f"  train/valid WAPE       "
+                    f"{overfit['raw_train']['wape']:.4f} / "
+                    f"{overfit['raw_validation']['wape']:.4f}"
+                )
         for cutoff, wape in backtest["folds"].items():
             print(f"    fold {cutoff}     {wape:.4f}")
     if not stability.get("skipped"):

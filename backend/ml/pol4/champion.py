@@ -24,6 +24,7 @@ import numpy as np
 import pandas as pd
 
 from .baseline import PickupBaseline
+from .calibration import Calibrator
 from .config import Pol4Config
 from .dataset import SupervisedFrame, build_inference_frame, build_training_frame
 from .features import GROUP_ORDER, feature_names
@@ -69,6 +70,9 @@ class ChampionSpec:
     #: rewards; the platform's L2-on-log1p targeted a mean and then under-shot.
     log1p: bool = True
     params: dict[str, Any] = field(default_factory=lambda: {"n_estimators": 600})
+    #: Learned from strictly out-of-fold predictions and accepted only when it
+    #: reduces absolute bias without worsening pooled WAPE.
+    calibration: str = "guarded_bias_horizon"
     #: Weight on the model when blending with the pickup baseline. Set to 1.0 by
     #: the ensemble experiment: a leave-one-fold-out alpha search picked 1.0 on
     #: four folds and 0.95 on the fifth, and blending scored 0.1623 against the
@@ -83,6 +87,7 @@ class ChampionSpec:
             "n_features": len(feature_names(self.groups)),
             "log1p_target": self.log1p,
             "params": dict(self.params),
+            "calibration_method": self.calibration,
             "blend_weight_on_model": self.blend,
         }
 
@@ -92,6 +97,7 @@ class FittedChampion:
     spec: ChampionSpec
     models: dict[tuple[int, int], RemainingDemandModel]
     baseline: PickupBaseline
+    calibrator: Calibrator
     cutoff: pd.Timestamp
     config: Pol4Config
     training_rows: int
@@ -106,6 +112,7 @@ class FittedChampion:
         *,
         baseline: PickupBaseline | None = None,
         train: SupervisedFrame | None = None,
+        calibrator: Calibrator | None = None,
     ) -> "FittedChampion":
         spec = spec or ChampionSpec()
         config = config or Pol4Config()
@@ -143,6 +150,7 @@ class FittedChampion:
             spec=spec,
             models=models,
             baseline=baseline,
+            calibrator=calibrator or Calibrator(method="none", alpha_global=1.0),
             cutoff=cutoff,
             config=config,
             training_rows=len(train),
@@ -191,6 +199,19 @@ class FittedChampion:
             temporary_path.unlink(missing_ok=True)
             raise
 
+        calibrator_path = directory / "calibrator_state.joblib"
+        fd, temporary = tempfile.mkstemp(
+            prefix=f".{calibrator_path.name}.", suffix=".tmp", dir=directory
+        )
+        os.close(fd)
+        temporary_path = Path(temporary)
+        try:
+            joblib.dump(self.calibrator, temporary_path)
+            temporary_path.replace(calibrator_path)
+        except Exception:
+            temporary_path.unlink(missing_ok=True)
+            raise
+
         spec_payload = {
             "format_version": ARTEFACT_FORMAT_VERSION,
             "cutoff": self.cutoff.isoformat(),
@@ -202,15 +223,18 @@ class FittedChampion:
                 "groups": list(self.spec.groups),
                 "log1p": self.spec.log1p,
                 "params": self.spec.params,
+                "calibration": self.spec.calibration,
                 "blend": self.spec.blend,
             },
             "models": model_entries,
             "baseline_file": baseline_path.name,
+            "calibrator_file": calibrator_path.name,
+            "calibration": self.calibrator.as_dict(),
         }
         write_json_atomic(spec_payload, directory / "model_spec.json")
 
         protected = [entry["file"] for entry in model_entries]
-        protected += ["baseline_state.joblib", "model_spec.json"]
+        protected += ["baseline_state.joblib", "calibrator_state.joblib", "model_spec.json"]
         checksums = {name: sha256_file(directory / name) for name in protected}
         bundle_digest = hashlib.sha256(
             "\n".join(f"{name}:{checksums[name]}" for name in sorted(checksums)).encode("utf-8")
@@ -249,6 +273,7 @@ class FittedChampion:
             groups=tuple(raw_spec["groups"]),
             log1p=bool(raw_spec["log1p"]),
             params=dict(raw_spec["params"]),
+            calibration=raw_spec.get("calibration", "guarded_bias_horizon"),
             blend=float(raw_spec["blend"]),
         )
         expected_features = feature_names(spec.groups)
@@ -273,6 +298,14 @@ class FittedChampion:
         baseline = joblib.load(directory / payload["baseline_file"])
         if not isinstance(baseline, PickupBaseline):
             raise ValueError("saved baseline state has an unexpected type")
+        calibrator_file = payload.get("calibrator_file")
+        calibrator = (
+            joblib.load(directory / calibrator_file)
+            if calibrator_file
+            else Calibrator(method="none", alpha_global=1.0)
+        )
+        if not isinstance(calibrator, Calibrator):
+            raise ValueError("saved calibrator state has an unexpected type")
         cutoff = pd.Timestamp(payload["cutoff"])
         if pd.Timestamp(baseline.cutoff) != cutoff:
             raise ValueError("saved baseline and champion use different cutoffs")
@@ -280,6 +313,7 @@ class FittedChampion:
             spec=spec,
             models=models,
             baseline=baseline,
+            calibrator=calibrator,
             cutoff=cutoff,
             config=baseline.config,
             training_rows=int(payload["training_rows"]),
@@ -309,6 +343,10 @@ class FittedChampion:
         if np.isnan(predicted).any():
             missing = sorted(set(horizons[np.isnan(predicted)]))
             raise RuntimeError(f"no horizon band covers horizon(s) {missing}")
+
+        predicted = self.calibrator.apply(
+            infer.meta.assign(predicted_demand=predicted)
+        )
 
         if self.spec.blend < 1.0:
             grid = infer.meta[[CITY, CHECKIN]].assign(observed=observed)

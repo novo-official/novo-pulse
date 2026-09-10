@@ -1,9 +1,9 @@
 {
-  "n_experiments": 4,
-  "best": "CHAMPION lightgbm",
-  "best_wape": 0.158148,
+  "n_experiments": 7,
+  "best": "CHAMPION calibrated (guarded_bias_horizon)",
+  "best_wape": 0.147927,
   "baseline_wape": 0.219991,
-  "relative_improvement": 0.2811,
+  "relative_improvement": 0.3276,
   "experiments": [
     {
       "name": "E0 pickup baseline",
@@ -106,6 +106,8 @@
         }
       ],
       "runtime_seconds": 0.0,
+      "training": null,
+      "validation_minus_train_wape": null,
       "meta": {}
     },
     {
@@ -209,6 +211,8 @@
         }
       ],
       "runtime_seconds": 0.0,
+      "training": null,
+      "validation_minus_train_wape": null,
       "meta": {}
     },
     {
@@ -312,59 +316,61 @@
         }
       ],
       "runtime_seconds": 0.0,
+      "training": null,
+      "validation_minus_train_wape": null,
       "meta": {}
     },
     {
-      "name": "CHAMPION lightgbm",
-      "stage": "champion",
+      "name": "CHAMPION raw lightgbm",
+      "stage": "champion_raw",
       "pooled": {
         "n": 48150,
         "actual_total": 64441140.0,
-        "predicted_total": 58088168.06,
-        "wape": 0.158148,
-        "mae": 211.6558,
-        "normalised_bias": -0.098586
+        "predicted_total": 58090372.23,
+        "wape": 0.15508,
+        "mae": 207.5496,
+        "normalised_bias": -0.098551
       },
       "folds": {
         "2024-11-21": {
           "n": 9630,
           "actual_total": 6787514.0,
-          "predicted_total": 6837346.28,
-          "wape": 0.12219,
-          "mae": 86.1235,
-          "normalised_bias": 0.007342
+          "predicted_total": 6841568.05,
+          "wape": 0.121684,
+          "mae": 85.7664,
+          "normalised_bias": 0.007964
         },
         "2025-05-21": {
           "n": 9630,
           "actual_total": 16216851.0,
-          "predicted_total": 12596538.03,
-          "wape": 0.271148,
-          "mae": 456.6116,
-          "normalised_bias": -0.223244
+          "predicted_total": 12631404.9,
+          "wape": 0.270578,
+          "mae": 455.6512,
+          "normalised_bias": -0.221094
         },
         "2025-08-21": {
           "n": 9630,
           "actual_total": 19510897.0,
-          "predicted_total": 18708455.78,
-          "wape": 0.127601,
-          "mae": 258.5263,
-          "normalised_bias": -0.041128
+          "predicted_total": 18660396.55,
+          "wape": 0.1182,
+          "mae": 239.479,
+          "normalised_bias": -0.043591
         },
         "2025-09-22": {
           "n": 9630,
           "actual_total": 12251705.0,
-          "predicted_total": 11220469.63,
-          "wape": 0.108677,
-          "mae": 138.2638,
-          "normalised_bias": -0.084171
+          "predicted_total": 11263115.81,
+          "wape": 0.108232,
+          "mae": 137.698,
+          "normalised_bias": -0.08069
         },
         "2025-10-22": {
           "n": 9630,
           "actual_total": 9674173.0,
-          "predicted_total": 8725358.34,
-          "wape": 0.118212,
-          "mae": 118.7538,
-          "normalised_bias": -0.098077
+          "predicted_total": 8693886.92,
+          "wape": 0.118609,
+          "mae": 119.1534,
+          "normalised_bias": -0.10133
         }
       },
       "horizon_bucket": [
@@ -372,49 +378,58 @@
           "key": "1-3",
           "n": 4815,
           "actual_total": 6209526.0,
-          "predicted_total": 6142647.96,
-          "wape": 0.029269,
-          "mae": 37.7464,
-          "normalised_bias": -0.01077
+          "predicted_total": 6144950.53,
+          "wape": 0.029215,
+          "mae": 37.6769,
+          "normalised_bias": -0.010399
         },
         {
           "key": "4-7",
           "n": 6420,
           "actual_total": 6770344.0,
-          "predicted_total": 6694682.66,
-          "wape": 0.063576,
-          "mae": 67.0454,
-          "normalised_bias": -0.011175
+          "predicted_total": 6725309.26,
+          "wape": 0.060656,
+          "mae": 63.9656,
+          "normalised_bias": -0.006652
         },
         {
           "key": "8-14",
           "n": 11235,
           "actual_total": 15110234.0,
-          "predicted_total": 14147572.46,
-          "wape": 0.113804,
-          "mae": 153.0585,
-          "normalised_bias": -0.063709
+          "predicted_total": 14070744.16,
+          "wape": 0.11351,
+          "mae": 152.6631,
+          "normalised_bias": -0.068794
         },
         {
           "key": "15-21",
           "n": 11235,
           "actual_total": 16241922.0,
-          "predicted_total": 15329779.31,
-          "wape": 0.13901,
-          "mae": 200.9609,
-          "normalised_bias": -0.05616
+          "predicted_total": 15271098.72,
+          "wape": 0.131304,
+          "mae": 189.8204,
+          "normalised_bias": -0.059773
         },
         {
           "key": "22-30",
           "n": 14445,
           "actual_total": 20109114.0,
-          "predicted_total": 15773485.67,
-          "wape": 0.278562,
-          "mae": 387.7908,
-          "normalised_bias": -0.215605
+          "predicted_total": 15878269.56,
+          "wape": 0.276175,
+          "mae": 384.4678,
+          "normalised_bias": -0.210394
         }
       ],
-      "runtime_seconds": 171.2,
+      "runtime_seconds": 337.5,
+      "training": {
+        "n": 10695399,
+        "actual_total": 12351692947.0,
+        "predicted_total": 12153273661.98,
+        "wape": 0.068722,
+        "mae": 79.3638,
+        "normalised_bias": -0.016064
+      },
+      "validation_minus_train_wape": 0.086358,
       "meta": {
         "model": "lightgbm",
         "groups": [
@@ -428,6 +443,390 @@
           "market",
           "province"
         ]
+      }
+    },
+    {
+      "name": "CHAMPION calibrated (horizon_shrunk)",
+      "stage": "calibration_candidate",
+      "pooled": {
+        "n": 48150,
+        "actual_total": 64441140.0,
+        "predicted_total": 59840913.52,
+        "wape": 0.149292,
+        "mae": 199.8035,
+        "normalised_bias": -0.071386
+      },
+      "folds": {
+        "2024-11-21": {
+          "n": 9630,
+          "actual_total": 6787514.0,
+          "predicted_total": 6841568.05,
+          "wape": 0.121684,
+          "mae": 85.7664,
+          "normalised_bias": 0.007964
+        },
+        "2025-05-21": {
+          "n": 9630,
+          "actual_total": 16216851.0,
+          "predicted_total": 12512471.51,
+          "wape": 0.279842,
+          "mae": 471.2526,
+          "normalised_bias": -0.228428
+        },
+        "2025-08-21": {
+          "n": 9630,
+          "actual_total": 19510897.0,
+          "predicted_total": 19551356.26,
+          "wape": 0.11581,
+          "mae": 234.637,
+          "normalised_bias": 0.002074
+        },
+        "2025-09-22": {
+          "n": 9630,
+          "actual_total": 12251705.0,
+          "predicted_total": 11719210.26,
+          "wape": 0.09006,
+          "mae": 114.578,
+          "normalised_bias": -0.043463
+        },
+        "2025-10-22": {
+          "n": 9630,
+          "actual_total": 9674173.0,
+          "predicted_total": 9216307.42,
+          "wape": 0.09236,
+          "mae": 92.7833,
+          "normalised_bias": -0.047329
+        }
+      },
+      "horizon_bucket": [
+        {
+          "key": "1-3",
+          "n": 4815,
+          "actual_total": 6209526.0,
+          "predicted_total": 6166554.18,
+          "wape": 0.028865,
+          "mae": 37.2243,
+          "normalised_bias": -0.00692
+        },
+        {
+          "key": "4-7",
+          "n": 6420,
+          "actual_total": 6770344.0,
+          "predicted_total": 6780907.29,
+          "wape": 0.065006,
+          "mae": 68.5535,
+          "normalised_bias": 0.00156
+        },
+        {
+          "key": "8-14",
+          "n": 11235,
+          "actual_total": 15110234.0,
+          "predicted_total": 14741604.76,
+          "wape": 0.10868,
+          "mae": 146.1659,
+          "normalised_bias": -0.024396
+        },
+        {
+          "key": "15-21",
+          "n": 11235,
+          "actual_total": 16241922.0,
+          "predicted_total": 15631118.58,
+          "wape": 0.12525,
+          "mae": 181.0677,
+          "normalised_bias": -0.037607
+        },
+        {
+          "key": "22-30",
+          "n": 14445,
+          "actual_total": 20109114.0,
+          "predicted_total": 16520728.71,
+          "wape": 0.264791,
+          "mae": 368.6202,
+          "normalised_bias": -0.178446
+        }
+      ],
+      "runtime_seconds": 337.5,
+      "training": {
+        "n": 10695399,
+        "actual_total": 12351692947.0,
+        "predicted_total": 12153273661.98,
+        "wape": 0.068722,
+        "mae": 79.3638,
+        "normalised_bias": -0.016064
+      },
+      "validation_minus_train_wape": 0.08057,
+      "meta": {
+        "model": "lightgbm",
+        "groups": [
+          "base",
+          "pickup",
+          "velocity",
+          "activity",
+          "curve",
+          "calendar",
+          "city",
+          "market",
+          "province"
+        ],
+        "calibration": "horizon_shrunk",
+        "source": "CHAMPION raw lightgbm",
+        "safe": true
+      }
+    },
+    {
+      "name": "CHAMPION calibrated (guarded_bias_horizon)",
+      "stage": "champion",
+      "pooled": {
+        "n": 48150,
+        "actual_total": 64441140.0,
+        "predicted_total": 60046976.41,
+        "wape": 0.147927,
+        "mae": 197.9773,
+        "normalised_bias": -0.068189
+      },
+      "folds": {
+        "2024-11-21": {
+          "n": 9630,
+          "actual_total": 6787514.0,
+          "predicted_total": 6841568.05,
+          "wape": 0.121684,
+          "mae": 85.7664,
+          "normalised_bias": 0.007964
+        },
+        "2025-05-21": {
+          "n": 9630,
+          "actual_total": 16216851.0,
+          "predicted_total": 12777345.68,
+          "wape": 0.272169,
+          "mae": 458.3312,
+          "normalised_bias": -0.212095
+        },
+        "2025-08-21": {
+          "n": 9630,
+          "actual_total": 19510897.0,
+          "predicted_total": 19611780.56,
+          "wape": 0.114597,
+          "mae": 232.1799,
+          "normalised_bias": 0.005171
+        },
+        "2025-09-22": {
+          "n": 9630,
+          "actual_total": 12251705.0,
+          "predicted_total": 11714675.45,
+          "wape": 0.09263,
+          "mae": 117.8479,
+          "normalised_bias": -0.043833
+        },
+        "2025-10-22": {
+          "n": 9630,
+          "actual_total": 9674173.0,
+          "predicted_total": 9101606.66,
+          "wape": 0.095324,
+          "mae": 95.7609,
+          "normalised_bias": -0.059185
+        }
+      },
+      "horizon_bucket": [
+        {
+          "key": "1-3",
+          "n": 4815,
+          "actual_total": 6209526.0,
+          "predicted_total": 6144950.53,
+          "wape": 0.029215,
+          "mae": 37.6769,
+          "normalised_bias": -0.010399
+        },
+        {
+          "key": "4-7",
+          "n": 6420,
+          "actual_total": 6770344.0,
+          "predicted_total": 6725309.26,
+          "wape": 0.060656,
+          "mae": 63.9656,
+          "normalised_bias": -0.006652
+        },
+        {
+          "key": "8-14",
+          "n": 11235,
+          "actual_total": 15110234.0,
+          "predicted_total": 14915782.53,
+          "wape": 0.107822,
+          "mae": 145.0127,
+          "normalised_bias": -0.012869
+        },
+        {
+          "key": "15-21",
+          "n": 11235,
+          "actual_total": 16241922.0,
+          "predicted_total": 15789207.97,
+          "wape": 0.12444,
+          "mae": 179.8968,
+          "normalised_bias": -0.027873
+        },
+        {
+          "key": "22-30",
+          "n": 14445,
+          "actual_total": 20109114.0,
+          "predicted_total": 16471726.12,
+          "wape": 0.263073,
+          "mae": 366.2287,
+          "normalised_bias": -0.180883
+        }
+      ],
+      "runtime_seconds": 337.5,
+      "training": {
+        "n": 10695399,
+        "actual_total": 12351692947.0,
+        "predicted_total": 12153273661.98,
+        "wape": 0.068722,
+        "mae": 79.3638,
+        "normalised_bias": -0.016064
+      },
+      "validation_minus_train_wape": 0.079205,
+      "meta": {
+        "model": "lightgbm",
+        "groups": [
+          "base",
+          "pickup",
+          "velocity",
+          "activity",
+          "curve",
+          "calendar",
+          "city",
+          "market",
+          "province"
+        ],
+        "calibration": "guarded_bias_horizon",
+        "source": "CHAMPION raw lightgbm",
+        "safe": true
+      }
+    },
+    {
+      "name": "CHAMPION calibrated (bias_horizon_shrunk)",
+      "stage": "calibration_candidate",
+      "pooled": {
+        "n": 48150,
+        "actual_total": 64441140.0,
+        "predicted_total": 63579763.31,
+        "wape": 0.172189,
+        "mae": 230.4476,
+        "normalised_bias": -0.013367
+      },
+      "folds": {
+        "2024-11-21": {
+          "n": 9630,
+          "actual_total": 6787514.0,
+          "predicted_total": 6841568.05,
+          "wape": 0.121684,
+          "mae": 85.7664,
+          "normalised_bias": 0.007964
+        },
+        "2025-05-21": {
+          "n": 9630,
+          "actual_total": 16216851.0,
+          "predicted_total": 12544749.78,
+          "wape": 0.281661,
+          "mae": 474.3148,
+          "normalised_bias": -0.226437
+        },
+        "2025-08-21": {
+          "n": 9630,
+          "actual_total": 19510897.0,
+          "predicted_total": 22154411.69,
+          "wape": 0.183897,
+          "mae": 372.5856,
+          "normalised_bias": 0.135489
+        },
+        "2025-09-22": {
+          "n": 9630,
+          "actual_total": 12251705.0,
+          "predicted_total": 12384705.03,
+          "wape": 0.095547,
+          "mae": 121.5588,
+          "normalised_bias": 0.010856
+        },
+        "2025-10-22": {
+          "n": 9630,
+          "actual_total": 9674173.0,
+          "predicted_total": 9654328.76,
+          "wape": 0.097565,
+          "mae": 98.0125,
+          "normalised_bias": -0.002051
+        }
+      },
+      "horizon_bucket": [
+        {
+          "key": "1-3",
+          "n": 4815,
+          "actual_total": 6209526.0,
+          "predicted_total": 6209764.65,
+          "wape": 0.028223,
+          "mae": 36.3975,
+          "normalised_bias": 3.8e-05
+        },
+        {
+          "key": "4-7",
+          "n": 6420,
+          "actual_total": 6770344.0,
+          "predicted_total": 6858472.84,
+          "wape": 0.069148,
+          "mae": 72.9212,
+          "normalised_bias": 0.013017
+        },
+        {
+          "key": "8-14",
+          "n": 11235,
+          "actual_total": 15110234.0,
+          "predicted_total": 15008873.3,
+          "wape": 0.11076,
+          "mae": 148.9634,
+          "normalised_bias": -0.006708
+        },
+        {
+          "key": "15-21",
+          "n": 11235,
+          "actual_total": 16241922.0,
+          "predicted_total": 15926249.49,
+          "wape": 0.124614,
+          "mae": 180.1489,
+          "normalised_bias": -0.019436
+        },
+        {
+          "key": "22-30",
+          "n": 14445,
+          "actual_total": 20109114.0,
+          "predicted_total": 19576403.03,
+          "wape": 0.335921,
+          "mae": 467.6406,
+          "normalised_bias": -0.026491
+        }
+      ],
+      "runtime_seconds": 337.5,
+      "training": {
+        "n": 10695399,
+        "actual_total": 12351692947.0,
+        "predicted_total": 12153273661.98,
+        "wape": 0.068722,
+        "mae": 79.3638,
+        "normalised_bias": -0.016064
+      },
+      "validation_minus_train_wape": 0.103467,
+      "meta": {
+        "model": "lightgbm",
+        "groups": [
+          "base",
+          "pickup",
+          "velocity",
+          "activity",
+          "curve",
+          "calendar",
+          "city",
+          "market",
+          "province"
+        ],
+        "calibration": "bias_horizon_shrunk",
+        "source": "CHAMPION raw lightgbm",
+        "safe": false
       }
     }
   ]

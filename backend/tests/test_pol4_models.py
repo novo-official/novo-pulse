@@ -73,6 +73,36 @@ def test_best_alpha_recovers_a_known_scale():
     assert unbiased == pytest.approx(1.4, abs=0.02)
 
 
+def test_bias_calibration_matches_remaining_demand_total():
+    frame = pd.DataFrame(
+        {
+            "observed": [100.0, 50.0, 20.0],
+            "predicted_demand": [200.0, 100.0, 30.0],
+            "actual": [250.0, 125.0, 35.0],
+            "horizon": [5, 5, 5],
+        }
+    )
+    calibrator = Calibrator.fit(frame, "bias_global")
+    calibrated = calibrator.apply(frame)
+    assert calibrated.sum() == pytest.approx(frame["actual"].sum())
+    assert calibrator.alpha_global == pytest.approx(1.5)
+
+
+def test_guarded_bias_calibration_leaves_near_term_and_caps_long_term():
+    frame = pd.DataFrame(
+        {
+            "observed": [100.0, 100.0, 100.0],
+            "predicted_demand": [120.0, 120.0, 120.0],
+            "actual": [200.0, 200.0, 300.0],
+            "horizon": [2, 10, 25],
+        }
+    )
+    calibrator = Calibrator.fit(frame, "guarded_bias_horizon", shrinkage=0.0)
+    assert calibrator.alpha_by_bucket["1-3"] == 1.0
+    assert calibrator.alpha_by_bucket["8-14"] <= 1.12
+    assert calibrator.alpha_by_bucket["22-30"] <= 1.08
+
+
 def test_calibration_windows_all_close_before_the_fold(pol4):
     _, config = pol4
     cutoff = pd.Timestamp("2024-10-01")

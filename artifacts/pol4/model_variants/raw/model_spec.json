@@ -30,7 +30,7 @@
     "params": {
       "n_estimators": 600
     },
-    "calibration": "guarded_bias_horizon",
+    "calibration": "none",
     "blend": 1.0
   },
   "models": [
@@ -208,27 +208,10 @@
   "baseline_file": "baseline_state.joblib",
   "calibrator_file": "calibrator_state.joblib",
   "calibration": {
-    "method": "guarded_bias_horizon",
-    "alpha_global": 1.1,
-    "alpha_by_bucket": {
-      "1-3": 1.0,
-      "15-21": 1.0749,
-      "22-30": 1.08,
-      "4-7": 1.0,
-      "8-14": 1.1025
-    },
-    "support": {
-      "1-3": 6209526.0,
-      "15-21": 16241922.0,
-      "22-30": 20109114.0,
-      "4-7": 6770344.0,
-      "8-14": 15110234.0
-    },
-    "diagnostics": {
-      "rows": 48150,
-      "alpha_global_wape_optimal": 1.09,
-      "alpha_global_bias_matching": 1.1547,
-      "shrinkage": 500000.0
-    }
+    "method": "none",
+    "alpha_global": 1.0,
+    "alpha_by_bucket": {},
+    "support": {},
+    "diagnostics": {}
   }
 }

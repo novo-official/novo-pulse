@@ -2,7 +2,8 @@
 
 Example:
 
-    PYTHONPATH=backend python -m ml.pol4.inference
+    PYTHONPATH=backend python -m ml.pol4.inference --variant calibrated
+    PYTHONPATH=backend python -m ml.pol4.inference --variant raw
 """
 from __future__ import annotations
 
@@ -24,16 +25,27 @@ from .submission import (
 )
 
 
+MODEL_VARIANTS = {
+    "raw": Path("model_variants/raw"),
+    "calibrated": Path("model_variants/calibrated"),
+}
+
+
 def run_from_bundle(
     config: Pol4Config | None = None,
     *,
     model_dir: str | Path | None = None,
     output_path: str | Path | None = None,
+    variant: str = "calibrated",
 ) -> dict[str, Any]:
     """Verify provenance, load native boosters and write a valid submission."""
     config = config or Pol4Config()
-    model_dir = Path(model_dir or config.artifacts_dir / "model_bundle")
-    output_path = Path(output_path or config.artifacts_dir / "results_from_bundle.csv")
+    if variant not in MODEL_VARIANTS:
+        raise ValueError(f"unknown model variant {variant!r}; choose from {sorted(MODEL_VARIANTS)}")
+    model_dir = Path(model_dir or config.artifacts_dir / MODEL_VARIANTS[variant])
+    output_path = Path(
+        output_path or config.artifacts_dir / f"results_{variant}_from_bundle.csv"
+    )
 
     data = load_pol4(config)
     inputs = build_input_manifest(config, data)
@@ -54,6 +66,7 @@ def run_from_bundle(
     return {
         "valid": report.valid,
         "rows": report.rows,
+        "variant": variant,
         "model_bundle": str(model_dir),
         "bundle_digest": model_manifest["bundle_digest"],
         "input_digest": inputs["input_digest"],
@@ -72,6 +85,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--artifacts-dir", type=Path, default=defaults.artifacts_dir)
     parser.add_argument("--model-dir", type=Path)
     parser.add_argument("--output", type=Path)
+    parser.add_argument(
+        "--variant",
+        choices=tuple(MODEL_VARIANTS),
+        default="calibrated",
+        help="saved champion variant; --model-dir may override its default directory",
+    )
     return parser
 
 
@@ -80,7 +99,12 @@ def main(argv: list[str] | None = None) -> int:
     config = replace(
         Pol4Config(), raw_dir=args.raw_dir, artifacts_dir=args.artifacts_dir
     )
-    result = run_from_bundle(config, model_dir=args.model_dir, output_path=args.output)
+    result = run_from_bundle(
+        config,
+        model_dir=args.model_dir,
+        output_path=args.output,
+        variant=args.variant,
+    )
     print(json.dumps(result, indent=2, ensure_ascii=False))
     return 0
 

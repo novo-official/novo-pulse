@@ -166,13 +166,28 @@ def baseline_snapshot(baseline: PickupBaseline) -> Callable:
     return predict
 
 
-def model_snapshot(model: Any, groups: tuple[str, ...], baseline: PickupBaseline) -> Callable:
+def model_snapshot(
+    model: Any,
+    groups: tuple[str, ...],
+    baseline: PickupBaseline,
+    calibrator: Any | None = None,
+) -> Callable:
     """A fitted remaining-demand model, evaluated at an arbitrary horizon."""
     columns = feature_names(groups)
 
     def predict(builder: FeatureBuilder, horizon: int, observed: np.ndarray) -> np.ndarray:
         features = builder.at_horizon(horizon, groups, baseline)
-        return model.predict_final(features[columns], observed)
+        predicted = model.predict_final(features[columns], observed)
+        if calibrator is None:
+            return predicted
+        frame = pd.DataFrame(
+            {
+                "observed": observed,
+                "horizon": np.full(len(observed), horizon),
+                "predicted_demand": predicted,
+            }
+        )
+        return calibrator.apply(frame)
 
     return predict
 

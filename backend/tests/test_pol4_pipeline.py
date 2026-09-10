@@ -8,7 +8,7 @@ import pandas as pd
 import pytest
 
 from ml.pol4.champion import ChampionSpec
-from ml.pol4.config import SUBMISSION_COLUMNS
+from ml.pol4.config import Pol4Config, SUBMISSION_COLUMNS
 from ml.pol4.inference import run_from_bundle
 from ml.pol4.pipeline import build_parser, run
 from tests.pol4_fixtures import write_dataset
@@ -53,6 +53,12 @@ def test_champion_run_writes_every_phase2_artefact(champion_run):
         "experiments.csv",
         "experiment_summary.json",
         "backtest_metrics_phase2.json",
+        "validation_audit.json",
+        "model_comparison.csv",
+        "model_comparison_summary.json",
+        "results_raw.csv",
+        "results_calibrated.csv",
+        "FULL_AUDIT.md",
         "feature_importance.json",
         "model_card.json",
         "stability.parquet",
@@ -64,6 +70,12 @@ def test_champion_run_writes_every_phase2_artefact(champion_run):
         assert (config.artifacts_dir / "trainset" / name).exists(), name
     for name in ("manifest.json", "model_spec.json", "baseline_state.joblib"):
         assert (config.artifacts_dir / "model_bundle" / name).exists(), name
+    for variant in ("raw", "calibrated"):
+        for name in ("manifest.json", "model_spec.json", "baseline_state.joblib"):
+            assert (config.artifacts_dir / "model_variants" / variant / name).exists(), (
+                variant,
+                name,
+            )
 
 
 def test_champion_run_reports_a_valid_submission(champion_run):
@@ -96,6 +108,19 @@ def test_phase2_backtest_carries_the_required_breakdowns(champion_run):
         ):
             assert key in payload[side], f"{side}.{key}"
         assert "normalised_bias" in payload[side]["pooled"]
+    assert payload["validation_audit"]["protocol"]["kind"].startswith("rolling-origin")
+
+
+def test_validation_audit_reports_honest_selection_and_overfit_diagnostics(champion_run):
+    summary, config = champion_run
+    audit = json.loads((config.artifacts_dir / "validation_audit.json").read_text())
+    assert audit == summary["backtest"]["validation_audit"]
+    assert audit["protocol"]["rows"] > 0
+    assert audit["prequential_selection"]["pooled"]["wape"] >= 0
+    assert audit["last_fold_holdout"]["cutoff"] == config.backtest_cutoffs[-1]
+    assert audit["overfit_diagnostics"]["raw_train"]["wape"] >= 0
+    interval = audit["reported_selected"]["confidence_interval"]
+    assert interval["lower"] <= summary["backtest"]["pooled_wape"] <= interval["upper"]
 
 
 def test_stability_snapshots_are_written(champion_run):
@@ -119,6 +144,14 @@ def test_run_summary_records_how_the_champion_was_configured(champion_run):
     assert champion["log1p_target"] is True
     assert champion["training_rows"] > 0
     assert champion["model_bundle"]["load_parity_verified"] is True
+    assert champion["calibration"]["method"] in {
+        "none",
+        "horizon_shrunk",
+        "guarded_bias_horizon",
+        "bias_horizon_shrunk",
+    }
+    assert "calibration_accepted" in summary["backtest"]
+    assert len(summary["backtest"]["calibration_candidates"]) == 3
     assert champion["trainset"]["rows"] == champion["training_rows"]
     assert len(champion["top_features"]) > 0
 
@@ -147,6 +180,34 @@ def test_saved_bundle_can_produce_submission_without_training(champion_run, tmp_
     )
 
 
+def test_raw_and_calibrated_variants_run_independently(champion_run, tmp_path):
+    summary, config = champion_run
+    outputs = {}
+    for variant in ("raw", "calibrated"):
+        output = tmp_path / f"{variant}.csv"
+        result = run_from_bundle(config, output_path=output, variant=variant)
+        assert result["valid"] is True
+        assert result["variant"] == variant
+        outputs[variant] = pd.read_csv(output)
+
+    stored_raw = pd.read_csv(config.artifacts_dir / "results_raw.csv")
+    stored_calibrated = pd.read_csv(config.artifacts_dir / "results_calibrated.csv")
+    pd.testing.assert_frame_equal(outputs["raw"], stored_raw)
+    pd.testing.assert_frame_equal(outputs["calibrated"], stored_calibrated)
+    assert summary["model_variants"]["raw"]["calibration"] == "none"
+
+
+def test_full_audit_records_data_trainset_features_and_both_models(champion_run):
+    summary, config = champion_run
+    report = (config.artifacts_dir / "FULL_AUDIT.md").read_text(encoding="utf-8")
+    assert "Raw data audit" in report
+    assert "Trainset audit" in report
+    assert "Real submission-grid feature audit" in report
+    assert "raw_two_band_lightgbm" in report
+    assert "guarded_calibrated_two_band_lightgbm" in report
+    assert summary["full_audit"].endswith("FULL_AUDIT.md")
+
+
 def test_champion_and_baseline_agree_on_the_grid_shape(baseline_run, champion_run):
     baseline_summary, _ = baseline_run
     champion_summary, _ = champion_run
@@ -160,6 +221,8 @@ def test_cli_defaults_to_the_champion():
     assert args.model == "champion"
     assert args.ablation is False
     assert args.reuse_trainset is False
+    assert args.train_window_days == Pol4Config().train_window_days
+    assert args.max_train_rows is None
 
 
 def test_cli_exposes_the_baseline_fallback():

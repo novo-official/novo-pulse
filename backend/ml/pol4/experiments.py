@@ -45,6 +45,7 @@ class FoldContext:
     baseline: PickupBaseline
     calibrators: dict[str, Calibrator] = field(default_factory=dict)
     models: dict[Any, Any] = field(default_factory=dict, repr=False)
+    diagnostics: dict[Any, dict[str, float]] = field(default_factory=dict, repr=False)
     _cache: dict[Any, Any] = field(default_factory=dict, repr=False)
 
     @property
@@ -55,8 +56,8 @@ class FoldContext:
 
     # Feature groups are additive column subsets, so the tensors are built once
     # per fold with every group and each ablation stage selects its columns.
-    # Rebuilding per stage would cost nine passes over a 900k-row frame for
-    # exactly the same numbers.
+    # Rebuilding per stage would repeatedly materialise a multi-million-row
+    # frame for exactly the same numbers.
     def training_frame(self) -> SupervisedFrame:
         if "train" not in self._cache:
             started = time.perf_counter()
@@ -163,6 +164,8 @@ class ExperimentResult:
     runtime_seconds: float
     meta: dict[str, Any] = field(default_factory=dict)
     predictions: pd.DataFrame = field(default_factory=pd.DataFrame, repr=False)
+    training: dict[str, float] = field(default_factory=dict)
+    training_folds: dict[str, dict[str, float]] = field(default_factory=dict)
 
     def row(self) -> dict[str, Any]:
         """One line for experiments.csv."""
@@ -175,6 +178,12 @@ class ExperimentResult:
             "normalised_bias": self.pooled["normalised_bias"],
             "mae": self.pooled["mae"],
             "runtime_seconds": round(self.runtime_seconds, 2),
+            "train_wape": self.training.get("wape"),
+            "validation_minus_train_wape": (
+                round(self.pooled["wape"] - self.training["wape"], 6)
+                if "wape" in self.training
+                else None
+            ),
             "n_features": self.meta.get("n_features"),
             "model": self.meta.get("model", ""),
             "feature_groups": ",".join(self.meta.get("groups", ())),
@@ -198,7 +207,8 @@ def run_experiment(
     for context in contexts:
         # Every experiment inherits the Phase 1 floor: a pair cannot finish
         # below what has already been counted.
-        scored = _score_fold(context, predictor)
+        label = context.cutoff.date().isoformat()
+        scored = _score_fold(context, predictor).assign(fold_cutoff=label)
         folds[context.cutoff.date().isoformat()] = score(scored["actual"], scored["prediction"])
         frames.append(scored)
 
@@ -214,7 +224,7 @@ def run_experiment(
         detail=detail,
         runtime_seconds=time.perf_counter() - started,
         meta=meta or {},
-        predictions=pooled_frame[[CITY, CHECKIN, "horizon", "observed", "actual", "prediction"]],
+        predictions=pooled_frame.copy(),
     )
 
 
@@ -238,6 +248,7 @@ def gbdt_predictor(
     calibration: str | None = None,
     blend: float | None = None,
     bands: tuple[tuple[int, int], ...] = ((1, 30),),
+    measure_training: bool = False,
 ) -> Predictor:
     """Fit a remaining-demand model per fold and predict that fold's grid.
 
@@ -249,6 +260,8 @@ def gbdt_predictor(
 
     columns = feature_names(groups)
 
+    diagnostic_key = object()
+
     def predict(context: FoldContext) -> np.ndarray:
         train = context.training_frame()
         infer = context.inference_frame()
@@ -256,6 +269,9 @@ def gbdt_predictor(
         infer_horizon = infer.meta["horizon"].to_numpy()
 
         predicted = np.full(len(infer.meta), np.nan)
+        train_predicted = (
+            np.full(len(train.meta), np.nan) if measure_training else None
+        )
         for low, high in bands:
             fit_rows = (train_horizon >= low) & (train_horizon <= high)
             predict_rows = (infer_horizon >= low) & (infer_horizon <= high)
@@ -265,17 +281,33 @@ def gbdt_predictor(
                 kind=kind, params=params or {}, log1p=log1p, seed=context.config.seed
             ).fit(train.X.loc[fit_rows, columns], train.y[fit_rows])
             context.models[(kind, groups, log1p, (low, high))] = model
+            if train_predicted is not None:
+                train_predicted[fit_rows] = model.predict_final(
+                    train.X.loc[fit_rows, columns],
+                    train.meta.loc[fit_rows, "observed"].to_numpy(),
+                )
             predicted[predict_rows] = model.predict_final(
                 infer.X.loc[predict_rows, columns],
                 infer.meta.loc[predict_rows, "observed"].to_numpy(),
             )
         aligned = _align(infer.meta, predicted, context.frame)
 
+        covered = np.isfinite(train_predicted) if train_predicted is not None else None
+        if covered is not None and covered.any() and train.y is not None:
+            train_actual = (
+                train.meta.loc[covered, "observed"].to_numpy(dtype=np.float64)
+                + train.y[covered]
+            )
+            context.diagnostics[diagnostic_key] = score(
+                train_actual, train_predicted[covered]
+            )
+
         if blend is not None:
             other = context.calibrators[calibration or "none"].apply(context.frame)
             aligned = blend * aligned + (1.0 - blend) * other
         return aligned
 
+    predict.diagnostic_key = diagnostic_key  # type: ignore[attr-defined]
     return predict
 
 
@@ -310,6 +342,9 @@ def run_suite(
     per_spec: dict[str, list[pd.DataFrame]] = {spec.name: [] for spec in specs}
     per_spec_folds: dict[str, dict[str, dict[str, float]]] = {spec.name: {} for spec in specs}
     runtimes: dict[str, float] = {spec.name: 0.0 for spec in specs}
+    per_spec_training: dict[str, dict[str, dict[str, float]]] = {
+        spec.name: {} for spec in specs
+    }
 
     for cutoff in config.backtest_cutoffs:
         log.info("fold %s: building context", cutoff)
@@ -317,10 +352,13 @@ def run_suite(
         label = context.cutoff.date().isoformat()
         for spec in specs:
             started = time.perf_counter()
-            scored = _score_fold(context, spec.predictor)
+            scored = _score_fold(context, spec.predictor).assign(fold_cutoff=label)
             runtimes[spec.name] += time.perf_counter() - started
             per_spec_folds[spec.name][label] = score(scored["actual"], scored["prediction"])
             per_spec[spec.name].append(scored)
+            diagnostic_key = getattr(spec.predictor, "diagnostic_key", None)
+            if diagnostic_key in context.diagnostics:
+                per_spec_training[spec.name][label] = context.diagnostics[diagnostic_key]
             log.info(
                 "  %-42s wape=%.4f", spec.name, per_spec_folds[spec.name][label]["wape"]
             )
@@ -341,12 +379,109 @@ def run_suite(
                 detail=detail,
                 runtime_seconds=runtimes[spec.name],
                 meta=spec.meta,
-                predictions=pooled_frame[
-                    [CITY, CHECKIN, "horizon", "observed", "actual", "prediction"]
-                ],
+                predictions=pooled_frame.copy(),
+                training=_pool_scores(per_spec_training[spec.name].values()),
+                training_folds=per_spec_training[spec.name],
             )
         )
     return results
+
+
+def _pool_scores(scores) -> dict[str, float]:
+    """Pool already-scored disjoint frames without retaining their rows."""
+    scores = list(scores)
+    if not scores:
+        return {}
+    n = sum(int(item["n"]) for item in scores)
+    actual = sum(float(item["actual_total"]) for item in scores)
+    predicted = sum(float(item["predicted_total"]) for item in scores)
+    absolute_error = sum(float(item["wape"]) * float(item["actual_total"]) for item in scores)
+    return {
+        "n": n,
+        "actual_total": round(actual, 2),
+        "predicted_total": round(predicted, 2),
+        "wape": round(absolute_error / actual, 6) if actual else float("nan"),
+        "mae": round(absolute_error / n, 4) if n else float("nan"),
+        "normalised_bias": round((predicted - actual) / actual, 6)
+        if actual
+        else float("nan"),
+    }
+
+
+def fit_oof_calibrator(
+    predictions: pd.DataFrame,
+    config: Pol4Config,
+    *,
+    method: str = "bias_horizon_shrunk",
+    outcomes_available_by: pd.Timestamp | None = None,
+) -> Calibrator:
+    """Fit a final calibrator on completed out-of-fold predictions only."""
+    history = predictions.copy()
+    if outcomes_available_by is not None:
+        available = pd.to_datetime(history["fold_cutoff"]) + pd.Timedelta(
+            days=config.target_days
+        )
+        history = history.loc[available <= pd.Timestamp(outcomes_available_by)]
+    frame = history[["actual", "observed", "horizon"]].assign(
+        predicted_demand=history["prediction"].to_numpy()
+    )
+    return Calibrator.fit(frame, method, config)
+
+
+def cross_fit_calibration(
+    raw: ExperimentResult,
+    config: Pol4Config,
+    *,
+    method: str = "bias_horizon_shrunk",
+) -> tuple[ExperimentResult, Calibrator]:
+    """Calibrate each fold using only earlier, fully-observed OOF folds.
+
+    The returned calibrator is fitted on all OOF predictions and is therefore
+    valid for the later competition cutoff. It is never used to score the same
+    rows that fitted it; the reported backtest remains strictly cross-fitted.
+    """
+    calibrated_frames: list[pd.DataFrame] = []
+    fold_scores: dict[str, dict[str, float]] = {}
+    predictions = raw.predictions.copy()
+
+    for cutoff_value in config.backtest_cutoffs:
+        cutoff = pd.Timestamp(cutoff_value)
+        label = cutoff.date().isoformat()
+        current = predictions.loc[predictions["fold_cutoff"] == label].copy()
+        if current.empty:
+            continue
+        outcome_dates = pd.to_datetime(predictions["fold_cutoff"]) + pd.Timedelta(
+            days=config.target_days
+        )
+        history = predictions.loc[outcome_dates <= cutoff]
+        calibration_frame = history[["actual", "observed", "horizon"]].assign(
+            predicted_demand=history["prediction"].to_numpy()
+        )
+        calibrator = Calibrator.fit(calibration_frame, method, config)
+        current["prediction"] = calibrator.apply(current, column="prediction")
+        fold_scores[label] = score(current["actual"], current["prediction"])
+        calibrated_frames.append(current)
+
+    if not calibrated_frames:
+        raise ValueError("cross-fitted calibration received no matching folds")
+
+    pooled = pd.concat(calibrated_frames, ignore_index=True)
+    detail = breakdowns(pooled, "prediction")
+    detail["high_demand"] = high_demand_scores(pooled, "prediction")
+    result = ExperimentResult(
+        name=f"CHAMPION calibrated ({method})",
+        stage="champion",
+        pooled=score(pooled["actual"], pooled["prediction"]),
+        folds=fold_scores,
+        horizon=detail["by_horizon_bucket"],
+        detail=detail,
+        runtime_seconds=raw.runtime_seconds,
+        meta={**raw.meta, "calibration": method, "source": raw.name},
+        predictions=pooled,
+        training=raw.training,
+        training_folds=raw.training_folds,
+    )
+    return result, fit_oof_calibrator(predictions, config, method=method)
 
 
 def _score_fold(context: FoldContext, predictor: Predictor) -> pd.DataFrame:

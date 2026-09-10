@@ -1,4 +1,4 @@
-"""Bias calibration for the pickup projection.
+"""Bias calibration for pickup and remaining-demand predictions.
 
 Phase 1 measured a pooled normalised bias of -0.150: the projection
 systematically under-predicts, and worsens with horizon (-0.02 at 1-3 days,
@@ -18,6 +18,8 @@ Two design decisions matter more than the arithmetic:
   scores is not a calibration, it is the answer. For a fold at cutoff C the
   factors come from simulated cutoffs whose entire target window closes at or
   before C, so every number used was knowable to a forecaster standing at C.
+  The champion follows the same rule with out-of-fold model predictions and
+  only accepts calibration when WAPE does not regress.
 """
 from __future__ import annotations
 
@@ -82,7 +84,15 @@ class Calibrator:
     support: dict[str, float] = field(default_factory=dict)
     diagnostics: dict[str, Any] = field(default_factory=dict)
 
-    METHODS = ("none", "global", "horizon", "horizon_shrunk")
+    METHODS = (
+        "none",
+        "global",
+        "horizon",
+        "horizon_shrunk",
+        "bias_global",
+        "bias_horizon_shrunk",
+        "guarded_bias_horizon",
+    )
 
     # ------------------------------------------------------------------ fit
     @classmethod
@@ -110,7 +120,14 @@ class Calibrator:
             "alpha_global_wape_optimal": alpha_global,
             "alpha_global_bias_matching": round(unbiased_global, 4),
         }
-        if method == "global":
+        guarded = method == "guarded_bias_horizon"
+        bias_matching = method.startswith("bias_") or guarded
+        if bias_matching:
+            alpha_global = unbiased_global
+        if guarded:
+            alpha_global = float(np.clip(alpha_global, 0.95, 1.10))
+
+        if method in ("global", "bias_global"):
             return cls(
                 method=method, alpha_global=alpha_global, diagnostics=diagnostics
             )
@@ -128,8 +145,24 @@ class Calibrator:
             if not mask.any():
                 alpha_by_bucket[label] = alpha_global
                 continue
-            alpha, _ = best_alpha(actual[mask], observed[mask], predicted[mask])
-            if method == "horizon_shrunk":
+            alpha_wape, alpha_unbiased = best_alpha(
+                actual[mask], observed[mask], predicted[mask]
+            )
+            alpha = alpha_unbiased if bias_matching else alpha_wape
+            if guarded:
+                _low, high = (int(value) for value in label.split("-"))
+                if high <= 7:
+                    alpha_by_bucket[label] = 1.0
+                    continue
+                # The measured raw bias is already near zero at D-1..D-7.
+                # Far-horizon full bias matching fixed totals but damaged WAPE,
+                # so only a bounded fraction of that correction is allowed.
+                upper = 1.12 if high <= 21 else 1.08
+                weight = demand / (demand + shrink) if demand + shrink > 0 else 0.0
+                alpha = 1.0 + weight * (alpha - 1.0)
+                alpha_by_bucket[label] = float(np.clip(alpha, 0.95, upper))
+                continue
+            if method in ("horizon_shrunk", "bias_horizon_shrunk"):
                 weight = demand / (demand + shrink) if demand + shrink > 0 else 0.0
                 alpha = weight * alpha + (1.0 - weight) * alpha_global
             alpha_by_bucket[label] = float(alpha)
@@ -146,7 +179,7 @@ class Calibrator:
 
     # ---------------------------------------------------------------- apply
     def alphas(self, horizons: np.ndarray) -> np.ndarray:
-        if self.method in ("none", "global") or not self.alpha_by_bucket:
+        if self.method in ("none", "global", "bias_global") or not self.alpha_by_bucket:
             return np.full(len(horizons), self.alpha_global, dtype=np.float64)
         labels = _bucket_labels(np.asarray(horizons), self.bucket_edges)
         return np.array(

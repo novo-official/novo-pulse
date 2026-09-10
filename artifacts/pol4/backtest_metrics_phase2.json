@@ -21,59 +21,60 @@
       25,
       30
     ],
-    "train_window_days": 540,
-    "max_train_rows": 900000
+    "train_window_days": 752,
+    "city_history_days": 752,
+    "max_train_rows": null
   },
   "champion": {
-    "name": "CHAMPION lightgbm",
+    "name": "CHAMPION calibrated (guarded_bias_horizon)",
     "pooled": {
       "n": 48150,
       "actual_total": 64441140.0,
-      "predicted_total": 58088168.06,
-      "wape": 0.158148,
-      "mae": 211.6558,
-      "normalised_bias": -0.098586
+      "predicted_total": 60046976.41,
+      "wape": 0.147927,
+      "mae": 197.9773,
+      "normalised_bias": -0.068189
     },
     "folds": {
       "2024-11-21": {
         "n": 9630,
         "actual_total": 6787514.0,
-        "predicted_total": 6837346.28,
-        "wape": 0.12219,
-        "mae": 86.1235,
-        "normalised_bias": 0.007342
+        "predicted_total": 6841568.05,
+        "wape": 0.121684,
+        "mae": 85.7664,
+        "normalised_bias": 0.007964
       },
       "2025-05-21": {
         "n": 9630,
         "actual_total": 16216851.0,
-        "predicted_total": 12596538.03,
-        "wape": 0.271148,
-        "mae": 456.6116,
-        "normalised_bias": -0.223244
+        "predicted_total": 12777345.68,
+        "wape": 0.272169,
+        "mae": 458.3312,
+        "normalised_bias": -0.212095
       },
       "2025-08-21": {
         "n": 9630,
         "actual_total": 19510897.0,
-        "predicted_total": 18708455.78,
-        "wape": 0.127601,
-        "mae": 258.5263,
-        "normalised_bias": -0.041128
+        "predicted_total": 19611780.56,
+        "wape": 0.114597,
+        "mae": 232.1799,
+        "normalised_bias": 0.005171
       },
       "2025-09-22": {
         "n": 9630,
         "actual_total": 12251705.0,
-        "predicted_total": 11220469.63,
-        "wape": 0.108677,
-        "mae": 138.2638,
-        "normalised_bias": -0.084171
+        "predicted_total": 11714675.45,
+        "wape": 0.09263,
+        "mae": 117.8479,
+        "normalised_bias": -0.043833
       },
       "2025-10-22": {
         "n": 9630,
         "actual_total": 9674173.0,
-        "predicted_total": 8725358.34,
-        "wape": 0.118212,
-        "mae": 118.7538,
-        "normalised_bias": -0.098077
+        "predicted_total": 9101606.66,
+        "wape": 0.095324,
+        "mae": 95.7609,
+        "normalised_bias": -0.059185
       }
     },
     "by_horizon": [
@@ -81,271 +82,271 @@
         "key": 1,
         "n": 1605,
         "actual_total": 2445231.0,
-        "predicted_total": 2416998.2,
-        "wape": 0.02201,
-        "mae": 33.5325,
-        "normalised_bias": -0.011546
+        "predicted_total": 2418042.11,
+        "wape": 0.022002,
+        "mae": 33.5202,
+        "normalised_bias": -0.011119
       },
       {
         "key": 2,
         "n": 1605,
         "actual_total": 1983424.0,
-        "predicted_total": 1953807.24,
-        "wape": 0.030366,
-        "mae": 37.5256,
-        "normalised_bias": -0.014932
+        "predicted_total": 1953706.95,
+        "wape": 0.030904,
+        "mae": 38.1899,
+        "normalised_bias": -0.014983
       },
       {
         "key": 3,
         "n": 1605,
         "actual_total": 1780871.0,
-        "predicted_total": 1771842.52,
-        "wape": 0.038016,
-        "mae": 42.1812,
-        "normalised_bias": -0.00507
+        "predicted_total": 1773201.47,
+        "wape": 0.03724,
+        "mae": 41.3205,
+        "normalised_bias": -0.004307
       },
       {
         "key": 4,
         "n": 1605,
         "actual_total": 1438398.0,
-        "predicted_total": 1407517.09,
-        "wape": 0.050143,
-        "mae": 44.9379,
-        "normalised_bias": -0.021469
+        "predicted_total": 1415072.34,
+        "wape": 0.046082,
+        "mae": 41.299,
+        "normalised_bias": -0.016216
       },
       {
         "key": 5,
         "n": 1605,
         "actual_total": 1534207.0,
-        "predicted_total": 1541638.72,
-        "wape": 0.047772,
-        "mae": 45.6647,
-        "normalised_bias": 0.004844
+        "predicted_total": 1551684.83,
+        "wape": 0.04833,
+        "mae": 46.1982,
+        "normalised_bias": 0.011392
       },
       {
         "key": 6,
         "n": 1605,
         "actual_total": 1659725.0,
-        "predicted_total": 1651819.75,
-        "wape": 0.062251,
-        "mae": 64.3736,
-        "normalised_bias": -0.004763
+        "predicted_total": 1657602.24,
+        "wape": 0.06534,
+        "mae": 67.5683,
+        "normalised_bias": -0.001279
       },
       {
         "key": 7,
         "n": 1605,
         "actual_total": 2138014.0,
-        "predicted_total": 2093707.1,
-        "wape": 0.084983,
-        "mae": 113.2056,
-        "normalised_bias": -0.020723
+        "predicted_total": 2100949.85,
+        "wape": 0.075668,
+        "mae": 100.7968,
+        "normalised_bias": -0.017336
       },
       {
         "key": 8,
         "n": 1605,
         "actual_total": 2169580.0,
-        "predicted_total": 2031200.22,
-        "wape": 0.100379,
-        "mae": 135.6887,
-        "normalised_bias": -0.063782
+        "predicted_total": 2146700.44,
+        "wape": 0.090986,
+        "mae": 122.9916,
+        "normalised_bias": -0.010546
       },
       {
         "key": 9,
         "n": 1605,
         "actual_total": 1744283.0,
-        "predicted_total": 1670442.82,
-        "wape": 0.08549,
-        "mae": 92.9089,
-        "normalised_bias": -0.042333
+        "predicted_total": 1755981.18,
+        "wape": 0.092555,
+        "mae": 100.5868,
+        "normalised_bias": 0.006707
       },
       {
         "key": 10,
         "n": 1605,
         "actual_total": 1885905.0,
-        "predicted_total": 1744260.33,
-        "wape": 0.110503,
-        "mae": 129.8435,
-        "normalised_bias": -0.075107
+        "predicted_total": 1850132.9,
+        "wape": 0.09247,
+        "mae": 108.6534,
+        "normalised_bias": -0.018968
       },
       {
         "key": 11,
         "n": 1605,
         "actual_total": 1566502.0,
-        "predicted_total": 1440210.32,
-        "wape": 0.107229,
-        "mae": 104.6565,
-        "normalised_bias": -0.08062
+        "predicted_total": 1535523.37,
+        "wape": 0.080026,
+        "mae": 78.106,
+        "normalised_bias": -0.019776
       },
       {
         "key": 12,
         "n": 1605,
         "actual_total": 1702579.0,
-        "predicted_total": 1626962.8,
-        "wape": 0.086493,
-        "mae": 91.7515,
-        "normalised_bias": -0.044413
+        "predicted_total": 1696086.65,
+        "wape": 0.080086,
+        "mae": 84.9552,
+        "normalised_bias": -0.003813
       },
       {
         "key": 13,
         "n": 1605,
         "actual_total": 2327008.0,
-        "predicted_total": 2357586.61,
-        "wape": 0.095359,
-        "mae": 138.256,
-        "normalised_bias": 0.013141
+        "predicted_total": 2479392.55,
+        "wape": 0.125469,
+        "mae": 181.9114,
+        "normalised_bias": 0.065485
       },
       {
         "key": 14,
         "n": 1605,
         "actual_total": 3714377.0,
-        "predicted_total": 3276909.36,
-        "wape": 0.163467,
-        "mae": 378.3044,
-        "normalised_bias": -0.117777
+        "predicted_total": 3451965.43,
+        "wape": 0.146001,
+        "mae": 337.8844,
+        "normalised_bias": -0.070648
       },
       {
         "key": 15,
         "n": 1605,
         "actual_total": 2990185.0,
-        "predicted_total": 2899834.25,
-        "wape": 0.1236,
-        "mae": 230.273,
-        "normalised_bias": -0.030216
+        "predicted_total": 2966613.61,
+        "wape": 0.122898,
+        "mae": 228.9636,
+        "normalised_bias": -0.007883
       },
       {
         "key": 16,
         "n": 1605,
         "actual_total": 1871315.0,
-        "predicted_total": 1935290.35,
-        "wape": 0.164182,
-        "mae": 191.4241,
-        "normalised_bias": 0.034187
+        "predicted_total": 1945949.34,
+        "wape": 0.146428,
+        "mae": 170.7245,
+        "normalised_bias": 0.039883
       },
       {
         "key": 17,
         "n": 1605,
         "actual_total": 1933551.0,
-        "predicted_total": 1892986.24,
-        "wape": 0.166014,
-        "mae": 199.9984,
-        "normalised_bias": -0.020979
+        "predicted_total": 1915299.97,
+        "wape": 0.14931,
+        "mae": 179.8749,
+        "normalised_bias": -0.009439
       },
       {
         "key": 18,
         "n": 1605,
         "actual_total": 1690581.0,
-        "predicted_total": 1651393.65,
-        "wape": 0.127812,
-        "mae": 134.6273,
-        "normalised_bias": -0.02318
+        "predicted_total": 1694914.89,
+        "wape": 0.112013,
+        "mae": 117.9855,
+        "normalised_bias": 0.002564
       },
       {
         "key": 19,
         "n": 1605,
         "actual_total": 2003969.0,
-        "predicted_total": 1849086.56,
-        "wape": 0.10534,
-        "mae": 131.5255,
-        "normalised_bias": -0.077288
+        "predicted_total": 1869417.29,
+        "wape": 0.106793,
+        "mae": 133.3393,
+        "normalised_bias": -0.067143
       },
       {
         "key": 20,
         "n": 1605,
         "actual_total": 2776614.0,
-        "predicted_total": 2400763.92,
-        "wape": 0.15601,
-        "mae": 269.8944,
-        "normalised_bias": -0.135363
+        "predicted_total": 2519575.22,
+        "wape": 0.128404,
+        "mae": 222.136,
+        "normalised_bias": -0.092573
       },
       {
         "key": 21,
         "n": 1605,
         "actual_total": 2975707.0,
-        "predicted_total": 2700424.33,
-        "wape": 0.134294,
-        "mae": 248.9839,
-        "normalised_bias": -0.09251
+        "predicted_total": 2877437.65,
+        "wape": 0.111247,
+        "mae": 206.254,
+        "normalised_bias": -0.033024
       },
       {
         "key": 22,
         "n": 1605,
         "actual_total": 2566587.0,
-        "predicted_total": 2273022.01,
-        "wape": 0.162642,
-        "mae": 260.0845,
-        "normalised_bias": -0.11438
+        "predicted_total": 2314780.99,
+        "wape": 0.161361,
+        "mae": 258.0361,
+        "normalised_bias": -0.098109
       },
       {
         "key": 23,
         "n": 1605,
         "actual_total": 2317533.0,
-        "predicted_total": 1851371.18,
-        "wape": 0.233056,
-        "mae": 336.5209,
-        "normalised_bias": -0.201146
+        "predicted_total": 1926277.83,
+        "wape": 0.22266,
+        "mae": 321.5086,
+        "normalised_bias": -0.168824
       },
       {
         "key": 24,
         "n": 1605,
         "actual_total": 2059851.0,
-        "predicted_total": 1807579.2,
-        "wape": 0.173086,
-        "mae": 222.1385,
-        "normalised_bias": -0.122471
+        "predicted_total": 1908777.8,
+        "wape": 0.146688,
+        "mae": 188.2588,
+        "normalised_bias": -0.073342
       },
       {
         "key": 25,
         "n": 1605,
         "actual_total": 1813315.0,
-        "predicted_total": 1517720.1,
-        "wape": 0.214183,
-        "mae": 241.9823,
-        "normalised_bias": -0.163014
+        "predicted_total": 1604151.91,
+        "wape": 0.196586,
+        "mae": 222.1006,
+        "normalised_bias": -0.115348
       },
       {
         "key": 26,
         "n": 1605,
         "actual_total": 1989278.0,
-        "predicted_total": 1500680.01,
-        "wape": 0.294081,
-        "mae": 364.4914,
-        "normalised_bias": -0.245616
+        "predicted_total": 1603018.45,
+        "wape": 0.265189,
+        "mae": 328.6817,
+        "normalised_bias": -0.194171
       },
       {
         "key": 27,
         "n": 1605,
         "actual_total": 2284077.0,
-        "predicted_total": 1621195.37,
-        "wape": 0.351932,
-        "mae": 500.8343,
-        "normalised_bias": -0.290219
+        "predicted_total": 1696498.19,
+        "wape": 0.33015,
+        "mae": 469.8373,
+        "normalised_bias": -0.25725
       },
       {
         "key": 28,
         "n": 1605,
         "actual_total": 2650852.0,
-        "predicted_total": 2044318.16,
-        "wape": 0.343138,
-        "mae": 566.734,
-        "normalised_bias": -0.228807
+        "predicted_total": 2183729.42,
+        "wape": 0.327986,
+        "mae": 541.708,
+        "normalised_bias": -0.176216
       },
       {
         "key": 29,
         "n": 1605,
         "actual_total": 2464406.0,
-        "predicted_total": 1809502.4,
-        "wape": 0.336764,
-        "mae": 517.0858,
-        "normalised_bias": -0.265745
+        "predicted_total": 1841136.86,
+        "wape": 0.330078,
+        "mae": 506.8204,
+        "normalised_bias": -0.252908
       },
       {
         "key": 30,
         "n": 1605,
         "actual_total": 1963215.0,
-        "predicted_total": 1348097.24,
-        "wape": 0.392619,
-        "mae": 480.2458,
-        "normalised_bias": -0.313322
+        "predicted_total": 1393354.68,
+        "wape": 0.375336,
+        "mae": 459.1064,
+        "normalised_bias": -0.290269
       }
     ],
     "by_horizon_bucket": [
@@ -353,46 +354,46 @@
         "key": "1-3",
         "n": 4815,
         "actual_total": 6209526.0,
-        "predicted_total": 6142647.96,
-        "wape": 0.029269,
-        "mae": 37.7464,
-        "normalised_bias": -0.01077
+        "predicted_total": 6144950.53,
+        "wape": 0.029215,
+        "mae": 37.6769,
+        "normalised_bias": -0.010399
       },
       {
         "key": "4-7",
         "n": 6420,
         "actual_total": 6770344.0,
-        "predicted_total": 6694682.66,
-        "wape": 0.063576,
-        "mae": 67.0454,
-        "normalised_bias": -0.011175
+        "predicted_total": 6725309.26,
+        "wape": 0.060656,
+        "mae": 63.9656,
+        "normalised_bias": -0.006652
       },
       {
         "key": "8-14",
         "n": 11235,
         "actual_total": 15110234.0,
-        "predicted_total": 14147572.46,
-        "wape": 0.113804,
-        "mae": 153.0585,
-        "normalised_bias": -0.063709
+        "predicted_total": 14915782.53,
+        "wape": 0.107822,
+        "mae": 145.0127,
+        "normalised_bias": -0.012869
       },
       {
         "key": "15-21",
         "n": 11235,
         "actual_total": 16241922.0,
-        "predicted_total": 15329779.31,
-        "wape": 0.13901,
-        "mae": 200.9609,
-        "normalised_bias": -0.05616
+        "predicted_total": 15789207.97,
+        "wape": 0.12444,
+        "mae": 179.8968,
+        "normalised_bias": -0.027873
       },
       {
         "key": "22-30",
         "n": 14445,
         "actual_total": 20109114.0,
-        "predicted_total": 15773485.67,
-        "wape": 0.278562,
-        "mae": 387.7908,
-        "normalised_bias": -0.215605
+        "predicted_total": 16471726.12,
+        "wape": 0.263073,
+        "mae": 366.2287,
+        "normalised_bias": -0.180883
       }
     ],
     "by_province": [
@@ -400,64 +401,64 @@
         "key": "mazandaran",
         "n": 9300,
         "actual_total": 23702705.0,
-        "predicted_total": 20834341.15,
-        "wape": 0.180249,
-        "mae": 459.3963,
-        "normalised_bias": -0.121014
+        "predicted_total": 21538342.89,
+        "wape": 0.167661,
+        "mae": 427.3138,
+        "normalised_bias": -0.091313
       },
       {
         "key": "khorasan_razavi",
         "n": 6150,
         "actual_total": 5476245.0,
-        "predicted_total": 5276051.19,
-        "wape": 0.0985,
-        "mae": 87.7091,
-        "normalised_bias": -0.036557
+        "predicted_total": 5370697.7,
+        "wape": 0.084164,
+        "mae": 74.9431,
+        "normalised_bias": -0.019274
       },
       {
         "key": "isfahan",
         "n": 11700,
         "actual_total": 2808208.0,
-        "predicted_total": 2541887.3,
-        "wape": 0.163501,
-        "mae": 39.2432,
-        "normalised_bias": -0.094837
+        "predicted_total": 2631182.02,
+        "wape": 0.14542,
+        "mae": 34.9034,
+        "normalised_bias": -0.063039
       },
       {
         "key": "hormozgan",
         "n": 3750,
         "actual_total": 5227343.0,
-        "predicted_total": 4989342.71,
-        "wape": 0.079067,
-        "mae": 110.2167,
-        "normalised_bias": -0.04553
+        "predicted_total": 5100035.11,
+        "wape": 0.070663,
+        "mae": 98.5016,
+        "normalised_bias": -0.024354
       },
       {
         "key": "gilan",
         "n": 7950,
         "actual_total": 15003243.0,
-        "predicted_total": 13491088.55,
-        "wape": 0.157252,
-        "mae": 296.7664,
-        "normalised_bias": -0.100789
+        "predicted_total": 14082951.29,
+        "wape": 0.143293,
+        "mae": 270.4229,
+        "normalised_bias": -0.06134
       },
       {
         "key": "alborz",
         "n": 2700,
         "actual_total": 3692806.0,
-        "predicted_total": 3238607.18,
-        "wape": 0.215071,
-        "mae": 294.1538,
-        "normalised_bias": -0.122996
+        "predicted_total": 3347798.18,
+        "wape": 0.229488,
+        "mae": 313.8721,
+        "normalised_bias": -0.093427
       },
       {
         "key": "tehran",
         "n": 6600,
         "actual_total": 8530590.0,
-        "predicted_total": 7716849.97,
-        "wape": 0.15866,
-        "mae": 205.0704,
-        "normalised_bias": -0.095391
+        "predicted_total": 7975969.21,
+        "wape": 0.155044,
+        "mae": 200.3967,
+        "normalised_bias": -0.065016
       }
     ],
     "by_weekday": [
@@ -465,64 +466,64 @@
         "key": 0,
         "n": 6420,
         "actual_total": 6724589.0,
-        "predicted_total": 6119263.21,
-        "wape": 0.147188,
-        "mae": 154.1712,
-        "normalised_bias": -0.090017
+        "predicted_total": 6367900.06,
+        "wape": 0.138054,
+        "mae": 144.6038,
+        "normalised_bias": -0.053042
       },
       {
         "key": 1,
         "n": 6741,
         "actual_total": 8436861.0,
-        "predicted_total": 7614155.67,
-        "wape": 0.153281,
-        "mae": 191.8427,
-        "normalised_bias": -0.097513
+        "predicted_total": 7873425.66,
+        "wape": 0.150543,
+        "mae": 188.4154,
+        "normalised_bias": -0.066783
       },
       {
         "key": 2,
         "n": 6741,
         "actual_total": 11817912.0,
-        "predicted_total": 10036501.17,
-        "wape": 0.186011,
-        "mae": 326.1028,
-        "normalised_bias": -0.150738
+        "predicted_total": 10466326.77,
+        "wape": 0.165953,
+        "mae": 290.9387,
+        "normalised_bias": -0.114368
       },
       {
         "key": 3,
         "n": 7062,
         "actual_total": 15009911.0,
-        "predicted_total": 13397232.73,
-        "wape": 0.162496,
-        "mae": 345.3767,
-        "normalised_bias": -0.107441
+        "predicted_total": 13837311.66,
+        "wape": 0.149886,
+        "mae": 318.5758,
+        "normalised_bias": -0.078122
       },
       {
         "key": 4,
         "n": 7704,
         "actual_total": 8887660.0,
-        "predicted_total": 7826864.4,
-        "wape": 0.180296,
-        "mae": 207.9974,
-        "normalised_bias": -0.119356
+        "predicted_total": 8030553.58,
+        "wape": 0.174809,
+        "mae": 201.6666,
+        "normalised_bias": -0.096438
       },
       {
         "key": 5,
         "n": 7062,
         "actual_total": 7212036.0,
-        "predicted_total": 7058504.79,
-        "wape": 0.116155,
-        "mae": 118.6231,
-        "normalised_bias": -0.021288
+        "predicted_total": 7256598.69,
+        "wape": 0.108237,
+        "mae": 110.5365,
+        "normalised_bias": 0.006179
       },
       {
         "key": 6,
         "n": 6420,
         "actual_total": 6352171.0,
-        "predicted_total": 6035646.09,
-        "wape": 0.13079,
-        "mae": 129.408,
-        "normalised_bias": -0.049829
+        "predicted_total": 6214859.99,
+        "wape": 0.124192,
+        "mae": 122.8803,
+        "normalised_bias": -0.021616
       }
     ],
     "by_demand_bucket": [
@@ -530,46 +531,46 @@
         "key": "q0.00-0.50",
         "n": 24171,
         "actual_total": 69101.0,
-        "predicted_total": 66893.92,
-        "wape": 0.542608,
-        "mae": 1.5512,
-        "normalised_bias": -0.03194
+        "predicted_total": 68335.05,
+        "wape": 0.555263,
+        "mae": 1.5874,
+        "normalised_bias": -0.011085
       },
       {
         "key": "q0.50-0.75",
         "n": 11948,
         "actual_total": 918002.0,
-        "predicted_total": 828554.7,
-        "wape": 0.277603,
-        "mae": 21.3291,
-        "normalised_bias": -0.097437
+        "predicted_total": 847465.27,
+        "wape": 0.280303,
+        "mae": 21.5366,
+        "normalised_bias": -0.076837
       },
       {
         "key": "q0.75-0.90",
         "n": 7217,
         "actual_total": 5435588.0,
-        "predicted_total": 4951130.13,
-        "wape": 0.201945,
-        "mae": 152.0981,
-        "normalised_bias": -0.089127
+        "predicted_total": 5139853.1,
+        "wape": 0.201255,
+        "mae": 151.5783,
+        "normalised_bias": -0.054407
       },
       {
         "key": "q0.90-0.99",
         "n": 4329,
         "actual_total": 35139123.0,
-        "predicted_total": 31672423.84,
-        "wape": 0.159831,
-        "mae": 1297.3699,
-        "normalised_bias": -0.098656
+        "predicted_total": 32801557.48,
+        "wape": 0.149842,
+        "mae": 1216.2912,
+        "normalised_bias": -0.066523
       },
       {
         "key": "q0.99-1.00",
         "n": 485,
         "actual_total": 22879326.0,
-        "predicted_total": 20569165.46,
-        "wape": 0.139204,
-        "mae": 6566.7773,
-        "normalised_bias": -0.100972
+        "predicted_total": 21189765.5,
+        "wape": 0.125775,
+        "mae": 5933.3018,
+        "normalised_bias": -0.073847
       }
     ],
     "by_observation_state": [
@@ -577,45 +578,691 @@
         "key": "observed",
         "n": 27689,
         "actual_total": 64346928.0,
-        "predicted_total": 58034025.69,
-        "wape": 0.157446,
-        "mae": 365.8917,
-        "normalised_bias": -0.098107
+        "predicted_total": 59991434.04,
+        "wape": 0.147198,
+        "mae": 342.0757,
+        "normalised_bias": -0.067688
       },
       {
         "key": "unobserved",
         "n": 20461,
         "actual_total": 94212.0,
-        "predicted_total": 54142.37,
-        "wape": 0.637422,
-        "mae": 2.935,
-        "normalised_bias": -0.425313
+        "predicted_total": 55542.36,
+        "wape": 0.646098,
+        "mae": 2.9749,
+        "normalised_bias": -0.410453
       }
     ],
     "high_demand": {
       "top_1pct": {
         "n": 482,
         "actual_total": 23942076.0,
-        "predicted_total": 21563760.04,
-        "wape": 0.145696,
-        "mae": 7237.0491,
-        "normalised_bias": -0.099336
+        "predicted_total": 22278831.07,
+        "wape": 0.134241,
+        "mae": 6668.0896,
+        "normalised_bias": -0.06947
       },
       "top_5pct": {
         "n": 2408,
         "actual_total": 50151783.0,
-        "predicted_total": 45011978.58,
-        "wape": 0.150152,
-        "mae": 3127.2324,
-        "normalised_bias": -0.102485
+        "predicted_total": 46494161.76,
+        "wape": 0.138793,
+        "mae": 2890.666,
+        "normalised_bias": -0.072931
       },
       "top_10pct": {
         "n": 4815,
         "actual_total": 58553989.0,
-        "predicted_total": 52603724.72,
-        "wape": 0.152973,
-        "mae": 1860.2642,
-        "normalised_bias": -0.10162
+        "predicted_total": 54391642.57,
+        "wape": 0.141698,
+        "mae": 1723.1561,
+        "normalised_bias": -0.071086
+      }
+    }
+  },
+  "champion_raw": {
+    "name": "CHAMPION raw lightgbm",
+    "pooled": {
+      "n": 48150,
+      "actual_total": 64441140.0,
+      "predicted_total": 58090372.23,
+      "wape": 0.15508,
+      "mae": 207.5496,
+      "normalised_bias": -0.098551
+    },
+    "training": {
+      "n": 10695399,
+      "actual_total": 12351692947.0,
+      "predicted_total": 12153273661.98,
+      "wape": 0.068722,
+      "mae": 79.3638,
+      "normalised_bias": -0.016064
+    },
+    "training_folds": {
+      "2024-11-21": {
+        "n": 1366497,
+        "actual_total": 1527391822.0,
+        "predicted_total": 1508544560.44,
+        "wape": 0.053222,
+        "mae": 59.4884,
+        "normalised_bias": -0.01234
+      },
+      "2025-05-21": {
+        "n": 2005608,
+        "actual_total": 2258514401.0,
+        "predicted_total": 2228756715.88,
+        "wape": 0.060665,
+        "mae": 68.3151,
+        "normalised_bias": -0.013176
+      },
+      "2025-08-21": {
+        "n": 2330460,
+        "actual_total": 2662522269.0,
+        "predicted_total": 2615398491.12,
+        "wape": 0.073611,
+        "mae": 84.0996,
+        "normalised_bias": -0.017699
+      },
+      "2025-09-22": {
+        "n": 2443452,
+        "actual_total": 2884247850.0,
+        "predicted_total": 2834979487.26,
+        "wape": 0.072512,
+        "mae": 85.5932,
+        "normalised_bias": -0.017082
+      },
+      "2025-10-22": {
+        "n": 2549382,
+        "actual_total": 3019016605.0,
+        "predicted_total": 2965594407.28,
+        "wape": 0.074657,
+        "mae": 88.41,
+        "normalised_bias": -0.017695
+      }
+    },
+    "validation_minus_train_wape": 0.086358,
+    "folds": {
+      "2024-11-21": {
+        "n": 9630,
+        "actual_total": 6787514.0,
+        "predicted_total": 6841568.05,
+        "wape": 0.121684,
+        "mae": 85.7664,
+        "normalised_bias": 0.007964
+      },
+      "2025-05-21": {
+        "n": 9630,
+        "actual_total": 16216851.0,
+        "predicted_total": 12631404.9,
+        "wape": 0.270578,
+        "mae": 455.6512,
+        "normalised_bias": -0.221094
+      },
+      "2025-08-21": {
+        "n": 9630,
+        "actual_total": 19510897.0,
+        "predicted_total": 18660396.55,
+        "wape": 0.1182,
+        "mae": 239.479,
+        "normalised_bias": -0.043591
+      },
+      "2025-09-22": {
+        "n": 9630,
+        "actual_total": 12251705.0,
+        "predicted_total": 11263115.81,
+        "wape": 0.108232,
+        "mae": 137.698,
+        "normalised_bias": -0.08069
+      },
+      "2025-10-22": {
+        "n": 9630,
+        "actual_total": 9674173.0,
+        "predicted_total": 8693886.92,
+        "wape": 0.118609,
+        "mae": 119.1534,
+        "normalised_bias": -0.10133
+      }
+    },
+    "by_horizon": [
+      {
+        "key": 1,
+        "n": 1605,
+        "actual_total": 2445231.0,
+        "predicted_total": 2418042.11,
+        "wape": 0.022002,
+        "mae": 33.5202,
+        "normalised_bias": -0.011119
+      },
+      {
+        "key": 2,
+        "n": 1605,
+        "actual_total": 1983424.0,
+        "predicted_total": 1953706.95,
+        "wape": 0.030904,
+        "mae": 38.1899,
+        "normalised_bias": -0.014983
+      },
+      {
+        "key": 3,
+        "n": 1605,
+        "actual_total": 1780871.0,
+        "predicted_total": 1773201.47,
+        "wape": 0.03724,
+        "mae": 41.3205,
+        "normalised_bias": -0.004307
+      },
+      {
+        "key": 4,
+        "n": 1605,
+        "actual_total": 1438398.0,
+        "predicted_total": 1415072.34,
+        "wape": 0.046082,
+        "mae": 41.299,
+        "normalised_bias": -0.016216
+      },
+      {
+        "key": 5,
+        "n": 1605,
+        "actual_total": 1534207.0,
+        "predicted_total": 1551684.83,
+        "wape": 0.04833,
+        "mae": 46.1982,
+        "normalised_bias": 0.011392
+      },
+      {
+        "key": 6,
+        "n": 1605,
+        "actual_total": 1659725.0,
+        "predicted_total": 1657602.24,
+        "wape": 0.06534,
+        "mae": 67.5683,
+        "normalised_bias": -0.001279
+      },
+      {
+        "key": 7,
+        "n": 1605,
+        "actual_total": 2138014.0,
+        "predicted_total": 2100949.85,
+        "wape": 0.075668,
+        "mae": 100.7968,
+        "normalised_bias": -0.017336
+      },
+      {
+        "key": 8,
+        "n": 1605,
+        "actual_total": 2169580.0,
+        "predicted_total": 2032777.57,
+        "wape": 0.100706,
+        "mae": 136.1311,
+        "normalised_bias": -0.063055
+      },
+      {
+        "key": 9,
+        "n": 1605,
+        "actual_total": 1744283.0,
+        "predicted_total": 1658934.61,
+        "wape": 0.096396,
+        "mae": 104.7609,
+        "normalised_bias": -0.04893
+      },
+      {
+        "key": 10,
+        "n": 1605,
+        "actual_total": 1885905.0,
+        "predicted_total": 1742215.37,
+        "wape": 0.108638,
+        "mae": 127.6517,
+        "normalised_bias": -0.076191
+      },
+      {
+        "key": 11,
+        "n": 1605,
+        "actual_total": 1566502.0,
+        "predicted_total": 1446884.64,
+        "wape": 0.097704,
+        "mae": 95.3608,
+        "normalised_bias": -0.07636
+      },
+      {
+        "key": 12,
+        "n": 1605,
+        "actual_total": 1702579.0,
+        "predicted_total": 1599420.88,
+        "wape": 0.093963,
+        "mae": 99.676,
+        "normalised_bias": -0.060589
+      },
+      {
+        "key": 13,
+        "n": 1605,
+        "actual_total": 2327008.0,
+        "predicted_total": 2336079.84,
+        "wape": 0.100269,
+        "mae": 145.3748,
+        "normalised_bias": 0.003899
+      },
+      {
+        "key": 14,
+        "n": 1605,
+        "actual_total": 3714377.0,
+        "predicted_total": 3254431.26,
+        "wape": 0.155422,
+        "mae": 359.6867,
+        "normalised_bias": -0.123829
+      },
+      {
+        "key": 15,
+        "n": 1605,
+        "actual_total": 2990185.0,
+        "predicted_total": 2876375.41,
+        "wape": 0.124081,
+        "mae": 231.1675,
+        "normalised_bias": -0.038061
+      },
+      {
+        "key": 16,
+        "n": 1605,
+        "actual_total": 1871315.0,
+        "predicted_total": 1883515.18,
+        "wape": 0.13896,
+        "mae": 162.0173,
+        "normalised_bias": 0.00652
+      },
+      {
+        "key": 17,
+        "n": 1605,
+        "actual_total": 1933551.0,
+        "predicted_total": 1853113.72,
+        "wape": 0.149217,
+        "mae": 179.7621,
+        "normalised_bias": -0.041601
+      },
+      {
+        "key": 18,
+        "n": 1605,
+        "actual_total": 1690581.0,
+        "predicted_total": 1639499.31,
+        "wape": 0.112184,
+        "mae": 118.1662,
+        "normalised_bias": -0.030215
+      },
+      {
+        "key": 19,
+        "n": 1605,
+        "actual_total": 2003969.0,
+        "predicted_total": 1807425.84,
+        "wape": 0.122312,
+        "mae": 152.7157,
+        "normalised_bias": -0.098077
+      },
+      {
+        "key": 20,
+        "n": 1605,
+        "actual_total": 2776614.0,
+        "predicted_total": 2431957.0,
+        "wape": 0.147065,
+        "mae": 254.42,
+        "normalised_bias": -0.124129
+      },
+      {
+        "key": 21,
+        "n": 1605,
+        "actual_total": 2975707.0,
+        "predicted_total": 2779212.26,
+        "wape": 0.124321,
+        "mae": 230.4941,
+        "normalised_bias": -0.066033
+      },
+      {
+        "key": 22,
+        "n": 1605,
+        "actual_total": 2566587.0,
+        "predicted_total": 2244481.4,
+        "wape": 0.167475,
+        "mae": 267.8118,
+        "normalised_bias": -0.1255
+      },
+      {
+        "key": 23,
+        "n": 1605,
+        "actual_total": 2317533.0,
+        "predicted_total": 1861305.74,
+        "wape": 0.231375,
+        "mae": 334.0927,
+        "normalised_bias": -0.196859
+      },
+      {
+        "key": 24,
+        "n": 1605,
+        "actual_total": 2059851.0,
+        "predicted_total": 1827814.01,
+        "wape": 0.167569,
+        "mae": 215.0577,
+        "normalised_bias": -0.112647
+      },
+      {
+        "key": 25,
+        "n": 1605,
+        "actual_total": 1813315.0,
+        "predicted_total": 1543994.55,
+        "wape": 0.210205,
+        "mae": 237.4876,
+        "normalised_bias": -0.148524
+      },
+      {
+        "key": 26,
+        "n": 1605,
+        "actual_total": 1989278.0,
+        "predicted_total": 1543498.84,
+        "wape": 0.280259,
+        "mae": 347.3602,
+        "normalised_bias": -0.224091
+      },
+      {
+        "key": 27,
+        "n": 1605,
+        "actual_total": 2284077.0,
+        "predicted_total": 1635971.06,
+        "wape": 0.347459,
+        "mae": 494.4689,
+        "normalised_bias": -0.28375
+      },
+      {
+        "key": 28,
+        "n": 1605,
+        "actual_total": 2650852.0,
+        "predicted_total": 2104067.74,
+        "wape": 0.333734,
+        "mae": 551.202,
+        "normalised_bias": -0.206267
+      },
+      {
+        "key": 29,
+        "n": 1605,
+        "actual_total": 2464406.0,
+        "predicted_total": 1778138.81,
+        "wape": 0.346026,
+        "mae": 531.307,
+        "normalised_bias": -0.278472
+      },
+      {
+        "key": 30,
+        "n": 1605,
+        "actual_total": 1963215.0,
+        "predicted_total": 1338997.42,
+        "wape": 0.393581,
+        "mae": 481.4227,
+        "normalised_bias": -0.317957
+      }
+    ],
+    "by_horizon_bucket": [
+      {
+        "key": "1-3",
+        "n": 4815,
+        "actual_total": 6209526.0,
+        "predicted_total": 6144950.53,
+        "wape": 0.029215,
+        "mae": 37.6769,
+        "normalised_bias": -0.010399
+      },
+      {
+        "key": "4-7",
+        "n": 6420,
+        "actual_total": 6770344.0,
+        "predicted_total": 6725309.26,
+        "wape": 0.060656,
+        "mae": 63.9656,
+        "normalised_bias": -0.006652
+      },
+      {
+        "key": "8-14",
+        "n": 11235,
+        "actual_total": 15110234.0,
+        "predicted_total": 14070744.16,
+        "wape": 0.11351,
+        "mae": 152.6631,
+        "normalised_bias": -0.068794
+      },
+      {
+        "key": "15-21",
+        "n": 11235,
+        "actual_total": 16241922.0,
+        "predicted_total": 15271098.72,
+        "wape": 0.131304,
+        "mae": 189.8204,
+        "normalised_bias": -0.059773
+      },
+      {
+        "key": "22-30",
+        "n": 14445,
+        "actual_total": 20109114.0,
+        "predicted_total": 15878269.56,
+        "wape": 0.276175,
+        "mae": 384.4678,
+        "normalised_bias": -0.210394
+      }
+    ],
+    "by_province": [
+      {
+        "key": "mazandaran",
+        "n": 9300,
+        "actual_total": 23702705.0,
+        "predicted_total": 20789030.94,
+        "wape": 0.176187,
+        "mae": 449.0427,
+        "normalised_bias": -0.122926
+      },
+      {
+        "key": "khorasan_razavi",
+        "n": 6150,
+        "actual_total": 5476245.0,
+        "predicted_total": 5225200.06,
+        "wape": 0.102344,
+        "mae": 91.1317,
+        "normalised_bias": -0.045843
+      },
+      {
+        "key": "isfahan",
+        "n": 11700,
+        "actual_total": 2808208.0,
+        "predicted_total": 2546415.38,
+        "wape": 0.157859,
+        "mae": 37.889,
+        "normalised_bias": -0.093224
+      },
+      {
+        "key": "hormozgan",
+        "n": 3750,
+        "actual_total": 5227343.0,
+        "predicted_total": 4981623.11,
+        "wape": 0.078713,
+        "mae": 109.7228,
+        "normalised_bias": -0.047007
+      },
+      {
+        "key": "gilan",
+        "n": 7950,
+        "actual_total": 15003243.0,
+        "predicted_total": 13572595.07,
+        "wape": 0.149986,
+        "mae": 283.0544,
+        "normalised_bias": -0.095356
+      },
+      {
+        "key": "alborz",
+        "n": 2700,
+        "actual_total": 3692806.0,
+        "predicted_total": 3241103.42,
+        "wape": 0.219163,
+        "mae": 299.7508,
+        "normalised_bias": -0.12232
+      },
+      {
+        "key": "tehran",
+        "n": 6600,
+        "actual_total": 8530590.0,
+        "predicted_total": 7734404.25,
+        "wape": 0.157385,
+        "mae": 203.4221,
+        "normalised_bias": -0.093333
+      }
+    ],
+    "by_weekday": [
+      {
+        "key": 0,
+        "n": 6420,
+        "actual_total": 6724589.0,
+        "predicted_total": 6157026.48,
+        "wape": 0.141449,
+        "mae": 148.1599,
+        "normalised_bias": -0.084401
+      },
+      {
+        "key": 1,
+        "n": 6741,
+        "actual_total": 8436861.0,
+        "predicted_total": 7593611.67,
+        "wape": 0.156363,
+        "mae": 195.6998,
+        "normalised_bias": -0.099948
+      },
+      {
+        "key": 2,
+        "n": 6741,
+        "actual_total": 11817912.0,
+        "predicted_total": 10079098.67,
+        "wape": 0.182444,
+        "mae": 319.8502,
+        "normalised_bias": -0.147134
+      },
+      {
+        "key": 3,
+        "n": 7062,
+        "actual_total": 15009911.0,
+        "predicted_total": 13421852.86,
+        "wape": 0.159401,
+        "mae": 338.7983,
+        "normalised_bias": -0.105801
+      },
+      {
+        "key": 4,
+        "n": 7704,
+        "actual_total": 8887660.0,
+        "predicted_total": 7795616.94,
+        "wape": 0.178391,
+        "mae": 205.7989,
+        "normalised_bias": -0.122872
+      },
+      {
+        "key": 5,
+        "n": 7062,
+        "actual_total": 7212036.0,
+        "predicted_total": 7027884.52,
+        "wape": 0.110283,
+        "mae": 112.6262,
+        "normalised_bias": -0.025534
+      },
+      {
+        "key": 6,
+        "n": 6420,
+        "actual_total": 6352171.0,
+        "predicted_total": 6015281.09,
+        "wape": 0.124929,
+        "mae": 123.609,
+        "normalised_bias": -0.053035
+      }
+    ],
+    "by_demand_bucket": [
+      {
+        "key": "q0.00-0.50",
+        "n": 24171,
+        "actual_total": 69101.0,
+        "predicted_total": 65928.37,
+        "wape": 0.540704,
+        "mae": 1.5458,
+        "normalised_bias": -0.045913
+      },
+      {
+        "key": "q0.50-0.75",
+        "n": 11948,
+        "actual_total": 918002.0,
+        "predicted_total": 818408.01,
+        "wape": 0.277159,
+        "mae": 21.295,
+        "normalised_bias": -0.10849
+      },
+      {
+        "key": "q0.75-0.90",
+        "n": 7217,
+        "actual_total": 5435588.0,
+        "predicted_total": 4959857.37,
+        "wape": 0.197014,
+        "mae": 148.3838,
+        "normalised_bias": -0.087521
+      },
+      {
+        "key": "q0.90-0.99",
+        "n": 4329,
+        "actual_total": 35139123.0,
+        "predicted_total": 31708310.99,
+        "wape": 0.155012,
+        "mae": 1258.2538,
+        "normalised_bias": -0.097635
+      },
+      {
+        "key": "q0.99-1.00",
+        "n": 485,
+        "actual_total": 22879326.0,
+        "predicted_total": 20537867.49,
+        "wape": 0.139158,
+        "mae": 6564.6411,
+        "normalised_bias": -0.102339
+      }
+    ],
+    "by_observation_state": [
+      {
+        "key": "observed",
+        "n": 27689,
+        "actual_total": 64346928.0,
+        "predicted_total": 58036999.14,
+        "wape": 0.154362,
+        "mae": 358.7237,
+        "normalised_bias": -0.098061
+      },
+      {
+        "key": "unobserved",
+        "n": 20461,
+        "actual_total": 94212.0,
+        "predicted_total": 53373.09,
+        "wape": 0.645501,
+        "mae": 2.9722,
+        "normalised_bias": -0.433479
+      }
+    ],
+    "high_demand": {
+      "top_1pct": {
+        "n": 482,
+        "actual_total": 23942076.0,
+        "predicted_total": 21518418.02,
+        "wape": 0.144117,
+        "mae": 7158.6239,
+        "normalised_bias": -0.10123
+      },
+      "top_5pct": {
+        "n": 2408,
+        "actual_total": 50151783.0,
+        "predicted_total": 44968641.63,
+        "wape": 0.147353,
+        "mae": 3068.9491,
+        "normalised_bias": -0.103349
+      },
+      "top_10pct": {
+        "n": 4815,
+        "actual_total": 58553989.0,
+        "predicted_total": 52616292.62,
+        "wape": 0.149813,
+        "mae": 1821.8432,
+        "normalised_bias": -0.101405
       }
     }
   },
@@ -1213,5 +1860,127 @@
         "normalised_bias": -0.15522
       }
     }
+  },
+  "validation_audit": {
+    "protocol": {
+      "kind": "rolling-origin pseudo-competition with prequential calibration selection",
+      "folds": 5,
+      "rows": 48150,
+      "selection_rule": "each fold selects calibration only from earlier fully-closed folds; raw is used when no candidate is safe",
+      "model_spec_status": "preselected; not nested inside this run"
+    },
+    "reported_selected": {
+      "n": 48150,
+      "actual_total": 64441140.0,
+      "predicted_total": 60046976.41,
+      "wape": 0.147927,
+      "mae": 197.9773,
+      "normalised_bias": -0.068189,
+      "confidence_interval": {
+        "method": "exact fold-cluster bootstrap",
+        "confidence": 0.95,
+        "lower": 0.097554,
+        "upper": 0.22185
+      },
+      "fold_wape_median": 0.114597,
+      "fold_wape_std": 0.075311,
+      "best_fold_wape": 0.09263,
+      "worst_fold_wape": 0.272169,
+      "beats_baseline_folds": 5
+    },
+    "prequential_selection": {
+      "pooled": {
+        "n": 48150,
+        "actual_total": 64441140.0,
+        "predicted_total": 58949651.61,
+        "wape": 0.148618,
+        "mae": 198.9013,
+        "normalised_bias": -0.085217
+      },
+      "decisions": [
+        {
+          "cutoff": "2024-11-21",
+          "history_folds": [],
+          "selected": "none",
+          "wape": 0.121684,
+          "normalised_bias": 0.007964
+        },
+        {
+          "cutoff": "2025-05-21",
+          "history_folds": [
+            "2024-11-21"
+          ],
+          "selected": "none",
+          "wape": 0.270578,
+          "normalised_bias": -0.221094
+        },
+        {
+          "cutoff": "2025-08-21",
+          "history_folds": [
+            "2024-11-21",
+            "2025-05-21"
+          ],
+          "selected": "none",
+          "wape": 0.1182,
+          "normalised_bias": -0.043591
+        },
+        {
+          "cutoff": "2025-09-22",
+          "history_folds": [
+            "2024-11-21",
+            "2025-05-21",
+            "2025-08-21"
+          ],
+          "selected": "guarded_bias_horizon",
+          "wape": 0.09263,
+          "normalised_bias": -0.043833
+        },
+        {
+          "cutoff": "2025-10-22",
+          "history_folds": [
+            "2024-11-21",
+            "2025-05-21",
+            "2025-08-21",
+            "2025-09-22"
+          ],
+          "selected": "guarded_bias_horizon",
+          "wape": 0.095324,
+          "normalised_bias": -0.059185
+        }
+      ]
+    },
+    "last_fold_holdout": {
+      "cutoff": "2025-10-22",
+      "selected_from_prior_folds": "guarded_bias_horizon",
+      "wape": 0.095324,
+      "normalised_bias": -0.059185,
+      "baseline_wape": 0.21665,
+      "relative_improvement_vs_baseline": 0.560009
+    },
+    "overfit_diagnostics": {
+      "raw_train": {
+        "n": 10695399,
+        "actual_total": 12351692947.0,
+        "predicted_total": 12153273661.98,
+        "wape": 0.068722,
+        "mae": 79.3638,
+        "normalised_bias": -0.016064
+      },
+      "raw_validation": {
+        "n": 48150,
+        "actual_total": 64441140.0,
+        "predicted_total": 58090372.23,
+        "wape": 0.15508,
+        "mae": 207.5496,
+        "normalised_bias": -0.098551
+      },
+      "validation_minus_train_wape": 0.086358,
+      "interpretation": "large positive gaps are an overfit warning; this is diagnostic, not a proof, because train and future-window distributions differ"
+    },
+    "limitations": [
+      "only five temporal folds are available, so uncertainty remains wide",
+      "the model specification was chosen before this audit and is not nested per outer fold",
+      "the competition target has no labels yet and remains the only truly unseen test"
+    ]
   }
 }

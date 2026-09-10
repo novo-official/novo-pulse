@@ -1,0 +1,75 @@
+{
+  "raw": {
+    "name": "raw_two_band_lightgbm",
+    "calibration": "none",
+    "backtest_wape": 0.15508,
+    "normalised_bias": -0.098551,
+    "forecast_total": 7977311,
+    "results_path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/results_raw.csv",
+    "bundle_path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/model_variants/raw",
+    "bundle_digest": "0e13a2c057a1c69d53bc456a102712daf8db31991b9ba7f81565782e93d42dc3"
+  },
+  "calibrated": {
+    "name": "guarded_calibrated_two_band_lightgbm",
+    "calibration": "guarded_bias_horizon",
+    "backtest_wape": 0.147927,
+    "normalised_bias": -0.068189,
+    "forecast_total": 8352768,
+    "results_path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/results_calibrated.csv",
+    "bundle_path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/model_variants/calibrated",
+    "bundle_digest": "0a4ac0be942b8851651572a9cd67f3ec04980a532e02074ca713f7871301b311"
+  },
+  "delta": {
+    "forecast_total": 375457,
+    "percent": 4.706560895018384,
+    "changed_rows": 3973
+  },
+  "comparison_path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/model_comparison.csv",
+  "horizon_backtest": [
+    {
+      "key": "1-3",
+      "n": 4815,
+      "actual_total": 6209526.0,
+      "predicted_total": 6144950.53,
+      "wape": 0.029215,
+      "mae": 37.6769,
+      "normalised_bias": -0.010399
+    },
+    {
+      "key": "4-7",
+      "n": 6420,
+      "actual_total": 6770344.0,
+      "predicted_total": 6725309.26,
+      "wape": 0.060656,
+      "mae": 63.9656,
+      "normalised_bias": -0.006652
+    },
+    {
+      "key": "8-14",
+      "n": 11235,
+      "actual_total": 15110234.0,
+      "predicted_total": 14915782.53,
+      "wape": 0.107822,
+      "mae": 145.0127,
+      "normalised_bias": -0.012869
+    },
+    {
+      "key": "15-21",
+      "n": 11235,
+      "actual_total": 16241922.0,
+      "predicted_total": 15789207.97,
+      "wape": 0.12444,
+      "mae": 179.8968,
+      "normalised_bias": -0.027873
+    },
+    {
+      "key": "22-30",
+      "n": 14445,
+      "actual_total": 20109114.0,
+      "predicted_total": 16471726.12,
+      "wape": 0.263073,
+      "mae": 366.2287,
+      "normalised_bias": -0.180883
+    }
+  ]
+}

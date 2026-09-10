@@ -96,14 +96,17 @@ class Pol4Config:
 
     # -- features / models ---------------------------------------------------
     #: Trailing window for the per-city demand statistics.
-    city_history_days: int = 365
-    #: Horizons sampled when building training rows. Stratified rather than
-    #: exhaustive: 30 horizons per pair is 7M rows for no extra signal.
+    city_history_days: int = 752
+    #: Horizons sampled when building training rows. The dense D-22..D-30
+    #: experiment increased runtime by 48%, worsened pooled WAPE, and did not
+    #: improve bias, so the evidence-backed stratified set remains selected.
     train_horizons: tuple[int, ...] = (1, 2, 3, 5, 7, 10, 14, 18, 21, 25, 30)
     #: Check-ins before the cutoff used for training. Longer is not always
     #: better - the regime drifts - so this is an experiment knob.
-    train_window_days: int = 540
-    max_train_rows: int = 900_000
+    train_window_days: int = 752
+    #: Optional safety cap for training rows. None keeps every row generated
+    #: from the configured training window and horizons.
+    max_train_rows: int | None = None
     #: Trees for the ablation ladder. Fewer than the champion uses: the ladder
     #: compares feature sets, and nine full-size fits per fold buys nothing.
     ablation_params: dict[str, Any] = field(default_factory=lambda: {"n_estimators": 300})

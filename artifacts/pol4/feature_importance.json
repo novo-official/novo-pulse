@@ -1,332 +1,332 @@
 [
   {
-    "feature":"city_hist_mean",
-    "importance":0.3066337676,
-    "share":0.3066337676
-  },
-  {
     "feature":"city_weekday_mean",
-    "importance":0.2179070328,
-    "share":0.2179070328
+    "importance":0.4676834519,
+    "share":0.4676834519
   },
   {
-    "feature":"city_hist_p90",
-    "importance":0.2098816179,
-    "share":0.2098816179
-  },
-  {
-    "feature":"pickup_baseline_remaining",
-    "importance":0.0684302138,
-    "share":0.0684302138
-  },
-  {
-    "feature":"city_hist_p75",
-    "importance":0.0561744761,
-    "share":0.0561744761
-  },
-  {
-    "feature":"city_volatility",
-    "importance":0.0358945299,
-    "share":0.0358945299
+    "feature":"city_hist_mean",
+    "importance":0.1581288536,
+    "share":0.1581288536
   },
   {
     "feature":"city_hist_median",
-    "importance":0.023631472,
-    "share":0.023631472
+    "importance":0.1373137416,
+    "share":0.1373137416
+  },
+  {
+    "feature":"pickup_baseline_remaining",
+    "importance":0.0657655817,
+    "share":0.0657655817
+  },
+  {
+    "feature":"city_hist_p75",
+    "importance":0.0501031289,
+    "share":0.0501031289
   },
   {
     "feature":"city_code",
-    "importance":0.0220975929,
-    "share":0.0220975929
+    "importance":0.0283351608,
+    "share":0.0283351608
   },
   {
-    "feature":"city_hist_std",
-    "importance":0.0124340367,
-    "share":0.0124340367
+    "feature":"city_hist_p90",
+    "importance":0.0270448111,
+    "share":0.0270448111
   },
   {
     "feature":"pickup_baseline_prediction",
-    "importance":0.008954879,
-    "share":0.008954879
-  },
-  {
-    "feature":"jalali_month",
-    "importance":0.0066217659,
-    "share":0.0066217659
-  },
-  {
-    "feature":"days_to_checkin",
-    "importance":0.0030561168,
-    "share":0.0030561168
-  },
-  {
-    "feature":"expected_completion_fraction",
-    "importance":0.0027697869,
-    "share":0.0027697869
-  },
-  {
-    "feature":"jalali_day",
-    "importance":0.0024932908,
-    "share":0.0024932908
-  },
-  {
-    "feature":"checkin_day_of_month",
-    "importance":0.0019943599,
-    "share":0.0019943599
-  },
-  {
-    "feature":"checkin_weekday",
-    "importance":0.0015057937,
-    "share":0.0015057937
-  },
-  {
-    "feature":"market_observed_total",
-    "importance":0.0011581438,
-    "share":0.0011581438
-  },
-  {
-    "feature":"city_share_of_province",
-    "importance":0.0011371368,
-    "share":0.0011371368
-  },
-  {
-    "feature":"market_pickup_acceleration_7d",
-    "importance":0.0011325496,
-    "share":0.0011325496
-  },
-  {
-    "feature":"market_pickup_1d",
-    "importance":0.0009700685,
-    "share":0.0009700685
-  },
-  {
-    "feature":"market_pickup_3d",
-    "importance":0.0009638796,
-    "share":0.0009638796
-  },
-  {
-    "feature":"is_weekend",
-    "importance":0.0008983066,
-    "share":0.0008983066
-  },
-  {
-    "feature":"lat",
-    "importance":0.0008406165,
-    "share":0.0008406165
+    "importance":0.0102057281,
+    "share":0.0102057281
   },
   {
     "feature":"observed_total",
-    "importance":0.0008316054,
-    "share":0.0008316054
+    "importance":0.0065772705,
+    "share":0.0065772705
   },
   {
-    "feature":"market_pickup_acceleration_3d",
-    "importance":0.0007586103,
-    "share":0.0007586103
+    "feature":"city_volatility",
+    "importance":0.0063209492,
+    "share":0.0063209492
   },
   {
-    "feature":"market_pickup_14d",
-    "importance":0.0007102446,
-    "share":0.0007102446
+    "feature":"jalali_month",
+    "importance":0.0057545376,
+    "share":0.0057545376
   },
   {
-    "feature":"city_share_of_market",
-    "importance":0.0006362502,
-    "share":0.0006362502
+    "feature":"days_to_checkin",
+    "importance":0.0035998738,
+    "share":0.0035998738
   },
   {
-    "feature":"pickup_surprise",
-    "importance":0.0006117599,
-    "share":0.0006117599
-  },
-  {
-    "feature":"province_pickup_14d",
-    "importance":0.0005861782,
-    "share":0.0005861782
-  },
-  {
-    "feature":"expected_remaining_fraction",
-    "importance":0.0005573799,
-    "share":0.0005573799
-  },
-  {
-    "feature":"long",
-    "importance":0.0005558188,
-    "share":0.0005558188
-  },
-  {
-    "feature":"market_pickup_7d",
-    "importance":0.0005488946,
-    "share":0.0005488946
-  },
-  {
-    "feature":"province_pickup_3d",
-    "importance":0.0005363374,
-    "share":0.0005363374
+    "feature":"expected_completion_fraction",
+    "importance":0.0026863581,
+    "share":0.0026863581
   },
   {
     "feature":"days_since_last_search",
-    "importance":0.0004891187,
-    "share":0.0004891187
+    "importance":0.0017563197,
+    "share":0.0017563197
   },
   {
-    "feature":"province_observed_total",
-    "importance":0.0004730984,
-    "share":0.0004730984
-  },
-  {
-    "feature":"city_weekend_ratio",
-    "importance":0.0004393011,
-    "share":0.0004393011
-  },
-  {
-    "feature":"province_pickup_acceleration_7d",
-    "importance":0.0004277245,
-    "share":0.0004277245
-  },
-  {
-    "feature":"province_pickup_1d",
-    "importance":0.0004182648,
-    "share":0.0004182648
+    "feature":"checkin_weekday",
+    "importance":0.0017330087,
+    "share":0.0017330087
   },
   {
     "feature":"province_pickup_7d",
-    "importance":0.0004154986,
-    "share":0.0004154986
+    "importance":0.0015436643,
+    "share":0.0015436643
   },
   {
-    "feature":"active_search_days",
-    "importance":0.0003388694,
-    "share":0.0003388694
-  },
-  {
-    "feature":"search_span",
-    "importance":0.0003018493,
-    "share":0.0003018493
+    "feature":"jalali_day",
+    "importance":0.0014560341,
+    "share":0.0014560341
   },
   {
     "feature":"days_since_first_search",
-    "importance":0.0002584,
-    "share":0.0002584
+    "importance":0.0013820408,
+    "share":0.0013820408
   },
   {
-    "feature":"pickup_1d_share",
-    "importance":0.0002416427,
-    "share":0.0002416427
+    "feature":"checkin_day_of_month",
+    "importance":0.0012899556,
+    "share":0.0012899556
   },
   {
-    "feature":"pickup_7d_share",
-    "importance":0.0002361717,
-    "share":0.0002361717
+    "feature":"active_search_days",
+    "importance":0.0012870461,
+    "share":0.0012870461
   },
   {
-    "feature":"mean_daily_search",
-    "importance":0.0002056676,
-    "share":0.0002056676
+    "feature":"lat",
+    "importance":0.0012825239,
+    "share":0.0012825239
+  },
+  {
+    "feature":"search_span",
+    "importance":0.0011528886,
+    "share":0.0011528886
+  },
+  {
+    "feature":"long",
+    "importance":0.0011204337,
+    "share":0.0011204337
+  },
+  {
+    "feature":"market_pickup_acceleration_7d",
+    "importance":0.0010832229,
+    "share":0.0010832229
+  },
+  {
+    "feature":"province_pickup_3d",
+    "importance":0.0010788359,
+    "share":0.0010788359
+  },
+  {
+    "feature":"pickup_surprise",
+    "importance":0.0010655219,
+    "share":0.0010655219
+  },
+  {
+    "feature":"city_share_of_province",
+    "importance":0.0009934743,
+    "share":0.0009934743
+  },
+  {
+    "feature":"is_weekend",
+    "importance":0.0009643172,
+    "share":0.0009643172
+  },
+  {
+    "feature":"market_observed_total",
+    "importance":0.0009187984,
+    "share":0.0009187984
+  },
+  {
+    "feature":"province_pickup_14d",
+    "importance":0.0007878716,
+    "share":0.0007878716
+  },
+  {
+    "feature":"market_pickup_1d",
+    "importance":0.0007814519,
+    "share":0.0007814519
+  },
+  {
+    "feature":"province_observed_total",
+    "importance":0.0007596915,
+    "share":0.0007596915
+  },
+  {
+    "feature":"market_pickup_3d",
+    "importance":0.0007413464,
+    "share":0.0007413464
+  },
+  {
+    "feature":"city_weekend_ratio",
+    "importance":0.0006636083,
+    "share":0.0006636083
+  },
+  {
+    "feature":"province_pickup_1d",
+    "importance":0.0006496161,
+    "share":0.0006496161
+  },
+  {
+    "feature":"city_share_of_market",
+    "importance":0.0005793621,
+    "share":0.0005793621
+  },
+  {
+    "feature":"expected_remaining_fraction",
+    "importance":0.0005764716,
+    "share":0.0005764716
+  },
+  {
+    "feature":"market_pickup_acceleration_3d",
+    "importance":0.0005591343,
+    "share":0.0005591343
+  },
+  {
+    "feature":"market_pickup_14d",
+    "importance":0.0005377833,
+    "share":0.0005377833
+  },
+  {
+    "feature":"market_pickup_7d",
+    "importance":0.0005081287,
+    "share":0.0005081287
+  },
+  {
+    "feature":"city_hist_std",
+    "importance":0.000450057,
+    "share":0.000450057
+  },
+  {
+    "feature":"province_pickup_acceleration_7d",
+    "importance":0.0003354973,
+    "share":0.0003354973
   },
   {
     "feature":"province_code",
-    "importance":0.00019965,
-    "share":0.00019965
-  },
-  {
-    "feature":"market_pickup_velocity_14d",
-    "importance":0.0001580581,
-    "share":0.0001580581
-  },
-  {
-    "feature":"province_pickup_velocity_3d",
-    "importance":0.0001513731,
-    "share":0.0001513731
-  },
-  {
-    "feature":"max_daily_search",
-    "importance":0.0001491221,
-    "share":0.0001491221
-  },
-  {
-    "feature":"province_pickup_acceleration_3d",
-    "importance":0.0001428565,
-    "share":0.0001428565
-  },
-  {
-    "feature":"pickup_3d_share",
-    "importance":0.0001422756,
-    "share":0.0001422756
-  },
-  {
-    "feature":"std_daily_search",
-    "importance":0.0001412556,
-    "share":0.0001412556
-  },
-  {
-    "feature":"market_pickup_velocity_3d",
-    "importance":0.0001341146,
-    "share":0.0001341146
-  },
-  {
-    "feature":"market_pickup_velocity_7d",
-    "importance":0.0000818686,
-    "share":0.0000818686
-  },
-  {
-    "feature":"province_pickup_velocity_14d",
-    "importance":0.0000762719,
-    "share":0.0000762719
-  },
-  {
-    "feature":"pickup_14d",
-    "importance":0.0000733581,
-    "share":0.0000733581
-  },
-  {
-    "feature":"pickup_3d",
-    "importance":0.0000722944,
-    "share":0.0000722944
-  },
-  {
-    "feature":"pickup_1d",
-    "importance":0.0000705812,
-    "share":0.0000705812
-  },
-  {
-    "feature":"pickup_acceleration_7d",
-    "importance":0.0000641518,
-    "share":0.0000641518
+    "importance":0.0002833646,
+    "share":0.0002833646
   },
   {
     "feature":"province_pickup_velocity_7d",
-    "importance":0.0000608633,
-    "share":0.0000608633
+    "importance":0.0002789857,
+    "share":0.0002789857
   },
   {
-    "feature":"pickup_acceleration_3d",
-    "importance":0.0000406088,
-    "share":0.0000406088
+    "feature":"province_pickup_velocity_3d",
+    "importance":0.0001940295,
+    "share":0.0001940295
+  },
+  {
+    "feature":"pickup_1d_share",
+    "importance":0.0001861776,
+    "share":0.0001861776
+  },
+  {
+    "feature":"pickup_7d_share",
+    "importance":0.0001785027,
+    "share":0.0001785027
+  },
+  {
+    "feature":"mean_daily_search",
+    "importance":0.0001477205,
+    "share":0.0001477205
+  },
+  {
+    "feature":"province_pickup_velocity_14d",
+    "importance":0.0001315629,
+    "share":0.0001315629
+  },
+  {
+    "feature":"std_daily_search",
+    "importance":0.0001220889,
+    "share":0.0001220889
+  },
+  {
+    "feature":"province_pickup_acceleration_3d",
+    "importance":0.0001112858,
+    "share":0.0001112858
+  },
+  {
+    "feature":"market_pickup_velocity_3d",
+    "importance":0.0001031801,
+    "share":0.0001031801
+  },
+  {
+    "feature":"max_daily_search",
+    "importance":0.0001019654,
+    "share":0.0001019654
+  },
+  {
+    "feature":"pickup_3d_share",
+    "importance":0.000095292,
+    "share":0.000095292
+  },
+  {
+    "feature":"market_pickup_velocity_14d",
+    "importance":0.0000944809,
+    "share":0.0000944809
+  },
+  {
+    "feature":"market_pickup_velocity_7d",
+    "importance":0.0000742618,
+    "share":0.0000742618
+  },
+  {
+    "feature":"pickup_1d",
+    "importance":0.0000701585,
+    "share":0.0000701585
+  },
+  {
+    "feature":"pickup_3d",
+    "importance":0.0000686062,
+    "share":0.0000686062
+  },
+  {
+    "feature":"pickup_14d",
+    "importance":0.0000610451,
+    "share":0.0000610451
+  },
+  {
+    "feature":"pickup_acceleration_7d",
+    "importance":0.000046954,
+    "share":0.000046954
   },
   {
     "feature":"pickup_7d",
-    "importance":0.0000332538,
-    "share":0.0000332538
+    "importance":0.0000458654,
+    "share":0.0000458654
+  },
+  {
+    "feature":"pickup_acceleration_3d",
+    "importance":0.0000196225,
+    "share":0.0000196225
   },
   {
     "feature":"pickup_3d_over_7d",
-    "importance":0.0000160135,
-    "share":0.0000160135
-  },
-  {
-    "feature":"pickup_velocity_14d",
-    "importance":0.0000148675,
-    "share":0.0000148675
-  },
-  {
-    "feature":"pickup_velocity_3d",
-    "importance":0.000013397,
-    "share":0.000013397
+    "importance":0.0000085828,
+    "share":0.0000085828
   },
   {
     "feature":"pickup_velocity_7d",
-    "importance":0.0000036445,
-    "share":0.0000036445
+    "importance":0.0000069587,
+    "share":0.0000069587
+  },
+  {
+    "feature":"pickup_velocity_3d",
+    "importance":0.0000060676,
+    "share":0.0000060676
+  },
+  {
+    "feature":"pickup_velocity_14d",
+    "importance":0.0000056876,
+    "share":0.0000056876
   }
 ]

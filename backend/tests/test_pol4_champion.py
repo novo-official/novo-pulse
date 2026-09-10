@@ -79,6 +79,8 @@ def test_champion_native_bundle_round_trip_is_prediction_identical(fitted, tmp_p
         "lightgbm_h1_14.txt",
         "lightgbm_h15_30.txt",
     }
+    assert (tmp_path / "bundle" / "calibrator_state.joblib").is_file()
+    assert restored.calibrator.method == champion.calibrator.method
     pd.testing.assert_frame_equal(before, after, check_exact=False, rtol=1e-12, atol=1e-12)
 
 
@@ -133,6 +135,7 @@ def test_champion_spec_records_what_was_selected():
     # log1p and the blend weight are experiment outcomes, not preferences.
     assert described["log1p_target"] is True
     assert described["blend_weight_on_model"] == 1.0
+    assert described["calibration_method"] == "guarded_bias_horizon"
     assert described["n_features"] == 66
 
 

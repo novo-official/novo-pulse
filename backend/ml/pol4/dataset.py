@@ -156,6 +156,9 @@ def materialize_training_frame(
         "sampled": len(train) < candidate_rows,
         "seed": config.seed,
         "cutoff": pd.Timestamp(config.cutoff).isoformat(),
+        "train_window_days": config.train_window_days,
+        "city_history_days": config.city_history_days,
+        "max_train_rows": config.max_train_rows,
         "checkin_min": dates.min().isoformat(),
         "checkin_max": dates.max().isoformat(),
         "horizons": horizons,
@@ -266,7 +269,7 @@ def build_training_frame(
     meta = pd.concat(metas, ignore_index=True)
     y = np.concatenate(targets)
 
-    if len(X) > config.max_train_rows:
+    if config.max_train_rows is not None and len(X) > config.max_train_rows:
         rng = np.random.default_rng(config.seed)
         picked = np.sort(rng.choice(len(X), size=config.max_train_rows, replace=False))
         X = X.iloc[picked].reset_index(drop=True)

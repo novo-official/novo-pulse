@@ -1,0 +1,122 @@
+{
+  "protocol": {
+    "kind": "rolling-origin pseudo-competition with prequential calibration selection",
+    "folds": 5,
+    "rows": 48150,
+    "selection_rule": "each fold selects calibration only from earlier fully-closed folds; raw is used when no candidate is safe",
+    "model_spec_status": "preselected; not nested inside this run"
+  },
+  "reported_selected": {
+    "n": 48150,
+    "actual_total": 64441140.0,
+    "predicted_total": 60046976.41,
+    "wape": 0.147927,
+    "mae": 197.9773,
+    "normalised_bias": -0.068189,
+    "confidence_interval": {
+      "method": "exact fold-cluster bootstrap",
+      "confidence": 0.95,
+      "lower": 0.097554,
+      "upper": 0.22185
+    },
+    "fold_wape_median": 0.114597,
+    "fold_wape_std": 0.075311,
+    "best_fold_wape": 0.09263,
+    "worst_fold_wape": 0.272169,
+    "beats_baseline_folds": 5
+  },
+  "prequential_selection": {
+    "pooled": {
+      "n": 48150,
+      "actual_total": 64441140.0,
+      "predicted_total": 58949651.61,
+      "wape": 0.148618,
+      "mae": 198.9013,
+      "normalised_bias": -0.085217
+    },
+    "decisions": [
+      {
+        "cutoff": "2024-11-21",
+        "history_folds": [],
+        "selected": "none",
+        "wape": 0.121684,
+        "normalised_bias": 0.007964
+      },
+      {
+        "cutoff": "2025-05-21",
+        "history_folds": [
+          "2024-11-21"
+        ],
+        "selected": "none",
+        "wape": 0.270578,
+        "normalised_bias": -0.221094
+      },
+      {
+        "cutoff": "2025-08-21",
+        "history_folds": [
+          "2024-11-21",
+          "2025-05-21"
+        ],
+        "selected": "none",
+        "wape": 0.1182,
+        "normalised_bias": -0.043591
+      },
+      {
+        "cutoff": "2025-09-22",
+        "history_folds": [
+          "2024-11-21",
+          "2025-05-21",
+          "2025-08-21"
+        ],
+        "selected": "guarded_bias_horizon",
+        "wape": 0.09263,
+        "normalised_bias": -0.043833
+      },
+      {
+        "cutoff": "2025-10-22",
+        "history_folds": [
+          "2024-11-21",
+          "2025-05-21",
+          "2025-08-21",
+          "2025-09-22"
+        ],
+        "selected": "guarded_bias_horizon",
+        "wape": 0.095324,
+        "normalised_bias": -0.059185
+      }
+    ]
+  },
+  "last_fold_holdout": {
+    "cutoff": "2025-10-22",
+    "selected_from_prior_folds": "guarded_bias_horizon",
+    "wape": 0.095324,
+    "normalised_bias": -0.059185,
+    "baseline_wape": 0.21665,
+    "relative_improvement_vs_baseline": 0.560009
+  },
+  "overfit_diagnostics": {
+    "raw_train": {
+      "n": 10695399,
+      "actual_total": 12351692947.0,
+      "predicted_total": 12153273661.98,
+      "wape": 0.068722,
+      "mae": 79.3638,
+      "normalised_bias": -0.016064
+    },
+    "raw_validation": {
+      "n": 48150,
+      "actual_total": 64441140.0,
+      "predicted_total": 58090372.23,
+      "wape": 0.15508,
+      "mae": 207.5496,
+      "normalised_bias": -0.098551
+    },
+    "validation_minus_train_wape": 0.086358,
+    "interpretation": "large positive gaps are an overfit warning; this is diagnostic, not a proof, because train and future-window distributions differ"
+  },
+  "limitations": [
+    "only five temporal folds are available, so uncertainty remains wide",
+    "the model specification was chosen before this audit and is not nested per outer fold",
+    "the competition target has no labels yet and remains the only truly unseen test"
+  ]
+}

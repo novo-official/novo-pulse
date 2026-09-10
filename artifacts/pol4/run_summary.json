@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-09T18:01:23.740199+00:00",
+  "generated_at": "2026-09-10T11:38:34.919688+00:00",
   "python": "3.13.15",
   "seed": 42,
   "model": "champion",
@@ -78,10 +78,253 @@
     }
   },
   "backtest": {
-    "skipped": true
+    "pooled_wape": 0.147927,
+    "pooled_normalised_bias": -0.068189,
+    "folds": {
+      "2024-11-21": 0.121684,
+      "2025-05-21": 0.272169,
+      "2025-08-21": 0.114597,
+      "2025-09-22": 0.09263,
+      "2025-10-22": 0.095324
+    },
+    "baseline_wape": 0.219991,
+    "relative_improvement": 0.3276,
+    "experiments": 7,
+    "calibration_accepted": true,
+    "calibration_method": "guarded_bias_horizon",
+    "raw_wape": 0.15508,
+    "raw_normalised_bias": -0.098551,
+    "calibrated_candidate_wape": 0.172189,
+    "calibrated_candidate_normalised_bias": -0.013367,
+    "calibration_candidates": [
+      {
+        "method": "horizon_shrunk",
+        "wape": 0.149292,
+        "normalised_bias": -0.071386,
+        "safe": true
+      },
+      {
+        "method": "guarded_bias_horizon",
+        "wape": 0.147927,
+        "normalised_bias": -0.068189,
+        "safe": true
+      },
+      {
+        "method": "bias_horizon_shrunk",
+        "wape": 0.172189,
+        "normalised_bias": -0.013367,
+        "safe": false
+      }
+    ],
+    "validation_audit": {
+      "protocol": {
+        "kind": "rolling-origin pseudo-competition with prequential calibration selection",
+        "folds": 5,
+        "rows": 48150,
+        "selection_rule": "each fold selects calibration only from earlier fully-closed folds; raw is used when no candidate is safe",
+        "model_spec_status": "preselected; not nested inside this run"
+      },
+      "reported_selected": {
+        "n": 48150,
+        "actual_total": 64441140.0,
+        "predicted_total": 60046976.41,
+        "wape": 0.147927,
+        "mae": 197.9773,
+        "normalised_bias": -0.068189,
+        "confidence_interval": {
+          "method": "exact fold-cluster bootstrap",
+          "confidence": 0.95,
+          "lower": 0.097554,
+          "upper": 0.22185
+        },
+        "fold_wape_median": 0.114597,
+        "fold_wape_std": 0.075311,
+        "best_fold_wape": 0.09263,
+        "worst_fold_wape": 0.272169,
+        "beats_baseline_folds": 5
+      },
+      "prequential_selection": {
+        "pooled": {
+          "n": 48150,
+          "actual_total": 64441140.0,
+          "predicted_total": 58949651.61,
+          "wape": 0.148618,
+          "mae": 198.9013,
+          "normalised_bias": -0.085217
+        },
+        "decisions": [
+          {
+            "cutoff": "2024-11-21",
+            "history_folds": [],
+            "selected": "none",
+            "wape": 0.121684,
+            "normalised_bias": 0.007964
+          },
+          {
+            "cutoff": "2025-05-21",
+            "history_folds": [
+              "2024-11-21"
+            ],
+            "selected": "none",
+            "wape": 0.270578,
+            "normalised_bias": -0.221094
+          },
+          {
+            "cutoff": "2025-08-21",
+            "history_folds": [
+              "2024-11-21",
+              "2025-05-21"
+            ],
+            "selected": "none",
+            "wape": 0.1182,
+            "normalised_bias": -0.043591
+          },
+          {
+            "cutoff": "2025-09-22",
+            "history_folds": [
+              "2024-11-21",
+              "2025-05-21",
+              "2025-08-21"
+            ],
+            "selected": "guarded_bias_horizon",
+            "wape": 0.09263,
+            "normalised_bias": -0.043833
+          },
+          {
+            "cutoff": "2025-10-22",
+            "history_folds": [
+              "2024-11-21",
+              "2025-05-21",
+              "2025-08-21",
+              "2025-09-22"
+            ],
+            "selected": "guarded_bias_horizon",
+            "wape": 0.095324,
+            "normalised_bias": -0.059185
+          }
+        ]
+      },
+      "last_fold_holdout": {
+        "cutoff": "2025-10-22",
+        "selected_from_prior_folds": "guarded_bias_horizon",
+        "wape": 0.095324,
+        "normalised_bias": -0.059185,
+        "baseline_wape": 0.21665,
+        "relative_improvement_vs_baseline": 0.560009
+      },
+      "overfit_diagnostics": {
+        "raw_train": {
+          "n": 10695399,
+          "actual_total": 12351692947.0,
+          "predicted_total": 12153273661.98,
+          "wape": 0.068722,
+          "mae": 79.3638,
+          "normalised_bias": -0.016064
+        },
+        "raw_validation": {
+          "n": 48150,
+          "actual_total": 64441140.0,
+          "predicted_total": 58090372.23,
+          "wape": 0.15508,
+          "mae": 207.5496,
+          "normalised_bias": -0.098551
+        },
+        "validation_minus_train_wape": 0.086358,
+        "interpretation": "large positive gaps are an overfit warning; this is diagnostic, not a proof, because train and future-window distributions differ"
+      },
+      "limitations": [
+        "only five temporal folds are available, so uncertainty remains wide",
+        "the model specification was chosen before this audit and is not nested per outer fold",
+        "the competition target has no labels yet and remains the only truly unseen test"
+      ]
+    }
   },
   "stability": {
-    "skipped": true
+    "target_start": "2025-10-23",
+    "target_days": 30,
+    "anchor_cutoff": "2025-09-23",
+    "snapshot_horizons": [
+      30,
+      21,
+      14,
+      7,
+      3,
+      1
+    ],
+    "pairs": 9630,
+    "stability_score": 0.8388,
+    "mean_absolute_revision": 67.285,
+    "mean_relative_revision": 0.1612,
+    "convergence_rate": 0.6709,
+    "by_step": [
+      {
+        "step": "30->21",
+        "mean_absolute_revision": 76.8832,
+        "mean_relative_revision": 0.1557,
+        "convergence_rate": 0.6513,
+        "n": 9630
+      },
+      {
+        "step": "21->14",
+        "mean_absolute_revision": 88.387,
+        "mean_relative_revision": 0.1646,
+        "convergence_rate": 0.451,
+        "n": 9630
+      },
+      {
+        "step": "14->7",
+        "mean_absolute_revision": 73.4609,
+        "mean_relative_revision": 0.186,
+        "convergence_rate": 0.7097,
+        "n": 9630
+      },
+      {
+        "step": "7->3",
+        "mean_absolute_revision": 64.2531,
+        "mean_relative_revision": 0.1596,
+        "convergence_rate": 0.7461,
+        "n": 9630
+      },
+      {
+        "step": "3->1",
+        "mean_absolute_revision": 33.4394,
+        "mean_relative_revision": 0.1403,
+        "convergence_rate": 0.7964,
+        "n": 9630
+      }
+    ],
+    "by_horizon": [
+      {
+        "horizon": 1,
+        "wape": 0.02,
+        "mean_prediction": 995.48
+      },
+      {
+        "horizon": 3,
+        "wape": 0.04,
+        "mean_prediction": 986.33
+      },
+      {
+        "horizon": 7,
+        "wape": 0.08,
+        "mean_prediction": 955.18
+      },
+      {
+        "horizon": 14,
+        "wape": 0.1,
+        "mean_prediction": 969.37
+      },
+      {
+        "horizon": 21,
+        "wape": 0.14,
+        "mean_prediction": 898.84
+      },
+      {
+        "horizon": 30,
+        "wape": 0.15,
+        "mean_prediction": 910.09
+      }
+    ]
   },
   "champion": {
     "model": "lightgbm",
@@ -111,106 +354,241 @@
     "params": {
       "n_estimators": 600
     },
+    "calibration_method": "guarded_bias_horizon",
     "blend_weight_on_model": 1.0,
-    "training_rows": 1906740,
+    "calibration": {
+      "method": "guarded_bias_horizon",
+      "alpha_global": 1.1,
+      "alpha_by_bucket": {
+        "1-3": 1.0,
+        "15-21": 1.0749,
+        "22-30": 1.08,
+        "4-7": 1.0,
+        "8-14": 1.1025
+      },
+      "support": {
+        "1-3": 6209526.0,
+        "15-21": 16241922.0,
+        "22-30": 20109114.0,
+        "4-7": 6770344.0,
+        "8-14": 15110234.0
+      },
+      "diagnostics": {
+        "rows": 48150,
+        "alpha_global_wape_optimal": 1.09,
+        "alpha_global_bias_matching": 1.1547,
+        "shrinkage": 500000.0
+      }
+    },
+    "training_rows": 2655312,
     "trainset": {
       "path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/trainset",
-      "rows": 1906740,
+      "rows": 2655312,
       "input_digest": "fc71f2f11bb1c781e2dff9aae3987b6af0afa3a7d51c43b1ef2dc8a72841636e",
       "files": {
-        "features.parquet": "cc720b6e362f6cd6fef8da71c0cf2ca44cdeead8020ff0b8c9edc3358c172ead",
-        "target.parquet": "2a53386e70ed8e487a2fedb555530666eda307134a320db5c61cee439c67cd7a",
-        "meta.parquet": "8e16ffcee1478d83b420288afeef1cfa2d06736311844c494cd5fa0e7864a173"
+        "features.parquet": "5a6ad9d84c2b17b87fad7518dbc65c59c74a8a656005684c4375f6450ce82d92",
+        "target.parquet": "6ec50ce7e04df174a827e93d58fd7cf764229f13a0e12285c5c97870fcf9a8d5",
+        "meta.parquet": "744f8d9e8d1a7297cf46aa2e52c08d4a8f6f6dc1ba13fd5d497ec04f40353dbc"
       },
-      "reused": false
+      "reused": true
     },
     "model_bundle": {
       "path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/model_bundle",
-      "bundle_digest": "d1c63afb15c1fd9985bfac6683e9fa338fac232f3a0cb584e8cd5a2905ee4916",
+      "bundle_digest": "0a4ac0be942b8851651572a9cd67f3ec04980a532e02074ca713f7871301b311",
       "input_digest": "fc71f2f11bb1c781e2dff9aae3987b6af0afa3a7d51c43b1ef2dc8a72841636e",
       "files": {
-        "lightgbm_h1_14.txt": "70b65746a58766642b9b618c177c0f69daabcb8acc21b54f0770461be8d84e84",
-        "lightgbm_h15_30.txt": "0b8b80ca1a5feef5a1f7ae4c70f630d5ba96f60837cb16fd9050147f43d92249",
-        "baseline_state.joblib": "88a4536221c89611acf790a5c51c1ea7356eaa113a6edb0b1c7a002172c2a291",
-        "model_spec.json": "ee68498a949149aac5eefec8f3e1341c1de57a5190e492626e1f1c91abb5b492"
+        "lightgbm_h1_14.txt": "c0120f475b79691e9cdadbbe9d8c312476612807df9b99595ad735332ab38f29",
+        "lightgbm_h15_30.txt": "9a3366adda1285a488145ce145491d28ad734a085ad9ba916b5719bbcdcf2d3c",
+        "baseline_state.joblib": "fa451ad6d9ca084c2aeb1e8a488789e259f530e065e270cc585fc2eb378c75fe",
+        "calibrator_state.joblib": "91729649822cb48435fa222a1594ba65c3136a58dacc5fb2bab9274fd6867578",
+        "model_spec.json": "f4a081e7ddef241fc31e38a2326ea6109f4ef41426c5423c9963692d2a79df31"
       },
       "load_parity_verified": true
     },
+    "model_variants": {
+      "raw": {
+        "path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/model_variants/raw",
+        "bundle_digest": "0e13a2c057a1c69d53bc456a102712daf8db31991b9ba7f81565782e93d42dc3",
+        "calibration": "none",
+        "load_parity_verified": true
+      },
+      "calibrated": {
+        "path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/model_variants/calibrated",
+        "bundle_digest": "0a4ac0be942b8851651572a9cd67f3ec04980a532e02074ca713f7871301b311",
+        "calibration": "guarded_bias_horizon",
+        "load_parity_verified": true
+      }
+    },
+    "real_grid_feature_audit": {
+      "rows": 9630,
+      "features": 66,
+      "expected_features": 66,
+      "exact_schema": true,
+      "cities": 321,
+      "dates": 30,
+      "horizon_min": 1,
+      "horizon_max": 30,
+      "infinite_values": 0,
+      "null_counts": {
+        "days_since_first_search": 4282,
+        "days_since_last_search": 4282,
+        "search_span": 4282
+      },
+      "unexpected_null_columns": [],
+      "market_features": 10,
+      "province_aggregate_features": 10,
+      "city_history_features": 5
+    },
     "top_features": [
       {
-        "feature": "city_hist_mean",
-        "importance": 0.3066337676233292,
-        "share": 0.3066337676233292
-      },
-      {
         "feature": "city_weekday_mean",
-        "importance": 0.21790703282638496,
-        "share": 0.21790703282638496
+        "importance": 0.46768345185790805,
+        "share": 0.46768345185790794
       },
       {
-        "feature": "city_hist_p90",
-        "importance": 0.2098816179070872,
-        "share": 0.2098816179070872
-      },
-      {
-        "feature": "pickup_baseline_remaining",
-        "importance": 0.06843021380845477,
-        "share": 0.06843021380845477
-      },
-      {
-        "feature": "city_hist_p75",
-        "importance": 0.05617447609645623,
-        "share": 0.05617447609645623
-      },
-      {
-        "feature": "city_volatility",
-        "importance": 0.03589452989187612,
-        "share": 0.03589452989187612
+        "feature": "city_hist_mean",
+        "importance": 0.15812885364538265,
+        "share": 0.15812885364538262
       },
       {
         "feature": "city_hist_median",
-        "importance": 0.02363147196707025,
-        "share": 0.02363147196707025
+        "importance": 0.13731374156671108,
+        "share": 0.13731374156671106
+      },
+      {
+        "feature": "pickup_baseline_remaining",
+        "importance": 0.06576558172585636,
+        "share": 0.06576558172585635
+      },
+      {
+        "feature": "city_hist_p75",
+        "importance": 0.05010312894546093,
+        "share": 0.050103128945460915
       },
       {
         "feature": "city_code",
-        "importance": 0.022097592921933445,
-        "share": 0.022097592921933445
+        "importance": 0.02833516083728023,
+        "share": 0.028335160837280222
       },
       {
-        "feature": "city_hist_std",
-        "importance": 0.012434036743609128,
-        "share": 0.012434036743609128
+        "feature": "city_hist_p90",
+        "importance": 0.02704481107567827,
+        "share": 0.027044811075678264
       },
       {
         "feature": "pickup_baseline_prediction",
-        "importance": 0.00895487898011536,
-        "share": 0.00895487898011536
+        "importance": 0.010205728116251499,
+        "share": 0.010205728116251497
+      },
+      {
+        "feature": "observed_total",
+        "importance": 0.0065772705491038645,
+        "share": 0.006577270549103863
+      },
+      {
+        "feature": "city_volatility",
+        "importance": 0.00632094923028084,
+        "share": 0.006320949230280838
       },
       {
         "feature": "jalali_month",
-        "importance": 0.006621765915075197,
-        "share": 0.006621765915075197
+        "importance": 0.00575453755872442,
+        "share": 0.005754537558724419
       },
       {
         "feature": "days_to_checkin",
-        "importance": 0.003056116848241898,
-        "share": 0.003056116848241898
+        "importance": 0.0035998737687294264,
+        "share": 0.0035998737687294256
       },
       {
         "feature": "expected_completion_fraction",
-        "importance": 0.0027697868678477804,
-        "share": 0.0027697868678477804
+        "importance": 0.0026863580576427923,
+        "share": 0.002686358057642792
       },
       {
-        "feature": "jalali_day",
-        "importance": 0.002493290785269698,
-        "share": 0.002493290785269698
+        "feature": "days_since_last_search",
+        "importance": 0.0017563197151552528,
+        "share": 0.0017563197151552524
       },
       {
-        "feature": "checkin_day_of_month",
-        "importance": 0.0019943599251736307,
-        "share": 0.0019943599251736307
+        "feature": "checkin_weekday",
+        "importance": 0.0017330087144004124,
+        "share": 0.001733008714400412
+      }
+    ]
+  },
+  "model_variants": {
+    "raw": {
+      "name": "raw_two_band_lightgbm",
+      "calibration": "none",
+      "backtest_wape": 0.15508,
+      "normalised_bias": -0.098551,
+      "forecast_total": 7977311,
+      "results_path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/results_raw.csv",
+      "bundle_path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/model_variants/raw",
+      "bundle_digest": "0e13a2c057a1c69d53bc456a102712daf8db31991b9ba7f81565782e93d42dc3"
+    },
+    "calibrated": {
+      "name": "guarded_calibrated_two_band_lightgbm",
+      "calibration": "guarded_bias_horizon",
+      "backtest_wape": 0.147927,
+      "normalised_bias": -0.068189,
+      "forecast_total": 8352768,
+      "results_path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/results_calibrated.csv",
+      "bundle_path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/model_variants/calibrated",
+      "bundle_digest": "0a4ac0be942b8851651572a9cd67f3ec04980a532e02074ca713f7871301b311"
+    },
+    "delta": {
+      "forecast_total": 375457,
+      "percent": 4.706560895018384,
+      "changed_rows": 3973
+    },
+    "comparison_path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/model_comparison.csv",
+    "horizon_backtest": [
+      {
+        "key": "1-3",
+        "n": 4815,
+        "actual_total": 6209526.0,
+        "predicted_total": 6144950.53,
+        "wape": 0.029215,
+        "mae": 37.6769,
+        "normalised_bias": -0.010399
+      },
+      {
+        "key": "4-7",
+        "n": 6420,
+        "actual_total": 6770344.0,
+        "predicted_total": 6725309.26,
+        "wape": 0.060656,
+        "mae": 63.9656,
+        "normalised_bias": -0.006652
+      },
+      {
+        "key": "8-14",
+        "n": 11235,
+        "actual_total": 15110234.0,
+        "predicted_total": 14915782.53,
+        "wape": 0.107822,
+        "mae": 145.0127,
+        "normalised_bias": -0.012869
+      },
+      {
+        "key": "15-21",
+        "n": 11235,
+        "actual_total": 16241922.0,
+        "predicted_total": 15789207.97,
+        "wape": 0.12444,
+        "mae": 179.8968,
+        "normalised_bias": -0.027873
+      },
+      {
+        "key": "22-30",
+        "n": 14445,
+        "actual_total": 20109114.0,
+        "predicted_total": 16471726.12,
+        "wape": 0.263073,
+        "mae": 366.2287,
+        "normalised_bias": -0.180883
       }
     ]
   },
@@ -221,67 +599,67 @@
     "dates": 30,
     "checkin_min": "2025-11-22",
     "checkin_max": "2025-12-21",
-    "total_predicted_demand": 7946421.0,
-    "rows_predicting_zero": 3036,
+    "total_predicted_demand": 8352768.0,
+    "rows_predicting_zero": 3017,
     "problems": [],
     "path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/results.csv",
     "named_path": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/results_named.csv"
   },
   "inference": {
     "observed_total": 2686508.0,
-    "predicted_total": 7946490.5127891665,
+    "predicted_total": 8352784.300120531,
     "pairs_with_no_observation": 4282,
     "cities_with_no_observation": 82,
     "top_cities": [
       {
         "city": "tehran",
         "city_code": 1183,
-        "predicted_demand": 1090072
+        "predicted_demand": 1175144
       },
       {
         "city": "qeshm",
         "city_code": 4995,
-        "predicted_demand": 985110
+        "predicted_demand": 1024778
       },
       {
         "city": "kish",
         "city_code": 2099,
-        "predicted_demand": 712768
+        "predicted_demand": 740144
       },
       {
         "city": "rasht",
         "city_code": 7339,
-        "predicted_demand": 615866
+        "predicted_demand": 645062
       },
       {
         "city": "mashhad",
         "city_code": 9356,
-        "predicted_demand": 560687
+        "predicted_demand": 580644
       },
       {
         "city": "ramsar",
         "city_code": 8978,
-        "predicted_demand": 527279
+        "predicted_demand": 556118
       },
       {
         "city": "kordan",
         "city_code": 9547,
-        "predicted_demand": 366404
+        "predicted_demand": 388450
       },
       {
         "city": "bandar_anzali",
         "city_code": 9814,
-        "predicted_demand": 247106
+        "predicted_demand": 257767
       },
       {
         "city": "isfahan",
         "city_code": 7619,
-        "predicted_demand": 225237
+        "predicted_demand": 234727
       },
       {
         "city": "chalus",
         "city_code": 9770,
-        "predicted_demand": 200283
+        "predicted_demand": 213875
       }
     ],
     "cities_rounding_to_zero": {
@@ -309,7 +687,7 @@
         "gharchak"
       ],
       "median_historical_demand": 2.0,
-      "median_unrounded_prediction": 5.031234247820384e-15,
+      "median_unrounded_prediction": 0.034462242733853184,
       "note": "these cities receive a positive prediction; it rounds to zero because their measured demand is below half a search per night"
     }
   },
@@ -325,5 +703,6 @@
     "history_days": 180
   },
   "model_card": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/model_card.json",
-  "elapsed_seconds": 57.56
+  "full_audit": "/home/parsa/Desktop/workspace/platforms/novo-pulse/artifacts/pol4/FULL_AUDIT.md",
+  "elapsed_seconds": 487.42
 }

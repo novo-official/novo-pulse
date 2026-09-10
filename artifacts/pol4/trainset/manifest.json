@@ -1,12 +1,15 @@
 {
   "format_version": 1,
   "input_digest": "fc71f2f11bb1c781e2dff9aae3987b6af0afa3a7d51c43b1ef2dc8a72841636e",
-  "rows": 1906740,
-  "candidate_rows_before_sampling": 1906740,
+  "rows": 2655312,
+  "candidate_rows_before_sampling": 2655312,
   "sampled": false,
   "seed": 42,
   "cutoff": "2025-11-21T00:00:00",
-  "checkin_min": "2024-05-31T00:00:00",
+  "train_window_days": 752,
+  "city_history_days": 752,
+  "max_train_rows": null,
+  "checkin_min": "2023-11-01T00:00:00",
   "checkin_max": "2025-11-21T00:00:00",
   "horizons": [
     1,
@@ -301,9 +304,9 @@
   ],
   "feature_quality": {
     "null_counts": {
-      "days_since_first_search": 772622,
-      "days_since_last_search": 772622,
-      "search_span": 772622
+      "days_since_first_search": 1102022,
+      "days_since_last_search": 1102022,
+      "search_span": 1102022
     },
     "intentionally_nullable": [
       "days_since_first_search",
@@ -338,28 +341,28 @@
   "target": "remaining_demand",
   "target_summary": {
     "minimum": 0.0,
-    "median": 8.0,
-    "p90": 929.1000000000931,
-    "p99": 15961.60999999987,
+    "median": 7.0,
+    "p90": 828.0,
+    "p99": 15313.0,
     "maximum": 216699.0,
-    "zero_rows": 677548
+    "zero_rows": 972904
   },
   "rows_by_horizon": {
-    "1": 173340,
-    "2": 173340,
-    "3": 173340,
-    "5": 173340,
-    "7": 173340,
-    "10": 173340,
-    "14": 173340,
-    "18": 173340,
-    "21": 173340,
-    "25": 173340,
-    "30": 173340
+    "1": 241392,
+    "2": 241392,
+    "3": 241392,
+    "5": 241392,
+    "7": 241392,
+    "10": 241392,
+    "14": 241392,
+    "18": 241392,
+    "21": 241392,
+    "25": 241392,
+    "30": 241392
   },
   "files": {
-    "features.parquet": "cc720b6e362f6cd6fef8da71c0cf2ca44cdeead8020ff0b8c9edc3358c172ead",
-    "target.parquet": "2a53386e70ed8e487a2fedb555530666eda307134a320db5c61cee439c67cd7a",
-    "meta.parquet": "8e16ffcee1478d83b420288afeef1cfa2d06736311844c494cd5fa0e7864a173"
+    "features.parquet": "5a6ad9d84c2b17b87fad7518dbc65c59c74a8a656005684c4375f6450ce82d92",
+    "target.parquet": "6ec50ce7e04df174a827e93d58fd7cf764229f13a0e12285c5c97870fcf9a8d5",
+    "meta.parquet": "744f8d9e8d1a7297cf46aa2e52c08d4a8f6f6dc1ba13fd5d497ec04f40353dbc"
   }
 }
