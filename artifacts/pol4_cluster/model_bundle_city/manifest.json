@@ -1,0 +1,13 @@
+{
+  "format_version": 1,
+  "created_at": "2026-09-10T16:00:44.404960+00:00",
+  "input_digest": "fc71f2f11bb1c781e2dff9aae3987b6af0afa3a7d51c43b1ef2dc8a72841636e",
+  "bundle_digest": "ab41e7326203cdd805766afe38f771884b1fe29332985c3fa04a51e063708ee4",
+  "files": {
+    "lightgbm_h1_14.txt": "cfc1f01fd79a93fd37d8f9b6966d4b84054c7238b1878b12cfa809f459c0c0c5",
+    "lightgbm_h15_30.txt": "cbc6094f3651487ceeabd88844c04e84c86e748bfd0bf279b3d271af2ee9c34e",
+    "baseline_state.joblib": "847b11a5f2c6470f9cf19a0cd4c565411879c167893d40eaa612cbd537bb9ed4",
+    "calibrator_state.joblib": "d3241d32b9a76c4d8d689d6f33454bf4998c7914601c69cc2929468b7b36a15c",
+    "model_spec.json": "4c23461f5b90071606b2859fb6c79f4726cce5922f0400dff6a93aa402655e9b"
+  }
+}

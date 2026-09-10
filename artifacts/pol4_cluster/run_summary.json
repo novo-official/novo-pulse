@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-10T14:28:46.112343+00:00",
+  "generated_at": "2026-09-10T15:59:38.114122+00:00",
   "cutoff": "2025-11-21",
   "target_window": [
     "2025-11-22",
@@ -35,7 +35,7 @@
     "params": {
       "n_estimators": 600
     },
-    "calibration_method": "guarded_bias_horizon",
+    "calibration_method": "none",
     "blend_weight_on_model": 1.0
   },
   "clustering": {
@@ -3218,6 +3218,71 @@
     "total_predicted_demand": 7996589,
     "rows_predicting_zero": 3023
   },
+  "city_model_bundle": {
+    "path": "/Users/kardo/Documents/GitHub/novo-pulse/artifacts/pol4_cluster/model_bundle_city",
+    "model": "lightgbm",
+    "bundle_digest": "ab41e7326203cdd805766afe38f771884b1fe29332985c3fa04a51e063708ee4",
+    "boosters": [
+      "lightgbm_h1_14.txt",
+      "lightgbm_h15_30.txt"
+    ],
+    "panel_rows": 321,
+    "training_rows": 2655312,
+    "load_parity_verified": true,
+    "requires": "clusters.csv - the bundle reads a panel of virtual cities",
+    "top_features": [
+      {
+        "feature": "city_hist_mean",
+        "importance": 0.32214613125316804,
+        "share": 0.3221461312531681
+      },
+      {
+        "feature": "city_weekday_mean",
+        "importance": 0.27722527134772734,
+        "share": 0.2772252713477274
+      },
+      {
+        "feature": "city_hist_median",
+        "importance": 0.08303479429449598,
+        "share": 0.08303479429449599
+      },
+      {
+        "feature": "cluster_min_member_volume",
+        "importance": 0.0800567187579406,
+        "share": 0.08005671875794061
+      },
+      {
+        "feature": "pickup_baseline_remaining",
+        "importance": 0.06945132704964946,
+        "share": 0.06945132704964947
+      },
+      {
+        "feature": "city_hist_p75",
+        "importance": 0.05510510887963409,
+        "share": 0.0551051088796341
+      },
+      {
+        "feature": "city_code",
+        "importance": 0.025872891591120162,
+        "share": 0.02587289159112017
+      },
+      {
+        "feature": "city_hist_p90",
+        "importance": 0.023377519663133225,
+        "share": 0.02337751966313323
+      },
+      {
+        "feature": "pickup_baseline_prediction",
+        "importance": 0.01483092198753305,
+        "share": 0.014830921987533054
+      },
+      {
+        "feature": "jalali_month",
+        "importance": 0.005621208153865868,
+        "share": 0.005621208153865869
+      }
+    ]
+  },
   "clustered_submission": {
     "valid": true,
     "rows": 3270,
@@ -3226,6 +3291,71 @@
     "dates": 30,
     "total_predicted_demand": 7977220,
     "rows_predicting_zero": 565
+  },
+  "clustered_model_bundle": {
+    "path": "/Users/kardo/Documents/GitHub/novo-pulse/artifacts/pol4_cluster/model_bundle_clustered",
+    "model": "lightgbm",
+    "bundle_digest": "6ac780dce368ac0b81e44e47e0b3186bbd8366765285366d29b804c240499ad0",
+    "boosters": [
+      "lightgbm_h1_14.txt",
+      "lightgbm_h15_30.txt"
+    ],
+    "panel_rows": 109,
+    "training_rows": 901648,
+    "load_parity_verified": true,
+    "requires": "clusters.csv - the bundle reads a panel of virtual cities",
+    "top_features": [
+      {
+        "feature": "city_code",
+        "importance": 0.29278669075080466,
+        "share": 0.29278669075080466
+      },
+      {
+        "feature": "city_hist_mean",
+        "importance": 0.24405718628404793,
+        "share": 0.24405718628404793
+      },
+      {
+        "feature": "pickup_baseline_remaining",
+        "importance": 0.18164980468724704,
+        "share": 0.18164980468724704
+      },
+      {
+        "feature": "city_weekday_mean",
+        "importance": 0.08674519147746183,
+        "share": 0.08674519147746183
+      },
+      {
+        "feature": "pickup_baseline_prediction",
+        "importance": 0.041308875696571955,
+        "share": 0.041308875696571955
+      },
+      {
+        "feature": "city_hist_p75",
+        "importance": 0.02412504002711588,
+        "share": 0.02412504002711588
+      },
+      {
+        "feature": "jalali_month",
+        "importance": 0.018893318963261525,
+        "share": 0.018893318963261525
+      },
+      {
+        "feature": "observed_total",
+        "importance": 0.016352059850026968,
+        "share": 0.016352059850026968
+      },
+      {
+        "feature": "city_hist_p90",
+        "importance": 0.007218533865160045,
+        "share": 0.007218533865160045
+      },
+      {
+        "feature": "city_hist_median",
+        "importance": 0.005677838581983833,
+        "share": 0.005677838581983833
+      }
+    ]
   },
   "blended_submission": {
     "valid": true,
@@ -3247,5 +3377,5 @@
       "blended": "/Users/kardo/Documents/GitHub/novo-pulse/artifacts/pol4_cluster/results_blended.csv"
     }
   },
-  "runtime_seconds": 159.8
+  "runtime_seconds": 151.6
 }

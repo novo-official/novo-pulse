@@ -37,7 +37,8 @@ import pandas as pd
 from .aggregate import aggregate_data, city_volume_shares
 from .backtest import score
 from .baseline import PickupBaseline
-from .champion import ChampionSpec
+from .calibration import Calibrator
+from .champion import ChampionSpec, FittedChampion
 from .clustering import ClusterAssignment, ClusterPlan
 from .config import Pol4Config
 from .dataset import build_inference_frame, build_training_frame
@@ -52,7 +53,16 @@ CLUSTER = "cluster_code"
 
 
 def cluster_spec(**overrides: Any) -> ChampionSpec:
-    """The champion, unchanged, reading the three extra virtual-city columns."""
+    """The champion, unchanged, reading the three extra virtual-city columns.
+
+    Calibration is off. The champion learns its calibrator from out-of-fold
+    predictions, which would have to be refitted per aggregation level - and a
+    calibrator that differs between the levels being compared would put a second
+    variable into a comparison that exists to isolate one. Every arm here is
+    therefore raw LightGBM, and the sweep's absolute WAPE is correspondingly not
+    the champion's headline (see docs/POL4_CLUSTERING.md).
+    """
+    overrides.setdefault("calibration", "none")
     return ChampionSpec(groups=CLUSTER_GROUP_ORDER, **overrides)
 
 
@@ -68,6 +78,10 @@ class PanelResult:
     models: dict[tuple[int, int], RemainingDemandModel] = field(
         default_factory=dict, repr=False
     )
+    #: The same fit, wrapped so it can be checksummed, saved and reloaded by the
+    #: existing `FittedChampion` machinery. Only built when `keep_models=True`,
+    #: because the sweep fits twenty-odd models it has no reason to keep.
+    bundle: FittedChampion | None = field(default=None, repr=False)
 
     @property
     def n_groups(self) -> int:
@@ -143,7 +157,20 @@ def fit_panel(
         panel["actual"] = panel.pop("final").fillna(0.0).astype(np.float64)
 
     training_rows = len(train)
-    del train, infer, panel_data, baseline
+    bundle = (
+        FittedChampion(
+            spec=spec,
+            models=models,
+            baseline=baseline,
+            calibrator=Calibrator(method="none", alpha_global=1.0),
+            cutoff=cutoff,
+            config=config,
+            training_rows=training_rows,
+        )
+        if keep_models
+        else None
+    )
+    del train, infer, panel_data
     return PanelResult(
         cutoff=cutoff,
         assignment=assignment,
@@ -151,6 +178,7 @@ def fit_panel(
         training_rows=training_rows,
         seconds=time.perf_counter() - started,
         models=models,
+        bundle=bundle,
     )
 
 

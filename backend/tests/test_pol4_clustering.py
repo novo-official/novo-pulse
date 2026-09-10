@@ -465,3 +465,58 @@ def test_a_saved_sweep_round_trips_into_the_same_selection(tmp_path):
     restored = load_sweep(path)["levels"]
     assert [level.pooled for level in restored] == [level.pooled for level in levels]
     assert select_level(restored, min_gain=0.02)[0].mean_groups == 110
+
+
+def test_the_clustered_arm_ships_a_reloadable_lightgbm_bundle(pol4, plan, merged, tmp_path):
+    """A model nobody can reload is a claim, not an artefact."""
+    from ml.pol4.aggregate import aggregate_data
+    from ml.pol4.champion import FittedChampion
+    from ml.pol4.cluster_pipeline import save_arm
+
+    data, config = pol4
+    spec = cluster_spec(params={"n_estimators": 20}, bands=((1, 30),))
+    result = fit_panel(
+        data,
+        config.cutoff,
+        merged,
+        spec,
+        config,
+        target_dates=config.target_dates(),
+        keep_models=True,
+    )
+    assert result.bundle is not None
+    assert result.bundle.spec.kind == "lightgbm"
+
+    report = save_arm(
+        result,
+        data,
+        tmp_path / "bundle",
+        input_digest="test-digest",
+        target_dates=config.target_dates(),
+    )
+    assert report["model"] == "lightgbm"
+    assert report["boosters"] == ["lightgbm_h1_30.txt"]
+    assert (tmp_path / "bundle" / "lightgbm_h1_30.txt").is_file()
+
+    # And it really does reload into the same predictions on the same panel.
+    restored = FittedChampion.load(tmp_path / "bundle")
+    panel_data = aggregate_data(data, merged)
+    pd.testing.assert_frame_equal(
+        restored.predict(config.target_dates(), panel_data),
+        result.bundle.predict(config.target_dates(), panel_data),
+    )
+
+
+def test_the_sweep_does_not_retain_a_bundle_per_level(pol4, plan):
+    """Twenty-odd fits with their boosters held in memory is how a sweep OOMs."""
+    data, config = pol4
+    spec = cluster_spec(params={"n_estimators": 20}, bands=((1, 30),))
+    result = fit_panel(data, config.cutoff, plan.assign(0.0), spec, config)
+    assert result.bundle is None
+    assert result.models == {}
+
+
+def test_the_clustered_arm_records_that_it_is_uncalibrated(pol4):
+    """The sweep compares partitions, so no arm may carry its own calibrator."""
+    assert cluster_spec().calibration == "none"
+    assert cluster_spec().describe()["calibration_method"] == "none"

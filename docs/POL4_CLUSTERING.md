@@ -84,9 +84,13 @@ Two guards:
 The level is a swept parameter, scored on **three** windows — the cut height is a
 hyper-parameter chosen on validation performance, and one 45-day holdout would
 risk picking whatever suited that slice. Cutoffs `2024-11-21` (the seasonal
-analogue of the competition window), `2025-08-21`, `2025-10-22`; LightGBM at the
-champion's own spec (two horizon bands, log1p target, 600 trees, 69 features);
-the panel is rebuilt and the model retrained at every level.
+analogue of the competition window), `2025-08-21`, `2025-10-22`; **LightGBM at
+the champion's own spec** - `objective=regression_l1`, two horizon bands
+(1-14, 15-30), log1p target, 600 trees, 69 features - with calibration off, so
+that no arm carries a calibrator the others do not. The panel is rebuilt and the
+model retrained at every level; the final fits are saved as native boosters in
+`model_bundle_clustered/` and `model_bundle_city/`, each verified to reload into
+identical predictions.
 
 > **These numbers are not the champion's 0.1479, and must not be quoted against
 > it.** This sweep runs three folds, not five — it omits `2025-05-21` (WAPE
@@ -205,6 +209,29 @@ it** instead of an assertion, which is the part the brief actually asks for.
 
 ---
 
+## 4b. Did the three cluster columns earn their place?
+
+Gain importance from `model_bundle_clustered/feature_importance.json`, over the
+109-row panel:
+
+| feature | share of gain | rank of 69 |
+|---|---:|---:|
+| `cluster_min_member_volume` | 0.0030 | 18 |
+| `cluster_max_member_share` | 0.0002 | 61 |
+| `n_cities_in_cluster` | 0.0000 | **69 — never split on** |
+
+`cluster_min_member_volume` is used, modestly. The other two are not: the model
+already has `city_code` as a categorical (0.293 of all gain, the single largest
+feature) and `city_hist_mean` (0.244), and between them a cluster's identity and
+scale are fully described. Knowing *how many* cities were pooled adds nothing on
+top of knowing *which* pooled row this is.
+
+This is a small, self-consistent piece of the same answer the sweep gives: the
+model was already sharing information across cities through the categorical, so
+telling it about the pooling does not help either.
+
+---
+
 ## 5. Artefacts
 
 | file | what it is |
@@ -218,6 +245,8 @@ it** instead of an assertion, which is the part the brief actually asks for.
 | `results_city.csv` | 9,630 rows — the unclustered arm |
 | `results_blended.csv` | 9,630 rows — city grain with cluster shrinkage |
 | `results_selected.csv` | the arm the rule chose |
+| `model_bundle_clustered/` | the fitted model: `lightgbm_h1_14.txt`, `lightgbm_h15_30.txt` (600 trees each, `objective=regression_l1`), baseline state, checksums, `feature_importance.json` |
+| `model_bundle_city/` | the same for the unclustered arm |
 | `run_summary.json` | selection, decomposition, assignment, validation of every arm |
 
 Reproduce with `make pol4-cluster` (≈ 24 min). Re-argue the level without

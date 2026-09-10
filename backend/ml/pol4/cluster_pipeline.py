@@ -42,6 +42,7 @@ from .aggregate import aggregate_data
 from .artifacts import build_input_manifest, write_json_atomic
 from .baseline import PickupBaseline
 from .champion import ChampionSpec
+from .champion import FittedChampion
 from .clustering import ClusterAssignment, ClusterPlan
 from .cluster_experiment import (
     CLUSTER,
@@ -301,6 +302,51 @@ def write_clusters_csv(assignment: ClusterAssignment, data, path: Path) -> Path:
     return path
 
 
+def save_arm(
+    result: Any,
+    data: Any,
+    directory: Path,
+    *,
+    input_digest: str,
+    target_dates: pd.DataFrame,
+) -> dict[str, Any]:
+    """Persist a fitted arm as native LightGBM boosters, and prove it reloads.
+
+    The city-level pipeline ships `model_bundle/lightgbm_h1_14.txt` and friends;
+    an arm that only leaves a CSV behind cannot be audited, re-run or even shown
+    to be the model it claims to be. This writes the same bundle format -
+    checksummed, with a load-parity check - so the clustered arm is inspectable
+    on the same terms.
+
+    A clustered bundle is only meaningful **together with `clusters.csv`**: its
+    features are read from a panel of virtual cities, so reloading it requires
+    rebuilding that panel with `aggregate_data(data, assignment)` first.
+    """
+    if result.bundle is None:
+        raise ValueError("this arm was fitted without keep_models=True")
+    manifest = result.bundle.save(directory, input_digest=input_digest)
+
+    panel_data = aggregate_data(data, result.assignment)
+    restored = FittedChampion.load(directory)
+    before = result.bundle.predict(target_dates, panel_data)
+    after = restored.predict(target_dates, panel_data)
+    pd.testing.assert_frame_equal(before, after, check_exact=False, rtol=1e-12, atol=1e-12)
+
+    importance = result.bundle.importance()
+    importance.to_json(directory / "feature_importance.json", orient="records", indent=2)
+    return {
+        "path": str(directory),
+        "model": result.bundle.spec.kind,
+        "bundle_digest": manifest["bundle_digest"],
+        "boosters": [name for name in manifest["files"] if name.endswith((".txt", ".cbm"))],
+        "panel_rows": int(len(panel_data.cities)),
+        "training_rows": result.training_rows,
+        "load_parity_verified": True,
+        "requires": "clusters.csv - the bundle reads a panel of virtual cities",
+        "top_features": importance.head(10).to_dict(orient="records"),
+    }
+
+
 # ---------------------------------------------------------------------- run
 def run(
     config: Pol4Config | None = None,
@@ -468,12 +514,25 @@ def run(
     arms: dict[str, Path] = {}
 
     city_result = fit_panel(
-        data, config.cutoff, identity, spec, config, target_dates=target_dates
+        data,
+        config.cutoff,
+        identity,
+        spec,
+        config,
+        target_dates=target_dates,
+        keep_models=True,
     )
     city_submission = build_cluster_submission(city_result.panel)
     arms["city"] = write_submission(city_submission, artifacts_dir / "results_city.csv")
     summary["city_submission"] = validate_cluster_submission(
         city_submission, identity, data.city_codes, config
+    )
+    summary["city_model_bundle"] = save_arm(
+        city_result,
+        data,
+        artifacts_dir / "model_bundle_city",
+        input_digest=input_manifest["input_digest"],
+        target_dates=target_dates,
     )
 
     if clustered.is_identity:
@@ -482,7 +541,13 @@ def run(
         summary["clustered_submission"] = None
     else:
         cluster_result = fit_panel(
-            data, config.cutoff, clustered, spec, config, target_dates=target_dates
+            data,
+            config.cutoff,
+            clustered,
+            spec,
+            config,
+            target_dates=target_dates,
+            keep_models=True,
         )
         cluster_submission = build_cluster_submission(cluster_result.panel)
         arms["clustered"] = write_submission(
@@ -490,6 +555,13 @@ def run(
         )
         summary["clustered_submission"] = validate_cluster_submission(
             cluster_submission, clustered, data.city_codes, config
+        )
+        summary["clustered_model_bundle"] = save_arm(
+            cluster_result,
+            data,
+            artifacts_dir / "model_bundle_clustered",
+            input_digest=input_manifest["input_digest"],
+            target_dates=target_dates,
         )
 
     if blend_choice is not None and not clustered.is_identity:
