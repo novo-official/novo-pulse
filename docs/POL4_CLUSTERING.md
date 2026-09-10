@@ -88,6 +88,15 @@ analogue of the competition window), `2025-08-21`, `2025-10-22`; LightGBM at the
 champion's own spec (two horizon bands, log1p target, 600 trees, 69 features);
 the panel is rebuilt and the model retrained at every level.
 
+> **These numbers are not the champion's 0.1479, and must not be quoted against
+> it.** This sweep runs three folds, not five — it omits `2025-05-21` (WAPE
+> 0.272, the hardest window by far) and `2025-09-22` — and it applies **no
+> calibration**, because calibration is fitted per arm and would have varied
+> between the levels being compared. Both choices are deliberate: every level in
+> the table is scored under an identical budget, so the *comparison between rows*
+> is exact. The *absolute level* of the column is not comparable to anything
+> outside this table.
+
 Everything is scored as **one global WAPE at the submission grain** — the mix of
 city rows and cluster rows that would actually be submitted — because that is
 what gets graded. Aggregation moves demand between rows but never creates or
