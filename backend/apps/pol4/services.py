@@ -670,6 +670,17 @@ def dashboard(model: str | None = None) -> dict[str, Any]:
         {**row, "observed_share": observed_shares.get(str(row["key"]), 0.0)}
         for row in selected_scores["by_horizon_bucket"]
     ]
+    observed_by_day = target.groupby("horizon").agg(
+        observed=("observed_so_far", "sum"), total=("predicted_demand", "sum")
+    )
+    observed_shares_by_day = {
+        int(key): float(row["observed"] / max(row["total"], 1))
+        for key, row in observed_by_day.iterrows()
+    }
+    lead_time_daily = [
+        {**row, "observed_share": observed_shares_by_day.get(int(row["key"]), 0.0)}
+        for row in selected_scores["by_horizon"]
+    ]
 
     folds = [
         {
@@ -722,8 +733,14 @@ def dashboard(model: str | None = None) -> dict[str, Any]:
         "heatmap": heatmap(321, selected),
         "thresholds": thresholds,
         "lead_time": lead_time,
+        "lead_time_daily": lead_time_daily,
         "demand_buckets": selected_scores["by_demand_bucket"],
         "high_demand": high_demand,
+        "evaluation_dimensions": {
+            "province": selected_scores["by_province"],
+            "weekday": selected_scores["by_weekday"],
+            "observation": selected_scores["by_observation_state"],
+        },
         "folds": folds,
         "stability": summary.get("stability", {}),
     }

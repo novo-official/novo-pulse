@@ -238,8 +238,14 @@ export interface Dashboard {
     remaining_share_median: number;
   };
   lead_time: (Segment & { observed_share: number })[];
+  lead_time_daily: (Segment & { observed_share: number })[];
   demand_buckets: Segment[];
   high_demand: Segment[];
+  evaluation_dimensions: {
+    province: Segment[];
+    weekday: Segment[];
+    observation: Segment[];
+  };
   folds: {
     cutoff: string;
     model_wape: number;

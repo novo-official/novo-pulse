@@ -92,6 +92,13 @@ def test_dashboard_switches_the_forecast_and_the_validation_metrics(client):
     assert raw["summary"]["wape"] != calibrated["summary"]["wape"]
     assert len(raw["national_series"]) == len(calibrated["national_series"]) == 30
     assert len(raw["heatmap"]["rows"]) == 321
+    assert len(calibrated["lead_time_daily"]) == 30
+    assert [row["key"] for row in calibrated["lead_time_daily"]] == list(range(1, 31))
+    assert len(calibrated["demand_buckets"]) == 5
+    assert len(calibrated["high_demand"]) == 3
+    assert set(calibrated["evaluation_dimensions"]) == {
+        "province", "weekday", "observation"
+    }
 
 
 def test_dashboard_rejects_an_unknown_model(client):

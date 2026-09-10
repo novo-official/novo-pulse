@@ -167,6 +167,8 @@
   .presentation-segment button.is-active { color: #fff; background: #2a78d6; box-shadow: 0 8px 18px -10px rgb(42 120 214 / .9); }
   .presentation-selected { display: flex; height: 42px; align-items: center; gap: 10px; flex: 0 0 auto; border: 1px solid rgb(235 104 52 / .28); border-radius: 11px; color: #d95926; background: rgb(235 104 52 / .08); padding: 0 13px; font-size: 10px; font-weight: 850; }
   .presentation-selected b { font-size: 15px; font-weight: 500; }
+  .presentation-dimension-select { display: grid; gap: 4px; color: rgb(var(--muted)); font-size: 8px; font-weight: 850; }
+  .presentation-dimension-select select { min-width: 150px; height: 34px; border: 1px solid rgb(var(--line)); border-radius: 9px; color: rgb(var(--ink)); background: rgb(var(--surface)); padding: 0 10px; font-size: 10px; font-weight: 750; }
 
   .presentation-charts { display: grid; gap: 16px; }
   .presentation-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: stretch; }

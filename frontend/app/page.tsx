@@ -27,10 +27,32 @@ import { ChartTooltip } from '@/components/pol4/tooltip';
 import { SERIES, axisProps, compact, heatStep, jalali, num, percent } from '@/components/pol4/theme';
 import { ChartSkeleton, ErrorState, NoModelState } from '@/components/ui/states';
 import { pol4 } from '@/lib/pol4/api';
-import type { DashboardCity, HeatmapRow, ModelVariant } from '@/lib/pol4/types';
+import type { DashboardCity, HeatmapRow, ModelVariant, Segment } from '@/lib/pol4/types';
 
 const TOP_N = [10, 20, 30] as const;
 const SHOCK_FOLD = '2025-05-21';
+const DIMENSIONS = [
+  ['demand', 'سطح تقاضا'],
+  ['peak', 'اوج تقاضا'],
+  ['province', 'استان'],
+  ['weekday', 'روز هفته'],
+  ['observation', 'وضعیت مشاهده'],
+] as const;
+type EvaluationDimension = (typeof DIMENSIONS)[number][0];
+const DEMAND_LABELS: Record<string, string> = {
+  'q0.00-0.50': 'Low · 50٪ پایین',
+  'q0.50-0.75': 'Q50–75',
+  'q0.75-0.90': 'Q75–90',
+  'q0.90-0.99': 'High · Q90–99',
+  'q0.99-1.00': 'Peak · 1٪ بالا',
+};
+const PEAK_LABELS: Record<string, string> = {
+  top_1pct: 'Top 1%', top_5pct: 'Top 5%', top_10pct: 'Top 10%',
+};
+const WEEKDAY_LABELS: Record<string, string> = {
+  '0': 'دوشنبه', '1': 'سه‌شنبه', '2': 'چهارشنبه', '3': 'پنجشنبه',
+  '4': 'جمعه', '5': 'شنبه', '6': 'یکشنبه',
+};
 const COLORS = {
   model: '#2a78d6',
   modelShock: '#d97706',
@@ -100,11 +122,21 @@ function OpportunityTooltip({ active, payload, lens }: {
   );
 }
 
+function labelDimensionRow(dimension: EvaluationDimension, row: Segment) {
+  const key = String(row.key);
+  if (dimension === 'demand') return DEMAND_LABELS[key] ?? key;
+  if (dimension === 'peak') return PEAK_LABELS[key] ?? key;
+  if (dimension === 'weekday') return WEEKDAY_LABELS[key] ?? key;
+  if (dimension === 'observation') return key === 'observed' ? 'دارای مشاهده' : 'بدون مشاهده';
+  return key;
+}
+
 export default function PresentationDashboard() {
   const [model, setModel] = useState<ModelVariant>('calibrated');
   const [province, setProvince] = useState('all');
   const [topN, setTopN] = useState<(typeof TOP_N)[number]>(20);
   const [lens, setLens] = useState<'marketing' | 'supply'>('marketing');
+  const [evaluationDimension, setEvaluationDimension] = useState<EvaluationDimension>('demand');
   const [selectedCity, setSelectedCity] = useState<number | null>(null);
   const query = useQuery({
     queryKey: ['pol4-presentation-dashboard', model],
@@ -132,6 +164,19 @@ export default function PresentationDashboard() {
     () => filteredCities.filter((row) => row.predicted_demand > 0 && (lens === 'supply' || row.pickup_ratio !== null)),
     [filteredCities, lens],
   );
+
+  const dimensionRows = useMemo(() => {
+    if (!data) return [];
+    const source = evaluationDimension === 'demand'
+      ? data.demand_buckets
+      : evaluationDimension === 'peak'
+        ? data.high_demand
+        : data.evaluation_dimensions[evaluationDimension];
+    return source.map((row) => ({
+      ...row,
+      label: labelDimensionRow(evaluationDimension, row),
+    }));
+  }, [data, evaluationDimension]);
 
   if (query.isLoading) return <div className="presentation-loading"><ChartSkeleton height={600} /></div>;
   if (query.isError) return <div className="presentation-loading"><ErrorState message={(query.error as Error).message} onRetry={() => query.refetch()} /></div>;
@@ -299,6 +344,35 @@ export default function PresentationDashboard() {
           <Heatmap rows={heatRows} dates={data.heatmap.dates} max={heatMax} selectedCity={selectedCity} onSelect={setSelectedCity} />
         </ChartFrame>
 
+        <ChartFrame
+          title="دقت مدل در ابعاد مختلف"
+          unit="WAPE و Bias · کمتر بهتر"
+          hint="تقاضا را از Low تا Peak، و عملکرد را بر اساس استان، روز هفته و وجود/نبود مشاهده مقایسه کنید. WAPE خطا و Bias جهت کم‌برآورد یا بیش‌برآورد را نشان می‌دهد."
+          source="backtest_metrics_phase2.json → segmented diagnostics"
+          height={390}
+          action={(
+            <label className="presentation-dimension-select">
+              <span>بُعد ارزیابی</span>
+              <select value={evaluationDimension} onChange={(event) => setEvaluationDimension(event.target.value as EvaluationDimension)}>
+                {DIMENSIONS.map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+              </select>
+            </label>
+          )}
+          legend={[{ label: 'WAPE', color: SERIES.forecast }, { label: 'Bias نرمال‌شده', color: SERIES.observed }]}
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={dimensionRows} margin={{ top: 14, right: 16, left: 10, bottom: 34 }}>
+              <CartesianGrid stroke={SERIES.grid} strokeDasharray="3 6" vertical={false} />
+              <XAxis dataKey="label" {...axisProps} interval={0} angle={dimensionRows.length > 5 ? -18 : 0} textAnchor={dimensionRows.length > 5 ? 'end' : 'middle'} height={54} />
+              <YAxis {...axisProps} width={54} tickFormatter={(value) => percent(Number(value), 0)} />
+              <ReferenceLine y={0} stroke={SERIES.axis} />
+              <Tooltip content={<ChartTooltip order={['wape', 'normalised_bias']} valueFormatter={percent} />} />
+              <Bar isAnimationActive={false} dataKey="wape" name="WAPE" fill={SERIES.forecast} fillOpacity={0.82} radius={[7, 7, 0, 0]} />
+              <Line isAnimationActive={false} type="monotone" dataKey="normalised_bias" name="Bias" stroke={SERIES.observed} strokeWidth={2.8} dot={{ r: 4, fill: SERIES.observed }} />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </ChartFrame>
+
         <div className="presentation-grid">
           <ChartFrame
             title="اعتبار زمانی مدل"
@@ -323,17 +397,17 @@ export default function PresentationDashboard() {
           </ChartFrame>
 
           <ChartFrame
-            title="ریسک بر اساس Lead time"
+            title="Lead time دقیق؛ روز ۱ تا ۳۰"
             unit="WAPE و سهم مشاهده‌شده"
-            hint="هرچه check-in دورتر است، بخش کمتری از تقاضا مشاهده شده و خطای تاریخی افزایش می‌یابد."
+            hint="هر روز تا check-in جداگانه ارزیابی شده است؛ ستون خطای تاریخی و خط سهم تقاضای قابل‌مشاهده روی grid نهایی را نشان می‌دهد."
             source={`backtest_metrics_phase2.json + ${forecastSource}`}
             height={360}
             legend={[{ label: 'WAPE تاریخی', color: SERIES.forecast }, { label: 'سهم مشاهده‌شده', color: SERIES.observed }]}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={data.lead_time} margin={{ top: 14, right: 10, left: 8, bottom: 8 }}>
+              <ComposedChart data={data.lead_time_daily} margin={{ top: 14, right: 10, left: 8, bottom: 8 }}>
                 <CartesianGrid stroke={SERIES.grid} strokeDasharray="3 6" vertical={false} />
-                <XAxis dataKey="key" {...axisProps} tickFormatter={(value) => `D-${value}`} />
+                <XAxis dataKey="key" {...axisProps} interval={2} tickFormatter={(value) => `D-${value}`} />
                 <YAxis yAxisId="error" {...axisProps} width={50} tickFormatter={(value) => percent(Number(value), 0)} />
                 <YAxis yAxisId="seen" orientation="right" {...axisProps} width={50} tickFormatter={(value) => percent(Number(value), 0)} />
                 <Tooltip content={<ChartTooltip order={['wape', 'observed_share', 'normalised_bias']} valueFormatter={percent} />} />
