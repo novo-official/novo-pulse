@@ -6,153 +6,119 @@
 <title>Novo Pulse — Pol 4</title>
 <style>
   :root{
-    --ink:#0f2b46;          /* chart navy */
-    --muted:#5d7186;
-    --bg:#f4f7fb;           /* chart background */
-    --card:#ffffff;
-    --line:#dde5ee;
-    --blue:#3d7ebd;
-    --risk:#ee8866;         /* reserved: unknown / risk / shock */
-    --ok:#00a884;
+    --ink:#0f2b46; --muted:#5d7186; --bg:#f4f7fb; --card:#ffffff;
+    --line:#dde5ee; --blue:#3d7ebd; --risk:#ee8866; --ok:#00a884;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{
-    margin:0;background:var(--bg);color:var(--ink);
-    font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    overflow:hidden;
-  }
+  body{margin:0;background:var(--bg);color:var(--ink);overflow:hidden;
+    font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 
   .deck{position:relative;height:100vh;width:100vw}
-  .slide{
-    position:absolute;inset:0;display:none;
-    flex-direction:column;padding:3.2vh 3.6vw 2.4vh;
-  }
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;padding:3.4vh 4vw 3vh}
   .slide.on{display:flex}
 
-  /* ---------- slide furniture ---------- */
-  .eyebrow{
-    font-size:1.55vh;letter-spacing:.16em;text-transform:uppercase;
-    color:var(--muted);font-weight:600;margin-bottom:.8vh;
-  }
-  .eyebrow.appendix{color:var(--blue)}
-  h1{
-    font-size:4.0vh;line-height:1.15;margin:0 0 1.6vh;font-weight:700;
-    letter-spacing:-.015em;max-width:46ch;
-  }
-  .body{flex:1;min-height:0;display:flex;flex-direction:column;gap:1.6vh}
+  .eyebrow{font-size:1.5vh;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--muted);font-weight:700;margin-bottom:1vh}
+  h1{font-size:4.2vh;line-height:1.12;margin:0 0 2vh;font-weight:700;
+    letter-spacing:-.018em;max-width:44ch}
+  h1 em{font-style:normal;color:var(--blue)}
+  .body{flex:1;min-height:0;display:flex;flex-direction:column;gap:1.8vh}
 
   figure{margin:0;flex:1;min-height:0;display:flex}
-  figure img{
-    width:100%;height:100%;object-fit:contain;object-position:center;
-    border-radius:6px;
-  }
+  figure img{width:100%;height:100%;object-fit:contain;border-radius:6px}
 
-  /* ---------- number callouts ---------- */
-  .stats{display:flex;gap:1.6vw;flex-wrap:wrap}
-  .stat{
-    background:var(--card);border:1px solid var(--line);border-radius:8px;
-    padding:1.4vh 1.8vw;min-width:16ch;
-  }
-  .stat b{display:block;font-size:3.4vh;line-height:1.1;font-weight:700;letter-spacing:-.02em}
-  .stat span{display:block;font-size:1.6vh;color:var(--muted);margin-top:.4vh}
-  .stat.risk b{color:var(--risk)}
-  .stat.good b{color:var(--ok)}
+  /* number callouts */
+  .stats{display:flex;gap:1.4vw;flex-wrap:wrap}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:8px;
+    padding:1.5vh 1.6vw;flex:1;min-width:14ch}
+  .stat b{display:block;font-size:3.6vh;line-height:1.05;font-weight:700;letter-spacing:-.025em}
+  .stat span{display:block;font-size:1.55vh;color:var(--muted);margin-top:.5vh;line-height:1.35}
+  .stat.risk b{color:var(--risk)} .stat.good b{color:var(--ok)} .stat.key b{color:var(--blue)}
 
-  /* ---------- slide 1 hero ---------- */
-  .hero{flex:1;display:flex;flex-direction:column;justify-content:center;gap:3vh}
-  .hero .lede{font-size:6.2vh;line-height:1.1;font-weight:700;letter-spacing:-.025em;max-width:20ch}
-  .hero .sub{font-size:2.4vh;color:var(--muted);font-weight:500}
-  .timeline{display:flex;align-items:center;gap:1.2vw;max-width:74vw}
+  /* hero */
+  .hero{flex:1;display:flex;flex-direction:column;justify-content:center;gap:3.4vh}
+  .lede{font-size:6.4vh;line-height:1.08;font-weight:700;letter-spacing:-.03em;max-width:19ch}
+  .lede .hi{color:var(--risk)}
+  .sub{font-size:2.3vh;color:var(--muted);font-weight:500;max-width:60ch}
+  .timeline{display:flex;align-items:center;gap:1.2vw;max-width:72vw}
   .timeline .dot{width:1.3vh;height:1.3vh;border-radius:50%;background:var(--ink);flex:none}
   .timeline .dot.end{background:var(--blue)}
-  .timeline .track{flex:1;height:.5vh;border-radius:3px;
+  .timeline .track{flex:1;height:.6vh;border-radius:3px;
     background:linear-gradient(90deg,var(--risk) 0 32%,#aecbeb 32% 100%)}
   .timeline .lbl{font-size:1.7vh;color:var(--muted);font-weight:600;white-space:nowrap}
 
-  /* ---------- formula / pipeline ---------- */
-  .formula{
-    font:600 3.0vh/1.35 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  .formula{font:600 2.7vh/1.35 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
     background:var(--card);border:1px solid var(--line);border-left:4px solid var(--blue);
-    border-radius:8px;padding:1.8vh 2vw;letter-spacing:-.01em;
-  }
-  .formula .obs{color:var(--risk)}
-  .formula .rem{color:var(--blue)}
+    border-radius:8px;padding:1.6vh 1.8vw}
+  .formula .obs{color:var(--risk)} .formula .rem{color:var(--blue)}
 
-  .flow{display:flex;align-items:stretch;gap:.9vw;flex:1;min-height:0}
-  .step{
-    flex:1;background:var(--card);border:1px solid var(--line);border-radius:8px;
-    padding:2vh 1.2vw;display:flex;flex-direction:column;justify-content:center;gap:.8vh;
-  }
-  .step b{font-size:2.7vh;font-weight:700;letter-spacing:-.02em;line-height:1.1}
-  .step span{font-size:1.55vh;color:var(--muted);line-height:1.4}
-  .arrow{align-self:center;color:var(--line);font-size:3vh;flex:none}
+  /* two / three column blocks */
+  .split{display:flex;gap:1.4vw;flex:1;min-height:0}
+  .col{flex:1;background:var(--card);border:1px solid var(--line);border-radius:8px;
+    padding:2vh 1.6vw;display:flex;flex-direction:column}
+  .col.win{border-top:4px solid var(--ok)}
+  .col.gap{border-top:4px solid var(--risk)}
+  .col h3{margin:0 0 1.2vh;font-size:2.1vh;font-weight:700}
+  .col ul{margin:0;padding-left:1.2em;font-size:1.85vh;line-height:1.7;color:var(--ink)}
+  .col ul li{margin-bottom:.7vh}
+  .col ul li b{font-variant-numeric:tabular-nums}
 
-  /* ---------- two cards ---------- */
-  .cards{display:flex;gap:1.6vw}
-  .card{
-    flex:1;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:1.8vh 1.6vw;
-  }
-  .card h3{margin:0 0 .6vh;font-size:2.2vh;font-weight:700}
-  .card p{margin:0;font-size:1.75vh;color:var(--muted)}
+  .cards{display:flex;gap:1.4vw}
+  .card{flex:1;background:var(--card);border:1px solid var(--line);border-radius:8px;
+    padding:1.8vh 1.5vw}
+  .card h3{margin:0 0 .5vh;font-size:2.1vh;font-weight:700}
+  .card h3 .tag{font-size:1.4vh;font-weight:600;color:var(--muted);display:block;margin-top:.3vh}
+  .card p{margin:0;font-size:1.7vh;color:var(--muted);line-height:1.45}
 
-  .rule{
-    font-size:1.9vh;font-weight:600;color:var(--muted);
-    border-top:1px solid var(--line);padding-top:1.2vh;
-  }
+  .rule{font-size:1.9vh;font-weight:600;color:var(--muted);
+    border-top:1px solid var(--line);padding-top:1.2vh}
   .rule em{color:var(--risk);font-style:normal;font-weight:700}
+  .rule b{color:var(--ink)}
 
-  /* ---------- appendix tables ---------- */
-  table{border-collapse:collapse;width:100%;font-size:2.0vh}
-  th,td{text-align:left;padding:1.1vh 1.2vw;border-bottom:1px solid var(--line)}
-  th{font-size:1.5vh;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
-  td.num{font-variant-numeric:tabular-nums;font-weight:600}
-  tr.reject td{color:var(--muted)}
-  tr.reject td:last-child{color:var(--risk);font-weight:600}
-  tr.pick td{background:#eef5fc}
-  ul.plain{margin:0;padding-left:1.4em;font-size:2.0vh;line-height:1.85;color:var(--ink)}
-  ul.plain li{margin-bottom:.3vh}
+  /* three honesty blocks */
+  .proof{display:flex;flex-direction:column;gap:1.3vh;flex:1;min-height:0;justify-content:center}
+  .pr{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--blue);
+    border-radius:8px;padding:1.7vh 1.8vw}
+  .pr b{display:block;font-size:2.3vh;font-weight:700;margin-bottom:.4vh}
+  .pr span{font-size:1.8vh;color:var(--muted);line-height:1.45}
+  .pr span i{font-style:normal;color:var(--ink);font-weight:600}
 
-  /* ---------- chrome ---------- */
-  .bar{
-    position:fixed;left:0;bottom:0;height:3px;background:var(--blue);
-    transition:width .18s ease;z-index:5;
-  }
-  .meta{
-    position:fixed;right:1.6vw;bottom:1.6vh;font-size:1.5vh;color:var(--muted);
-    font-variant-numeric:tabular-nums;z-index:5;user-select:none;
-  }
-  .meta kbd{
-    font:inherit;border:1px solid var(--line);background:var(--card);
-    border-radius:4px;padding:.1em .4em;margin-left:.5em;
-  }
-  .zone{position:fixed;top:0;bottom:0;width:14vw;z-index:4;cursor:pointer}
-  .zone.prev{left:0}
-  .zone.next{right:0}
+  .now{display:flex;gap:1.4vw;flex:1;min-height:0}
+  .stage{flex:1;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:2vh 1.5vw}
+  .stage.a{border-top:4px solid var(--ok)}
+  .stage.b{border-top:4px solid var(--blue)}
+  .stage.c{border-top:4px solid var(--muted)}
+  .stage h3{margin:0 0 .4vh;font-size:2.0vh;font-weight:700}
+  .stage .when{font-size:1.4vh;color:var(--muted);font-weight:600;text-transform:uppercase;
+    letter-spacing:.1em;margin-bottom:1.1vh}
+  .stage ul{margin:0;padding-left:1.2em;font-size:1.75vh;line-height:1.6;color:var(--muted)}
+  .stage ul li{margin-bottom:.5vh}
+  .stage ul li b{color:var(--ink);font-weight:600}
 
-  .notes{
-    position:fixed;left:0;right:0;bottom:0;max-height:42vh;overflow:auto;
-    background:var(--ink);color:#e8eef5;padding:2.4vh 3.6vw;z-index:6;
-    display:none;font-size:1.95vh;line-height:1.65;
-    box-shadow:0 -8px 32px rgba(15,43,70,.22);
-  }
+  /* chrome */
+  .bar{position:fixed;left:0;bottom:0;height:3px;background:var(--blue);
+    transition:width .18s ease;z-index:5}
+  .meta{position:fixed;right:1.6vw;bottom:1.5vh;font-size:1.45vh;color:var(--muted);
+    font-variant-numeric:tabular-nums;z-index:5;user-select:none}
+  .meta kbd{font:inherit;border:1px solid var(--line);background:var(--card);
+    border-radius:4px;padding:.1em .4em;margin-left:.5em}
+  .zone{position:fixed;top:0;bottom:0;width:13vw;z-index:4;cursor:pointer}
+  .zone.prev{left:0} .zone.next{right:0}
+
+  .notes{position:fixed;left:0;right:0;bottom:0;max-height:44vh;overflow:auto;
+    background:var(--ink);color:#e8eef5;padding:2.4vh 4vw;z-index:6;display:none;
+    font-size:1.9vh;line-height:1.62;box-shadow:0 -8px 32px rgba(15,43,70,.22)}
   .notes.on{display:block}
-  .notes h4{margin:0 0 .8vh;font-size:1.5vh;letter-spacing:.14em;text-transform:uppercase;color:#8fb4d6}
+  .notes h4{margin:0 0 .8vh;font-size:1.45vh;letter-spacing:.14em;text-transform:uppercase;color:#8fb4d6}
   .notes p{margin:0 0 1vh}
   .notes .avoid{color:#ffb59b}
 
-  /* Designed for 16:9. On a narrow or portrait window the five-column
-     pipeline and side-by-side cards would squeeze to unreadable widths,
-     so they wrap instead. */
   @media (max-aspect-ratio: 5/4){
-    .flow{flex-wrap:wrap}
-    .flow .step{flex:1 1 30%;padding:1.4vh 2vw}
-    .flow .arrow{display:none}
-    .cards{flex-direction:column}
+    .split,.cards,.now{flex-direction:column}
+    .lede{font-size:4.6vh}
     .stats{gap:1.2vh}
-    .hero .lede{font-size:4.6vh}
   }
-
   @media print{
     body{overflow:visible}
     .slide{display:flex!important;position:relative;height:100vh;page-break-after:always}
@@ -164,230 +130,205 @@
 
 <div class="deck" id="deck">
 
-  <!-- 1 ───────────────────────────────────────────── -->
+  <!-- 1 · PROBLEM ─────────────────────────────────── -->
   <section class="slide">
     <div class="eyebrow">The problem</div>
     <div class="hero">
-      <div class="lede">Travel demand does not appear all at once.</div>
+      <div class="lede">You are looking at <span class="hi">32%</span> of the demand and deciding as if it were all of it.</div>
       <div class="timeline">
-        <span class="lbl">Today</span>
-        <span class="dot"></span>
+        <span class="lbl">Today</span><span class="dot"></span>
         <span class="track"></span>
-        <span class="dot end"></span>
-        <span class="lbl">Check-in</span>
+        <span class="dot end"></span><span class="lbl">Check-in night</span>
       </div>
-      <div class="sub">321 destinations · 30 check-in nights · one decision cutoff</div>
+      <div class="sub">Travel demand keeps forming until the night itself. At any decision point only
+        part of it has been searched — the rest has not happened yet.</div>
     </div>
     <div class="notes-src">
-      <p>Our problem was not predicting a single number. Search demand builds gradually, right up to check-in. A destination team that sees only the searches logged so far can spot a rising destination too late; a team that sees only a final forecast cannot tell how much of it is recorded fact and how much is model estimate. We built an early-warning signal across 321 destinations and the next 30 nights that separates the two.</p>
-      <p><b>Transition:</b> So our first technical decision was not to re-predict total demand — only the part that is still unknown.</p>
+      <p>Travel demand does not appear at once — it keeps building right up to the check-in night. So on any given day, a destination team looking at their dashboard sees only the searches logged so far. In our data that is <b>32%</b>. The other 68% has not happened yet.</p>
+      <p>That creates two failures. You spot a rising destination too late. And when you do see a forecast, you cannot tell how much of it is recorded fact and how much is a model's guess.</p>
+      <p><b>Transition:</b> So we did not build a model that re-predicts total demand. We built one that separates what is known from what is not.</p>
     </div>
   </section>
 
-  <!-- 2 ───────────────────────────────────────────── -->
+  <!-- 2 · SOLUTION ────────────────────────────────── -->
   <section class="slide">
-    <div class="eyebrow">The formulation</div>
-    <h1>Forecast only what is still unknown</h1>
+    <div class="eyebrow">The solution</div>
+    <h1>Separate the <em>fact</em> from the <em>forecast</em></h1>
     <div class="body">
       <div class="formula">Final Demand = <span class="obs">Observed So Far</span> + <span class="rem">Forecast Remaining</span></div>
       <figure><img src="presentation_charts/01_demand_formation.png" alt="Demand formation across the next 30 check-in nights"></figure>
     </div>
     <div class="notes-src">
-      <p>The data has two clocks: <b>log_date</b> is when a search happened, <b>check-in</b> is when the trip is for. At the cutoff, the orange area is genuinely observed and the model never touches it. The blue area is demand that has not happened yet — that is what the model forecasts. The dark line is the sum, and it is our output. In the current grid 32.2% of demand is already observed and 67.8% still has to be predicted. Naturally that blue gap is wider for nights further out.</p>
-      <p class="avoid"><b>Do not say:</b> the blue band is uncertainty or a confidence interval. It is a point forecast of remaining demand.</p>
-      <p><b>Transition:</b> A forecast only matters if it turns into a decision you can actually act on.</p>
+      <p>Orange is what has genuinely been searched — the model never touches it. Blue is what has not happened yet; that is the only thing we forecast. The dark line is the sum, and that is our output.</p>
+      <p>Two consequences. First, the number can never contradict reality — it is structurally impossible for our forecast to fall below searches that actually happened. Second, the team always sees how much of a number is fact and how much is estimate. For 321 destinations across the next 30 nights: 32.2% observed, 67.8% still to come.</p>
+      <p class="avoid"><b>Do not say</b> the blue band is uncertainty or a confidence interval. It is a point forecast of remaining demand.</p>
+      <p><b>Transition:</b> But a forecast is only worth something if it changes what someone does on Monday morning.</p>
     </div>
   </section>
 
-  <!-- 3 ───────────────────────────────────────────── -->
+  <!-- 3 · PRODUCT VALUE ───────────────────────────── -->
   <section class="slide">
-    <div class="eyebrow">Product value</div>
-    <h1>Turn 321 forecasts into a review queue</h1>
+    <div class="eyebrow">What it changes</div>
+    <h1>From 321 destinations to an <em>11-destination</em> Monday morning</h1>
     <div class="body">
       <div class="stats">
-        <div class="stat"><b>69.6%</b><span>of forecast demand sits in the top 10 destinations</span></div>
-        <div class="stat"><b>77.8%</b><span>in the top 15</span></div>
+        <div class="stat key"><b>11</b><span>destinations cover 70% of forecast demand</span></div>
+        <div class="stat"><b>17</b><span>cover 80%</span></div>
+        <div class="stat good"><b>13 of 20</b><span>top destinations are &gt;70% still unknown — where a forecast actually changes the call</span></div>
       </div>
-      <figure><img src="presentation_charts/02_city_priority_pareto.png" alt="Destination priority — forecast demand and cumulative share"></figure>
+      <figure><img src="presentation_charts/02_city_priority_pareto.png" alt="Destination priority and cumulative share"></figure>
     </div>
     <div class="notes-src">
-      <p>The goal is not for an analyst to review all 321 cities at once. The bars are each city's forecast; the orange line is cumulative share of total demand across all 321. Ten destinations cover 69.6%. So the model output becomes a <b>ranked review queue</b>: the team spends its limited time first where exposure is largest.</p>
-      <p class="avoid"><b>Wording:</b> "prioritise investigation" — never "automatically allocate campaign budget".</p>
-      <p><b>Transition:</b> For that queue to be trusted, we have to show the data contract and model design behind it.</p>
+      <p>An analyst cannot review 321 destinations every week. The bars are each destination's forecast; the orange line is cumulative share. <b>Eleven</b> destinations cover 70% of all demand. That is 97% less to look at.</p>
+      <p>But the more useful part is the second number. Of the top 20 destinations, <b>13 are still more than 70% unknown</b> — those are the ones where a forecast genuinely changes the decision. The other seven are already mostly visible; you do not need a model for them, you need to confirm with real data. <b>The product also tells you which decisions need a forecast at all.</b></p>
+      <p class="avoid"><b>Wording:</b> "prioritise investigation" — never "automatically allocate budget".</p>
+      <p><b>Transition:</b> Now, does the forecast behind that queue actually work?</p>
     </div>
   </section>
 
-  <!-- 4 ───────────────────────────────────────────── -->
+  <!-- 4 · PERFORMANCE ─────────────────────────────── -->
   <section class="slide">
-    <div class="eyebrow">Technical core</div>
-    <h1>A leakage-aware forecasting engine</h1>
-    <div class="body">
-      <div class="flow">
-        <div class="step"><b>3.30M</b><span>raw sparse search events, validated</span></div>
-        <div class="arrow">→</div>
-        <div class="step"><b>2.655M</b><span>train rows<br>321 × 752 × 11 snapshots</span></div>
-        <div class="arrow">→</div>
-        <div class="step"><b>66</b><span>time-safe features<br>Pickup · Velocity · Calendar · City · Market · Province</span></div>
-        <div class="arrow">→</div>
-        <div class="step"><b>2 LightGBM bands</b><span>D1–14 · D15–30<br>log1p remaining target</span></div>
-        <div class="arrow">→</div>
-        <div class="step"><b>9,630</b><span>valid city × check-in predictions<br>guarded calibration + observed floor</span></div>
-      </div>
-    </div>
-    <div class="notes-src">
-      <p>We start from 3.298M sparse search rows, controlling duplicates, invalid dates and lead time. The trainset is built on a time grid: 321 cities × 752 days × 11 historical snapshots = 2.655M rows, with no row cap. 66 features across Pickup, Velocity, Activity, Calendar, City History, Market and Province — every one of them computable on the real submission grid. The target is remaining demand with log1p to damp the right skew. One LightGBM for D1–D14, one for D15–D30. Finally guarded calibration is applied, and the observed floor prevents any forecast falling below already-observed search.</p>
-      <p><b>If asked which features matter:</b> city_weekday_mean, city_hist_mean and the pickup-based features. Full list is in the technical report — do not read 66 names from a slide.</p>
-      <p><b>Transition:</b> This architecture only matters if it beats the baseline at several historical points, without looking ahead.</p>
-    </div>
-  </section>
-
-  <!-- 5 ───────────────────────────────────────────── -->
-  <section class="slide">
-    <div class="eyebrow">Honest validation</div>
-    <h1>Keep the difficult regime in the score</h1>
+    <div class="eyebrow">Performance</div>
+    <h1>A third less error than the standard approach — on all five tests</h1>
     <div class="body">
       <div class="stats">
-        <div class="stat"><b>14.79%</b><span>model WAPE · five-fold rolling origin</span></div>
-        <div class="stat"><b>22.00%</b><span>pickup baseline</span></div>
-        <div class="stat good"><b>32.8%</b><span>relative gain</span></div>
+        <div class="stat"><b>22.00%</b><span>error · strong industry-standard baseline</span></div>
+        <div class="stat key"><b>14.79%</b><span>error · Novo Pulse</span></div>
+        <div class="stat good"><b>5 of 5</b><span>historical simulations won</span></div>
       </div>
-      <figure><img src="presentation_charts/06_temporal_validation_shock.png" alt="Temporal validation and the June 2025 shock"></figure>
+      <figure><img src="presentation_charts/06_temporal_validation_shock.png" alt="Five-fold temporal validation with the June 2025 shock"></figure>
     </div>
     <div class="notes-src">
-      <p>Our evaluation is not a random split. Five rolling-origin folds simulate what was knowable at each historical cutoff — 48,150 out-of-train predictions in total. The model beats the pickup baseline on all five folds, taking pooled WAPE from 22% to 14.79%: a 32.8% relative gain.</p>
-      <p>The orange bar is the important part. The May fold's target window overlaps the start of the Iran–Israel war on 13 June. Its WAPE is 27.22% and it alone produces 46.3% of total absolute error. <b>We did not remove it.</b> The 10.61% figure without that fold is a sensitivity diagnostic, not the official score.</p>
-      <p>On events: the war is not a model feature — a sudden shock was not knowable at forecast time. Schedulable events stay out until we have an official, year-by-year, geographic, versioned calendar; lunar dates shift every year.</p>
-      <p class="avoid"><b>Do not say:</b> Iran–US war (the artifact records Iran–Israel) · that fold overlap proves a causal effect · that 10.61% is the official score.</p>
-      <p><b>Transition:</b> One overall WAPE still is not enough — confidence changes with distance to check-in.</p>
+      <p>We did not test this by splitting data randomly. We replayed five moments in history and asked: standing here, knowing only what was knowable then, what happens next? That is 48,150 predictions the model never saw during training.</p>
+      <p>Against a strong baseline at 22% error, we are at <b>14.79%</b> — roughly a third less error — and we win on <b>all five</b> tests, not on average.</p>
+      <p>One test is much worse: the orange bar, at 27.22%. Its window overlaps the start of the June 2025 Iran–Israel war, and it alone produces 46.3% of our total error. <b>We kept it in the score.</b> Without it we would report 10.61% — we do not, because deleting your worst week is how you get a number nobody should trust.</p>
+      <p class="avoid"><b>Do not say:</b> Iran–US war · that the overlap proves causation · that 10.61% is the official score.</p>
+      <p><b>Transition:</b> That decision is not an accident — it is the thing that makes us different.</p>
     </div>
   </section>
 
-  <!-- 6 ───────────────────────────────────────────── -->
+  <!-- 5 · DIFFERENTIATION ─────────────────────────── -->
   <section class="slide">
-    <div class="eyebrow">Decision guardrail</div>
-    <h1>Confidence is a function of lead time</h1>
+    <div class="eyebrow">What makes this different</div>
+    <h1>Three times we chose the <em>honest</em> number over the better-looking one</h1>
     <div class="body">
-      <figure><img src="presentation_charts/04_lead_time_risk.png" alt="Lead-time risk — observed share and WAPE by horizon"></figure>
-      <div class="rule">D1–7 execute carefully · D8–21 monitor · D22–30 prioritise only</div>
+      <div class="proof">
+        <div class="pr"><b>We kept our worst week in the score</b>
+          <span>Removing the war-overlap window would have shown <i>10.61%</i> instead of <i>14.79%</i>. We report the number that includes the regime we cannot predict.</span></div>
+        <div class="pr"><b>We built a better model and threw it away</b>
+          <span>Clustering made the score look 2% better. We checked: <i>89.8%</i> of that gain was an accounting artefact, not real accuracy. Real gain was <i>0.21%</i> — below our pre-declared bar, so it did not ship.</span></div>
+        <div class="pr"><b>The forecast tells you when not to trust it</b>
+          <span>One day out, error is <i>2.2%</i>. Thirty days out, <i>37.5%</i>. So the product ships a usage rule, not one number: <i>D1–7 act · D8–21 monitor · D22–30 prioritise only</i>.</span></div>
+      </div>
     </div>
     <div class="notes-src">
-      <p>Accuracy is not one constant. At D1 roughly 90% of demand in the current grid is already observed and historical WAPE is about 2.2%. At D30 only 7.5% is observed and WAPE reaches 37.5%. So a near-term forecast can enter tactical review, while a far-out forecast is for ranking and scenario planning — not a firm budget or capacity commitment. The product itself should surface that difference rather than attaching one confidence level to every date.</p>
-      <p><b>Transition:</b> And it is not only time — the scale of demand changes the kind of risk too.</p>
+      <p>Anyone can show you a good number. What should make you trust a team is what they do when the number could be made to look better.</p>
+      <p><b>One.</b> We kept the war week. It costs us four points of headline accuracy.</p>
+      <p><b>Two.</b> We built a clustering model that pooled low-data destinations, and the score improved. Then we checked whether the improvement was real — when you merge rows, positive and negative errors cancel out and the metric flatters you for free. 89.8% of the gain was exactly that. The genuine modelling gain was 0.21%, below the 2% bar we set <i>before</i> running it. So we dropped it, and kept city-level detail the business actually needs.</p>
+      <p><b>Three.</b> Most forecasts hand you one number with no instructions. Ours states where it is reliable and where it is only a ranking signal.</p>
+      <p><b>Transition:</b> In that spirit — here is exactly where we are strong and where we are not.</p>
     </div>
   </section>
 
-  <!-- 7 ───────────────────────────────────────────── -->
+  <!-- 6 · STRENGTHS / LIMITS ──────────────────────── -->
   <section class="slide">
-    <div class="eyebrow">Nuance</div>
-    <h1>Percentage error and business exposure are different</h1>
+    <div class="eyebrow">Honest assessment</div>
+    <h1>What is solid, and what is not</h1>
+    <div class="body">
+      <div class="split">
+        <div class="col win">
+          <h3>Solid</h3>
+          <ul>
+            <li>Beats the baseline on <b>5 of 5</b> historical tests</li>
+            <li>Cannot read the future — enforced by design, proven by <b>17</b> adversarial tests</li>
+            <li>Forecast can never fall below observed reality</li>
+            <li>Output validated: <b>9,630</b> rows, zero duplicates, negatives or violations</li>
+            <li>Every number traceable to a file and a checksum</li>
+          </ul>
+        </div>
+        <div class="col gap">
+          <h3>Not yet</h3>
+          <ul>
+            <li><b>7 provinces</b> in the data, not all of Iran</li>
+            <li>No booking, revenue, inventory or conversion data — so <b>no financial claim</b></li>
+            <li>No holiday or event feature; lunar dates need a real calendar</li>
+            <li>Quiet destinations stay hard: <b>64.6%</b> error where nothing is observed yet</li>
+            <li>Five tests give a wide range: <b>9.8%–22.2%</b></li>
+          </ul>
+        </div>
+      </div>
+      <div class="rule"><b>Search interest is not booking.</b> We forecast intent — earlier than booking data can show it.</div>
+    </div>
+    <div class="notes-src">
+      <p>On the left, what we would defend in front of any reviewer. The leakage guarantee matters most: the model structurally cannot read information from after its decision point, and we prove it by corrupting all future data and requiring identical output.</p>
+      <p>On the right, the real limits. The most important one for this room: <b>we have no booking, revenue or inventory data</b>, so we cannot make a financial claim, and we will not pretend otherwise. Quiet destinations are still hard. And five tests is not enough to claim precision — our honest range is 9.8% to 22.2%.</p>
+      <p>If someone asks "so how much revenue does this bring?" — the answer is: none by itself, and anyone who tells you search data alone proves revenue is selling you something. What we have is an intent signal, roughly a month earlier than booking data would show it.</p>
+      <p><b>Transition:</b> Which is exactly what defines the next step.</p>
+    </div>
+  </section>
+
+  <!-- 7 · WHAT'S POSSIBLE + CLOSE ─────────────────── -->
+  <section class="slide">
+    <div class="eyebrow">What this unlocks</div>
+    <h1>Usable today — and four tables from a revenue decision</h1>
+    <div class="body">
+      <div class="now">
+        <div class="stage a">
+          <h3>Working today</h3>
+          <div class="when">No new data</div>
+          <ul>
+            <li><b>Destination review queue</b> — 11 to look at, not 321</li>
+            <li><b>Momentum alerts</b> — pickup running ahead of a destination's own history</li>
+            <li><b>Confidence policy</b> by lead time</li>
+            <li><b>Peak-night planning</b> across 30 nights</li>
+          </ul>
+        </div>
+        <div class="stage b">
+          <h3>One data join away</h3>
+          <div class="when">Needs 4 tables</div>
+          <ul>
+            <li>Booking · Inventory · Conversion · Campaign spend</li>
+            <li>→ <b>Revenue-weighted</b> priorities instead of volume</li>
+            <li>→ <b>Real supply-gap</b> detection, not a proxy</li>
+            <li>→ Campaign timing measured against outcome</li>
+          </ul>
+        </div>
+        <div class="stage c">
+          <h3>How we would prove it</h3>
+          <div class="when">4-week pilot</div>
+          <ul>
+            <li>Week 1 — baseline current review time</li>
+            <li>Week 2 — run in shadow mode</li>
+            <li>Weeks 3–4 — measure review time and correction rate</li>
+            <li>Target: <b>−20%</b> median review time, no rise in reversed decisions</li>
+          </ul>
+        </div>
+      </div>
+      <div class="rule">Novo Pulse is an early, auditable, segment-aware forecast that also shows <b>the boundary of its own confidence</b>.</div>
+    </div>
+    <div class="notes-src">
+      <p>Three honest tiers. <b>Left:</b> what works today with zero new data — the review queue, momentum alerts, the confidence policy, peak-night planning.</p>
+      <p><b>Middle:</b> what one data join unlocks. We know exactly which four tables: booking, inventory, conversion, campaign spend. Join them at destination-by-night level and volume priorities become revenue priorities, and the supply proxy becomes real gap detection.</p>
+      <p><b>Right:</b> we would not ask you to believe it — we would run a four-week pilot. Baseline the current review time, run in shadow, then measure. Target: 20% less median review time with no increase in reversed decisions. That is a proposed target, not a result we are claiming.</p>
+      <p><b>Closing line — say it exactly, then stop:</b> Novo Pulse is an early, auditable, segment-aware forecast that also shows the boundary of its own confidence.</p>
+    </div>
+  </section>
+
+  <!-- 8 · BACKUP ──────────────────────────────────── -->
+  <section class="slide">
+    <div class="eyebrow">Backup · only if asked</div>
+    <h1>Why we dropped the more sophisticated model</h1>
     <div class="body">
       <div class="stats">
-        <div class="stat"><b>55.5%</b><span>Low demand WAPE · MAE ≈ 2 searches</span></div>
-        <div class="stat"><b>12.6%</b><span>Peak demand WAPE · MAE ≈ 5.9K searches</span></div>
-      </div>
-      <figure><img src="presentation_charts/05_demand_regime_accuracy.png" alt="Accuracy by demand regime"></figure>
-    </div>
-    <div class="notes-src">
-      <p>An overall WAPE can hide two different risks. In the low-demand half the denominator is tiny, so WAPE looks like 55.5% while MAE is about two searches. In the top 1% WAPE is better at 12.6%, but MAE is close to 5.9 thousand searches and the business exposure is far larger. So for decisions we read WAPE alongside bias, MAE, sample size and actual volume. The same breakdown is filterable by province, weekday and observation state in the dashboard.</p>
-      <p><b>Transition:</b> Put scale, momentum and confidence together and the forecast becomes two concrete workflows.</p>
-    </div>
-  </section>
-
-  <!-- 8 ───────────────────────────────────────────── -->
-  <section class="slide">
-    <div class="eyebrow">Business action</div>
-    <h1>One forecast, two review workflows</h1>
-    <div class="body">
-      <div class="cards">
-        <div class="card"><h3>Growth Review</h3><p>High demand + faster-than-expected pickup</p></div>
-        <div class="card"><h3>Supply Review</h3><p>High demand + high remaining share</p></div>
-      </div>
-      <figure><img src="presentation_charts/03_growth_supply_opportunities.png" alt="Growth and supply opportunities"></figure>
-      <div class="rule">Review signal <em>≠</em> automatic spend or proof of shortage</div>
-    </div>
-    <div class="notes-src">
-      <p>In Growth, the top right holds destinations with both high demand and pickup running faster than their own history — first in line for content and campaign-calendar review. In Supply, destinations with high demand and a high remaining share are first for inventory and host-acquisition review. But search alone does not prove conversion, revenue or shortage. A financial decision needs booking, available inventory, margin and campaign exposure joined at this same grain.</p>
-      <p>In two days we went from data validation and trainset construction to a final forecast, rolling-origin evaluation, calibration, lead-time and demand-segment diagnostics, and an inspectable dashboard. The achievement is not only a better WAPE; it is a system that says where to look, how much demand is still unknown, and when not to over-trust the forecast. The next step is connecting booking and inventory data and testing this review queue in a controlled pilot.</p>
-      <p><b>Closing line — say it exactly:</b> Novo Pulse is an early, auditable, segment-aware forecast that also shows the boundary of its own confidence.</p>
-    </div>
-  </section>
-
-  <!-- A ───────────────────────────────────────────── -->
-  <section class="slide">
-    <div class="eyebrow appendix">Appendix A · only if asked</div>
-    <h1>Why city-level, not clustering</h1>
-    <div class="body">
-      <div class="stats">
-        <div class="stat"><b>89.8%</b><span>of the apparent gain was mechanical aggregation</span></div>
-        <div class="stat"><b>0.21%</b><span>true relative modelling gain — gate was 2%</span></div>
+        <div class="stat risk"><b>89.8%</b><span>of the apparent gain was mechanical, not real</span></div>
+        <div class="stat"><b>0.21%</b><span>genuine modelling gain — our bar was 2%</span></div>
       </div>
       <figure><img src="presentation_charts/07_clustering_gain_decomposition.png" alt="Clustering gain decomposition"></figure>
     </div>
     <div class="notes-src">
-      <p>We tested clustering to pool low-data cities. WAPE appeared to fall from 12.0168% to 11.7699% — but the aggregation control showed 89.8% of that drop was purely mechanical: merging rows lets positive and negative errors cancel before the absolute value is taken. The true relative modelling gain was only 0.21%, failing our pre-declared 2% gate. Since clustering also destroys city-level decision granularity, we kept the city-level model.</p>
-      <p class="avoid"><b>Essential caveat:</b> these are a three-fold uncalibrated sweep, comparable only within that experiment. Do not compare them to the final model's five-fold calibrated WAPE. If pressed: on five identical folds with identical calibration, city is 0.1479 and cluster is 0.1487 — clustering is still not better.</p>
-    </div>
-  </section>
-
-  <!-- B ───────────────────────────────────────────── -->
-  <section class="slide">
-    <div class="eyebrow appendix">Appendix B · only if asked</div>
-    <h1>What calibration actually improved</h1>
-    <div class="body">
-      <table>
-        <tr><th>Variant</th><th>WAPE</th><th>Bias</th><th>Outcome</th></tr>
-        <tr><td>Raw model</td><td class="num">15.51%</td><td class="num">−9.86%</td><td>—</td></tr>
-        <tr class="pick"><td><b>Guarded calibration</b></td><td class="num">14.79%</td><td class="num">−6.82%</td><td><b>selected</b></td></tr>
-        <tr class="reject"><td>Aggressive candidate</td><td class="num">17.22%</td><td class="num">−1.34%</td><td>rejected</td></tr>
-      </table>
-    </div>
-    <div class="notes-src">
-      <p>The goal was never to drive bias to zero at any cost. The aggressive candidate nearly eliminated bias but damaged WAPE, so the guardrail refused it. Guarded calibration was accepted only because it held or improved accuracy at the same time. Selection in the prequential setup uses only fully-closed earlier folds.</p>
-      <p><b>If asked whether raw and calibrated are two models:</b> no — the boosters are byte-identical. Calibration is post-processing applied to the remaining part only.</p>
-    </div>
-  </section>
-
-  <!-- C ───────────────────────────────────────────── -->
-  <section class="slide">
-    <div class="eyebrow appendix">Appendix C · only if asked</div>
-    <h1>Is the output valid?</h1>
-    <div class="body">
-      <div class="stats">
-        <div class="stat good"><b>9,630</b><span>rows = 321 cities × 30 nights</span></div>
-        <div class="stat good"><b>0</b><span>duplicates · negatives · floor violations</span></div>
-        <div class="stat"><b>8,352,768</b><span>total forecast demand</span></div>
-      </div>
-      <table>
-        <tr><th>Check</th><th>Result</th></tr>
-        <tr><td>Duplicate city × check-in keys</td><td class="num">0</td></tr>
-        <tr><td>Negative or NaN predictions</td><td class="num">0</td></tr>
-        <tr><td>Observed-floor violations</td><td class="num">0</td></tr>
-        <tr><td>Official file</td><td><code>artifacts/pol4/results.csv</code></td></tr>
-      </table>
-    </div>
-    <div class="notes-src">
-      <p><b>Critical distinction if a judge scores the file:</b> the 14.79% is five-fold historical backtest accuracy, not the measured accuracy of results.csv. The Azar window has no actuals in our data, so results.csv is unscored by construction. Our closest estimate of what a judge would measure is the same calendar window one year earlier: <b>12.17% WAPE, bias +0.8%</b>. Five-fold uncertainty is wide: 9.8%–22.2%.</p>
-      <p>Also useful: 32.2% of this file is already observed, so error on that portion is zero by construction. The forecast total is +23.1% year over year, which is conservative next to the two most recent comparable windows at +29.4% and +35.9%.</p>
-    </div>
-  </section>
-
-  <!-- D ───────────────────────────────────────────── -->
-  <section class="slide">
-    <div class="eyebrow appendix">Appendix D · only if asked</div>
-    <h1>What is not solved yet</h1>
-    <div class="body">
-      <ul class="plain">
-        <li>Only 7 provinces in the panel — not national coverage.</li>
-        <li>No booking, conversion, inventory, margin or campaign-exposure data.</li>
-        <li>No official versioned holiday / event feature in the model.</li>
-        <li>Lunar events need a year-by-year calendar with at least ±1 day uncertainty.</li>
-        <li>The war diagnostic is not causal; the model does not predict future shocks.</li>
-        <li>Five folds cannot establish significance for very small improvements.</li>
-        <li>Long-horizon and zero-observation slices remain the riskiest.</li>
-      </ul>
-    </div>
-    <div class="notes-src">
-      <p>These limitations are not hidden failures — they define the data contract for the next stage.</p>
+      <p>Clustering pools low-data destinations so each group has more signal. The score improved from 12.0168% to 11.7699%. But merging rows lets positive and negative errors cancel before the absolute value is taken — the metric improves even with an unchanged model. We measured that by taking the city model's own predictions and simply summing them onto the same groups: that alone captured 89.8% of the gain. Real modelling gain: 0.21%, against a 2% bar declared in advance.</p>
+      <p class="avoid"><b>Caveat:</b> those figures are a three-fold uncalibrated sweep, comparable only inside that experiment. If pressed — on five identical folds with identical calibration: city 0.1479 vs cluster 0.1487. Clustering is still not better.</p>
+      <p><b>If asked about results.csv accuracy:</b> 14.79% is five-fold historical backtest accuracy, not a measured score of the delivered file — the target window has no actuals yet. Closest estimate is the same calendar window a year earlier: 12.17%.</p>
     </div>
   </section>
 
@@ -396,7 +337,7 @@
 <div class="zone prev" id="zprev" title="Previous"></div>
 <div class="zone next" id="znext" title="Next"></div>
 <div class="bar" id="bar"></div>
-<div class="meta"><span id="count">1 / 12</span><kbd>←→</kbd><kbd>S notes</kbd><kbd>F full</kbd></div>
+<div class="meta"><span id="count">1 / 8</span><kbd>←→</kbd><kbd>S notes</kbd><kbd>F full</kbd></div>
 <div class="notes" id="notes"><h4>Speaker notes</h4><div id="notesBody"></div></div>
 
 <script>
@@ -408,7 +349,6 @@
   var count = document.getElementById('count');
   var i = 0, notesOn = false;
 
-  // lift each slide's .notes-src out of the flow
   var noteHTML = slides.map(function(s){
     var n = s.querySelector('.notes-src');
     if(!n) return '';
@@ -419,7 +359,7 @@
     slides.forEach(function(s,k){ s.classList.toggle('on', k===i); });
     bar.style.width = ((i+1)/slides.length*100) + '%';
     count.textContent = (i+1) + ' / ' + slides.length;
-    notesBody.innerHTML = noteHTML[i] || '<p>—</p>';
+    notesBody.innerHTML = noteHTML[i] || '&mdash;';
     // replaceState, not location.hash: a hash write pushes a history entry and
     // fires a navigation event, which makes arrow keys feel jumpy on some hosts.
     try{ history.replaceState(null, '', '#' + (i+1)); }catch(e){}
